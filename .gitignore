@@ -1,0 +1,6 @@
+__pycache__/
+.cache/
+saida/*_rascunho*
+saida/*_analise/
+saida/*.video.mp4
+saida/*.audio.f32

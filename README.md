@@ -1,0 +1,95 @@
+# Vídeo Neural
+
+Fábrica de vídeos verticais (TikTok/Reels) de **IA aprendendo sozinha**. Cada vídeo é uma
+simulação real: redes neurais evoluem por seleção natural, e o vídeo conta o que aconteceu,
+**sem inventar nenhum número**.
+
+```
+treino real  ->  roteiro tirado dos dados  ->  narração + legenda sincronizada  ->  holograma 2D + HUD  ->  MP4
+                         ^                                                                         |
+                         +------------------------ analistas (Claude) <--------------------------- +
+```
+
+## Episódios prontos
+
+| comando | o que é |
+|---|---|
+| `python gerar.py penalti` | **EP 04 · Pênalti**: 100 batedores x 100 goleiros co-evoluindo. Surgem paciência, leitura de corpo e finta. |
+| `python gerar.py foguete` | EP 01 · Foguete: de 0 a 84 de 150 pousos. |
+| `python gerar.py baliza` | EP 02 · Baliza: estacionar em paralelo entre dois carros. |
+
+Opções úteis: `--rascunho` (meia resolução, rápido), `--sem-voz` (só legenda), `--so-roteiro`,
+`--sementes 3,5,7` (treina várias e escolhe a melhor história), `--voz Fenrir`.
+
+Saída em `saida/`: o vídeo, `*_legenda.txt` (texto do post) e `*_analise/` (roteiro com tempos,
+checagem da voz, quadros-chave e mosaico, que são o material dos analistas).
+
+## Instalação
+
+```bash
+sudo apt install ffmpeg libcairo2-dev   # ffmpeg + cairo (+ fontes Inter e JetBrains Mono)
+pip install -r requirements.txt
+export GEMINI_API_KEY=...                # só para a narração (TTS); sem ela o vídeo sai só com legenda
+```
+
+**Custos:** a única API usada é o **TTS do Gemini**, só para a voz. Transcrição e sincronia da legenda
+usam o **Whisper local** (faster-whisper, grátis). A análise dos vídeos é feita pelos analistas do Claude Code.
+
+## Como a base funciona (para fazer QUALQUER vídeo)
+
+```
+neuralab/
+  rede.py, evolucao.py, coevolucao.py   redes neurais + algoritmo genético (1 ou 2 populações)
+  desafios/        simulações: foguete, baliza, penalti (física simples, vetorizada em numpy)
+  palco/           MOTOR 2D HOLOGRÁFICO + HUD (genéricos, não sabem qual é o desafio)
+    holo.py          câmera 2D (zoom, giro, tremida) + primitivas neon: linha, forma, rastro, cone,
+                     pulso, partículas, brilho; mistura aditiva e bloom real
+    arte.py          artes prontas: avatar (pessoa vista de cima, pose em pé <-> mergulho), bola,
+                     carro de cima, foguete de lado, explosão, placa holográfica, cotas, poeira,
+                     aberração cromática e varredura
+    kit.py           HUD: painéis de vidro, medidores, linha do tempo, console, rede neural,
+                     moldura de câmera, cartão de descoberta, replay, telestrador, legenda, gráficos
+  adaptadores/     a ÚNICA parte específica de cada vídeo: "o que desenhar no instante t"
+  roteiros/        cenas + falas montadas a partir dos dados (com checagens de honestidade)
+  video.py         MOTOR DE VÍDEO: narração, sincronia, câmera lenta, HUD, áudio, exportação
+  audio.py         voz (Gemini TTS em uma chamada só), trilha, efeitos (torcida, chute, rede...)
+  fala.py          Whisper local: alinhamento palavra a palavra e checagem da pronúncia
+ferramentas/ver_video.py   "assiste" qualquer vídeo: quadros, mosaico, cortes, transcrição
+.claude/agents/            analistas (roteiro, narração, visual, retenção, engajamento, diretor)
+```
+
+### Receita para um vídeo novo
+
+1. **Simulação** em `neuralab/desafios/` (uma classe com `observa()`, `passo()`, `aptidao()`).
+   Para dois lados, siga `penalti.py` + `coevolucao.py`.
+2. **Adaptador** em `neuralab/adaptadores/` herdando de `AdaptadorPopulacao` (ou `Adaptador`):
+   `camera()` (uma `Camera2D`), `desenha()` (monte a cena com `h.linha`, `h.forma`, `R.avatar`,
+   `R.veiculo_topo`, `R.foguete_lado`...),
+   `ponto()` (alvos do telestrador). O resto (HUD, medidores, rede, som) já vem pronto.
+   `adaptadores/baliza.py` tem ~95 linhas.
+3. **Roteiro** em `neuralab/roteiros/`: uma lista de cenas (dicionários).
+   ```python
+   dict(tipo="replay", ger=126, foco=1, fala="O corpo mostra um canto. A bola vai no outro.",
+        marcas=[{"tipo": "circulo", "em": 1.2, "alvo": "goleiro", "texto": "CAIU!"}],
+        cartao={"numero": 4, "rotulo": "BATEDOR", "nome": "A FINTA", "stat": "FINTAS QUE VIRAM GOL 89%", "cor": AMARELO})
+   ```
+   Tipos: `ao_vivo` (geração inteira), `replay` (um lance em câmera lenta), `grafico`, `barras`, `final`.
+   O motor ajusta durações pela voz, a velocidade da simulação e a câmera lenta automaticamente.
+4. Registre em `gerar.py`.
+
+## Analistas (Claude Code)
+
+Ficam em `.claude/agents/` e rodam com o seu plano do Claude (sem API extra):
+
+| analista | quando | olha |
+|---|---|---|
+| `analista-roteiro` | antes de renderizar | gancho, loops abertos, viradas, clareza, honestidade dos números |
+| `analista-narracao` | depois do áudio | voz x roteiro (Whisper), ritmo, pausas, pronúncia |
+| `analista-visual` | rascunho | legibilidade, zonas seguras do TikTok, clareza da ação, acabamento |
+| `analista-retencao` | rascunho | curva de retenção estimada, pontos de deslize, cortes |
+| `analista-engajamento` | antes de publicar | motivo para comentar/compartilhar/seguir, legenda e hashtags |
+| `diretor` | tudo | orquestra os cinco e só aprova com todas as notas >= 8 |
+
+No Claude Code: *"use o diretor para revisar o episódio do pênalti"*.
+
+Veja também `docs/ANALISE_REFERENCIAS.md` (o que os vídeos de referência ensinam) e `docs/IDEIAS.md` (próximos episódios).
