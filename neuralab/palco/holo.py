@@ -198,6 +198,15 @@ class Holo:
         ctx.set_operator(cairo.OPERATOR_OVER)
         self.linha(pts, cor, larg, alfa, fechado=True)
 
+    def preenche(self, pts, cor, alfa=0.1):
+        """Só o preenchimento translúcido (sem borda): bloco cheio que não vira grade de contornos."""
+        ctx = self.ctx
+        ctx.set_operator(cairo.OPERATOR_ADD)
+        self._caminho(pts, True)
+        self._cor(cor, alfa)
+        ctx.fill()
+        ctx.set_operator(cairo.OPERATOR_OVER)
+
     def circulo(self, c, r, cor, alfa=1.0, larg=2.5, preenche=0.12, oclusor=False):
         k = np.linspace(0, 2 * math.pi, 40)
         self.forma(np.c_[c[0] + r * np.cos(k), c[1] + r * np.sin(k)], cor, alfa, larg, preenche, gradiente=False,

@@ -481,6 +481,24 @@ def tique(semente=0):
     return np.sin(2 * np.pi * 2400 * tt) * np.exp(-tt * 300) * 0.06
 
 
+def sirene(intensidade=1.0, semente=0):
+    """Viatura: dois tons alternados (curto, só para a captura)."""
+    m = int(0.9 * SR)
+    tt = np.arange(m) / SR
+    f = np.where((tt * 6).astype(int) % 2 == 0, 960, 720)
+    fase = 2 * np.pi * np.cumsum(f) / SR
+    s = (np.sin(fase) + 0.3 * np.sign(np.sin(fase))) * np.minimum(tt / 0.02, 1) * np.exp(-tt * 2.2)
+    return _lp(s, 3500) * 0.16 * intensidade
+
+
+def alerta(intensidade=1.0, semente=0):
+    """Bipe duplo de radar: 'avistado'."""
+    m = int(0.22 * SR)
+    tt = np.arange(m) / SR
+    s = np.sin(2 * np.pi * 1760 * tt) * (((tt < 0.07) | ((tt > 0.11) & (tt < 0.18))) * 1.0) * np.exp(-tt * 6)
+    return s * 0.1 * intensidade
+
+
 def torcida(dur, semente=0):
     """Murmúrio contínuo de estádio com ondas lentas."""
     n = int(dur * SR)
@@ -493,7 +511,7 @@ def torcida(dur, semente=0):
 
 SONS = {"boom": boom, "batida": batida, "chute": chute, "rede": rede, "defesa": defesa, "fora": fora,
         "glitch": lambda i, k: glitch(k), "tique": lambda i, k: tique(k), "whoosh": lambda i, k: whoosh(k),
-        "ding": lambda i, k: ding(i > 1)}
+        "ding": lambda i, k: ding(i > 1), "sirene": sirene, "alerta": alerta}
 
 
 def mixa(dur, falas, eventos, semente=0, ambiente=None, musica=0.55):

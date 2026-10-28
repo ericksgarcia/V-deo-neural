@@ -16,9 +16,9 @@ import numpy as np
 
 from neuralab.video import Video
 
-DESAFIOS = ("penalti", "foguete", "baliza")
-GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260}
-EPISODIO = {"foguete": 1, "baliza": 2, "penalti": 4}
+DESAFIOS = ("penalti", "foguete", "baliza", "policia")
+GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260, "policia": 200}
+EPISODIO = {"foguete": 1, "baliza": 2, "penalti": 4, "policia": 5}
 
 
 def treino_penalti(G, sementes):
@@ -36,6 +36,25 @@ def treino_penalti(G, sementes):
         ev = eventos(hist)
         nota = sum(ev[k] is not None for k in ("mira", "paciente", "leitura", "finta")) + 0.1 * ev["ciclos"]
         print(f"  semente {s}: acontecimentos detectados {nota:.1f}")
+        if melhor is None or nota > melhor[0]:
+            melhor = (nota, s, hist)
+    return melhor[1], melhor[2]
+
+
+def treino_policia(G, sementes):
+    from neuralab.perseguicao import treina
+    melhor = None
+    for s in sementes:
+        arq = os.path.join(".cache", f"policia_v3_{G}_{s}.npz")
+        if os.path.exists(arq):
+            hist = dict(np.load(arq))
+        else:
+            print(f"treinando polícia e ladrão (semente {s}, {G} gerações)…")
+            hist = treina(G, semente=s, log=None)
+            np.savez_compressed(arq, **hist)
+        m = lambda c: np.convolve(hist["m_" + c], np.ones(7) / 7, "valid")
+        nota = float(m("preso")[-20:].mean() + 0.3 * m("diamantes")[-20:].mean() + 0.5 * m("rouba_oculto").mean())
+        print(f"  semente {s}: presos no fim {m('preso')[-1]:.0%}, nota {nota:.2f}")
         if melhor is None or nota > melhor[0]:
             melhor = (nota, s, hist)
     return melhor[1], melhor[2]
@@ -87,6 +106,13 @@ def main():
         sementes = [int(x) for x in (a.sementes or "3").split(",")]
         s, hist = treino_penalti(G, sementes)
         A = Penalti(hist)
+        cenas, info, post, _ = monta(hist, A)
+    elif a.desafio == "policia":
+        from neuralab.adaptadores.policia import Policia
+        from neuralab.roteiros.policia import monta
+        sementes = [int(x) for x in (a.sementes or "7").split(",")]
+        s, hist = treino_policia(G, sementes)
+        A = Policia(hist)
         cenas, info, post, _ = monta(hist, A)
     else:
         from neuralab.adaptadores.baliza import Baliza
