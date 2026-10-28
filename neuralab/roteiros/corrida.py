@@ -159,7 +159,8 @@ def monta(hist, A):
          fala=f"Começou do zero. Sem aula, sem piloto. Só tentativa e erro… <short pause> e {milhar(batidas_ate)} batidas.")
 
     if t_ini and t_fim and t_ini - t_fim > 1.0:
-        itens = [("1º TERMINAR", t_ini, VERMELHO), ("GERAÇÃO FINAL", t_fim, VERDE)]
+        itens = [(f"GER {gs + 1}", 1.0, VERMELHO, f"{t_ini:.1f} s".replace(".", ",")),
+                 (f"GER {gf + 1}", t_fim / t_ini, VERDE, f"{t_fim:.1f} s".replace(".", ","))]
         cena(tipo="barras", grupo="tempo", ger=gf, itens=itens, titulo="MELHOR TEMPO · 2 VOLTAS",
              sub="segundos do carro mais rápido", log=[(f"{t_ini:.1f}s → {t_fim:.1f}s".replace(".", ","), VERDE)],
              fala=f"E o carro mais rápido? Baixou de {t_ini:.1f} para {t_fim:.1f} segundos.".replace(".", ","))

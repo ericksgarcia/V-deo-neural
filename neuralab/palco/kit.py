@@ -696,7 +696,9 @@ def barras(ctx, ret, itens, titulo, sub, progresso, destaque=None, atual=None, c
     bx = x + (250 if n > 3 else 330)
     bw = 560 if n > 3 else 480
     topo = y + 210 + max(0, (h - 260 - alt * n) / 2 - 40)    # poucas barras: centraliza no painel
-    for k, (rot, v, c) in enumerate(itens):
+    for k, it in enumerate(itens):
+        rot, v, c = it[:3]
+        txt = it[3] if len(it) > 3 else None   # texto do valor (ex.: segundos); senão, a porcentagem
         yy = topo + k * alt
         p = suave(progresso * 1.5 - k * 0.07)
         dest, at = destaque == k, atual == k
@@ -710,7 +712,7 @@ def barras(ctx, ret, itens, titulo, sub, progresso, destaque=None, atual=None, c
         ctx.fill()
         if dest:
             brilho(ctx, bx + bw * v * p, yy + alt / 2, 50, cc, 0.7 * a)
-        texto(ctx, f"{v * p * 100:.0f}%", bx + bw * v * p + 14, yy + alt * 0.66, fs + 6, cc if (dest or at) else "texto",
+        texto(ctx, txt if (txt and p > 0.95) else ("" if txt else f"{v * p * 100:.0f}%"), bx + bw * v * p + 14, yy + alt * 0.66, fs + 6, cc if (dest or at) else "texto",
               a, familia=MONO_B)
         if dest:
             texto(ctx, rotulo_destaque, bx + bw * v * p + 110, yy + alt * 0.66, 30, cc, a, familia=MONO_B)
