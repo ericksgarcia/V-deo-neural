@@ -125,14 +125,6 @@ def monta(hist, A):
          carimbo={"texto": f"CAÍRAM {c0} DE {n}", "cor": VERMELHO, "em": 0.5, "sub": "GERAÇÃO 1"},
          fala=("E aí? Quantos você acha que caíram? <long pause> Todos." if c0 == n else
                f"E aí? Quantos você acha que caíram? <long pause> {c0} de {n}."))
-    r0 = A.rodada(0)
-    est0 = r0.reg["estado"][:, -1]
-    caiu = [k for k in np.argsort(r0.morte) if r0.morte[k] >= 0 and est0[k] == FALHA]
-    if len(caiu) >= 3:
-        pick = [caiu[int(i)] for i in np.linspace(len(caiu) * 0.15, len(caiu) * 0.85, 3)]
-        cena(tipo="montagem", clipes=[(0, int(k)) for k in pick], destaques=D,
-             log=[("CAIU. CAIU. CAIU.", VERMELHO)], fala="Caiu. <short pause> Caiu. <short pause> Caiu.")
-
     # ---------------------------------------------------------------- A REGRA
     g_sel = min(4, G - 1)
     cena(tipo="ao_vivo", ger=g_sel, log=[("OS QUE VÃO MAIS LONGE SÃO COPIADOS", VERDE), ("OS QUE CAEM CEDO SAEM", VERMELHO),
@@ -147,7 +139,7 @@ def monta(hist, A):
     m_s = float(r_s.morte[k_s]) * r_s.dt
     c_s = corr_pernas(r_s, k_s)
     jeito = ("alternando as pernas" if c_s < -0.3 else "com as pernas quase juntas" if c_s > 0.5
-             else "de um jeito torto")
+             else "ainda sem alternar as pernas")
     marcas_s = [{"tipo": "circulo", "em": max(m_s - 0.8, 0), "alvo": "alvo", "texto": "CHEGOU!", "rx": 90, "ry": 110,
                  "desloca": (0, -110)}]
     cena(tipo="replay", ger=gs, foco=k_s, marcas=marcas_s,
@@ -174,27 +166,13 @@ def monta(hist, A):
                       "Um passo de cada vez.")
             marcos.append((g_alt, "PASSO", AMARELO))
 
-    # ---------------------------------------------------------------- HERANÇA (montagem real)
-    gens = sorted(set([gs] + list(np.linspace(gs, melhor_g, 5).astype(int)[1:])))
-    clipes = []
-    for g in gens:
-        k = A.busca(A.rodada(g), "primeiro")
-        if k is not None:
-            clipes.append((g, k))
-    if len(clipes) >= 3:
-        cena(tipo="montagem", clipes=clipes[:4], log=[("OS PRÓXIMOS COPIAM ESSE JEITO", BRANCO)],
-             fala="Os robôs seguintes herdam esse jeito. <short pause> E vão melhorando, rodada após rodada.")
-
     # ---------------------------------------------------------------- O NÚMERO FINAL + O GRÁFICO
-    cena(tipo="ao_vivo", ger=melhor_g, log=[(f"GER {melhor_g + 1:03d} · {fin_s}/{n} CHEGAM", VERDE)],
-         carimbo={"texto": f"{fin_s} DE {n}", "cor": VERDE, "em": 0.5, "sub": "CRUZAM A LINHA SOZINHOS"},
-         fala=f"Geração {melhor_g + 1}. <short pause> De {n} robôs, {fin_s} cruzam a linha sozinhos."
-              + (" <short pause> Mais da metade." if fin_s > n / 2 else ""))
     serie = suc / n
     cena(tipo="grafico", grupo="grafico", serie=serie, titulo="% QUE CHEGA",
          eras=[(gs, G - 1, "APRENDENDO", VERDE)], rotulo_y="ROBÔS QUE CHEGAM POR GERAÇÃO",
-         final=pct(float(serie[melhor_g])), log=[(f"{milhar(quedas_ate)} QUEDAS NO TOTAL", VERMELHO)],
-         fala=f"Começou do zero. Sem professor, sem programação. Só tentativa e erro… <short pause> e {milhar(quedas_ate)} quedas.")
+         final=pct(float(serie[melhor_g])), log=[(f"GER {melhor_g + 1:03d} · {fin_s}/{n} CHEGAM", VERDE), (f"{milhar(quedas_ate)} QUEDAS NO TOTAL", VERMELHO)],
+         fala=f"Geração {melhor_g + 1}: de {n} robôs, {fin_s} cruzam a linha sozinhos. <short pause> "
+              f"Do zero, sem programação… e {milhar(quedas_ate)} quedas.")
 
     # ---------------------------------------------------------------- A VIRADA: o gelo
     if tem_virada:
