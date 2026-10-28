@@ -10,7 +10,17 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
    Para cada um: gancho em uma frase, vista 2D, se tem dois lados, a "descoberta" que pode surgir,
    esforço (reaproveita adaptador existente ou exige simulação nova). Dê uma recomendação.
 3. Use `AskUserQuestion` para o usuário escolher. Só então implemente (receita no README) e gere.
-4. Depois de gerar, rode os analistas (`diretor`) e corrija antes de entregar.
+4. **Ordem obrigatória (analisar ANTES de renderizar):** `--so-roteiro` -> analistas de roteiro e engajamento
+   (texto, gancho, retenção, CTA) -> ajustar -> **uma** voz (`--so-voz`) -> rascunho `--rascunho --sem-voz` só
+   para conferir o visual -> corrigir -> render final. Nunca renderize o final antes de aprovar o roteiro.
+
+## Economia de tokens (sem perder qualidade)
+
+- Passe aos analistas só o roteiro (texto + fatos reais), não o código; peça resposta curta e objetiva.
+- Rode só os analistas que o estágio precisa (roteiro/engajamento antes; visual/retenção no rascunho);
+  `diretor` completo só no fim, uma vez.
+- Não releia arquivos já lidos nem imprima logs longos (`tail`); treino e TTS ficam em `.cache/` (reuse).
+- Renders longos em segundo plano, sem polling; um único rascunho por rodada de correções.
 
 ## Ao entregar QUALQUER vídeo
 
