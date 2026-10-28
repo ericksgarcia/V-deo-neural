@@ -66,20 +66,72 @@ def por_extenso(n):
     return pre + (" e " if r < 100 or r % 100 == 0 else " ") + por_extenso(r)
 
 
-def falavel(texto):
-    return re.sub(r"\d{1,3}(?:\.\d{3})+|\d+", lambda m: por_extenso(int(m.group().replace(".", ""))), texto)
+def falavel(texto, tags=False):
+    """Texto como a voz deve dizer: números por extenso, siglas expandidas. As tags de evento (<short pause>...)
+    são removidas, exceto quando `tags=True` (roteiro enviado ao TTS)."""
+    if not tags:
+        texto = re.sub(r"<[^>]+>", " ", texto)
+    texto = re.sub(r"\bIA\b", "inteligência artificial", texto)
+    texto = re.sub(r"\d{1,3}(?:\.\d{3})+|\d+", lambda m: por_extenso(int(m.group().replace(".", ""))), texto)
+    return texto.replace("%", " por cento")
 
 
-def _tts(texto, voz, modelo):
-    corpo = {"contents": [{"parts": [{"text": texto}]}],
+class CotaEsgotada(RuntimeError):
+    """A voz já usou as requisições permitidas (limite local ou recusa da API)."""
+
+
+LIMITE_REQUISICOES = 10          # por voz, a cada 24 h (cota da conta)
+VOZES_RESERVA = ["Orus", "Fenrir", "Puck", "Iapetus", "Algenib", "Enceladus"]
+
+
+def _uso_arq(cache):
+    return os.path.join(cache, "uso.json")
+
+
+def _usos(cache, voz):
+    """Requisições reais já feitas com esta voz nas últimas 24 h (registradas por este projeto)."""
+    import time
+    try:
+        regs = json.load(open(_uso_arq(cache)))
+    except Exception:
+        regs = []
+    agora = time.time()
+    return [r for r in regs if r["voz"] == voz and agora - r["t"] < 24 * 3600]
+
+
+def _registra_uso(cache, voz, modelo):
+    import time
+    try:
+        regs = json.load(open(_uso_arq(cache)))
+    except Exception:
+        regs = []
+    regs.append({"t": time.time(), "voz": voz, "modelo": modelo})
+    json.dump(regs, open(_uso_arq(cache), "w"))
+
+
+def _tts(texto, voz, modelo, style=None):
+    """UMA requisição ao TTS. Gemini 3.8: o texto é um roteiro literal (tudo é falado, exceto tags em inglês
+    <assim>); estilo e ritmo vão em speechMetadata.style, ao lado do texto. Sem tentativas automáticas:
+    cada chamada gasta cota."""
+    parte = {"text": texto}
+    if style:
+        parte["speechMetadata"] = {"style": style}
+    corpo = {"contents": [{"parts": [parte]}],
              "generationConfig": {"responseModalities": ["AUDIO"],
                                   "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voz}}}}}
     url = API.format(modelo)
     if os.environ.get("GEMINI_API_KEY"):
         url += "?key=" + os.environ["GEMINI_API_KEY"]
     req = urllib.request.Request(url, json.dumps(corpo).encode(), {"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=300) as r:
-        parte = json.load(r)["candidates"][0]["content"]["parts"][0]["inlineData"]
+    try:
+        with urllib.request.urlopen(req, timeout=300) as r:
+            resp = json.load(r)
+    except urllib.error.HTTPError as e:
+        detalhe = e.read().decode("utf-8", "ignore")[:300]
+        if e.code == 429 or "RESOURCE_EXHAUSTED" in detalhe:
+            raise CotaEsgotada(f"cota da voz {voz} esgotada: {detalhe}")
+        raise RuntimeError(f"TTS falhou ({e.code}): {detalhe}")
+    parte = resp["candidates"][0]["content"]["parts"][0]["inlineData"]
     dados = base64.b64decode(parte["data"])
     if dados[:4] == b"RIFF":
         x, sr = _le_wav(dados)
@@ -106,48 +158,88 @@ def _silencios(x, minimo=0.25, limiar=0.02):
     return np.array(out)
 
 
-def narra_lote(falas, cache, voz="Charon", modelo="gemini-3.8-flash-tts", velocidade=1.0, tentativa=0,
-               ritmo=2.6, fator_min=0.72):
-    """Narra todas as falas numa ÚNICA chamada (mesmo timbre do início ao fim) e corta por fala.
+ESTILO_PADRAO = (
+    "You are a gripping, charismatic Brazilian Portuguese (pt-BR) storyteller narrating a short vertical video, "
+    "talking to one person like a friend who just discovered something amazing. Natural spoken Brazilian rhythm, "
+    "warm and confident. Pace: brisk and conversational, about three words per second; never rushed, never "
+    "dragging; slightly slower on key numbers. Open urgent and intriguing, as if sharing a secret; explain the "
+    "rules clearly and calmly with a hint of humor; build suspense before reveals; deliver surprises with real "
+    "surprise; end playful and direct, inviting the viewer to vote.")
 
-    O corte usa os tempos de cada palavra que o Whisper (local) ouve no áudio inteiro, alinhados
-    com o texto do roteiro; assim cada fala cai na cena certa.
 
-    Ritmo: a voz gerada acelera nas frases longas (chega a ~4 palavras/s) e arrasta nas curtas. Cada fala
-    mais rápida que `ritmo` (palavras faladas por segundo) é desacelerada até o alvo, sem passar de
-    `fator_min` (abaixo disso o áudio começa a soar artificial); as lentas ficam como estão.
+def narra_lote(falas, cache, voz="Charon", modelo="gemini-3.8-flash-tts", estilo=None, antes=None,
+               tts_textos=None, ritmo=3.2, faixa=(0.86, 1.14), reserva=True, forcar=False):
+    """Narra todas as falas com UMA ÚNICA requisição (mesmo timbre do início ao fim) e molda tudo localmente.
 
-    Devolve uma lista de áudios mono float32 a 48 kHz, ou None se a API não estiver disponível.
-    O texto vai puro: instruções de estilo no prompt acabam sendo lidas em voz alta."""
+    falas  : textos visíveis de cada cena (sem tags).
+    antes  : tags opcionais por cena (ex.: "<long pause>") inseridas ANTES da fala no roteiro enviado ao TTS.
+    A voz é cacheada por (modelo, voz, estilo, texto): o mesmo pedido nunca é repetido. Se a cota da voz
+    estiver esgotada, tenta as vozes de reserva (uma requisição em cada). Todo o resto é local: corte por cena
+    (palavras do Whisper), ritmo de cada fala para ~`ritmo` palavras/s (limitado a `faixa` de velocidade, sem
+    deixar a voz artificial) e volume igualado. Devolve áudios mono float32 a 48 kHz, ou None sem TTS."""
     os.makedirs(cache, exist_ok=True)
+    estilo = estilo or ESTILO_PADRAO
     textos = [falavel(f) for f in falas]
-    extra = f"|t{tentativa}" if tentativa else ""
-    base = hashlib.sha1(f"{modelo}|{voz}|{textos}{extra}".encode()).hexdigest()[:16]
-    final = os.path.join(cache, f"{base}_r{ritmo}_{fator_min}_{velocidade}.npz")
-    if os.path.exists(final):
-        z = np.load(final)
-        return [z[f"f{k}"] for k in range(len(falas))]
-    bruto = os.path.join(cache, base + "_bruto.npy")
-    if os.path.exists(bruto):
-        x = np.load(bruto)
-    else:
+    antes = antes or [""] * len(falas)
+    enviados = [falavel(f, tags=True) for f in (tts_textos or falas)]
+    roteiro = "\n\n".join((a + " " if a else "") + t for a, t in zip(antes, enviados))
+    vozes = [voz] + [v for v in VOZES_RESERVA if v != voz] if reserva else [voz]
+    x = None
+    for v in vozes:
+        base = hashlib.sha1(f"{modelo}|{v}|{estilo}|{roteiro}".encode()).hexdigest()[:16]
+        bruto = os.path.join(cache, base + "_bruto.npy")
+        if os.path.exists(bruto) and not forcar:
+            x, voz = np.load(bruto), v
+            break
+        if len(_usos(cache, v)) >= LIMITE_REQUISICOES:
+            print(f"  [cota] voz {v}: {LIMITE_REQUISICOES} requisições nas últimas 24 h; tentando outra voz")
+            continue
         try:
-            x = _apara(_tts("\n\n".join(textos), voz, modelo))
+            print(f"  [tts] 1 requisição ({modelo}, voz {v})")
+            _registra_uso(cache, v, modelo)
+            x = _apara(_tts(roteiro, v, modelo, estilo))
+        except CotaEsgotada as e:
+            print(f"  [cota] {e}")
+            continue
         except Exception as e:  # sem rede/chave: segue só com legendas
             print(f"  [aviso] TTS indisponível ({e}); usando só legenda")
             return None
         x = (0.9 * x / (np.abs(x).max() + 1e-6)).astype(np.float32)
         np.save(bruto, x)
+        voz = v
+        break
+    if x is None:
+        print("  [aviso] nenhuma voz disponível; usando só legenda")
+        return None
+    return _molda(x, falas, textos, ritmo, faixa, [("<" in t) for t in (tts_textos or falas)])
+
+
+def _molda(x, falas, textos, ritmo, faixa, com_pausas=None):
+    """Corta o áudio inteiro por fala e ajusta ritmo e volume de cada uma (tudo local, sem API).
+
+    Falas rápidas demais (> 1,1 x ritmo) são desaceleradas até lá. Falas lentas só são aceleradas se não
+    tiverem pausas dramáticas marcadas (as pausas baixam a média de propósito)."""
     partes = []
-    for t, p in zip(textos, _segmenta(x, falas)):
+    alvo_rms = None
+    com_pausas = com_pausas or [False] * len(falas)
+    for t, p, pausas in zip(textos, _segmenta(x, falas), com_pausas):
         palavras = len(t.split())
         vel = palavras / max(len(p) / SR, 1e-3)
-        fator = min(max(ritmo / vel, fator_min), 1.0) if vel > ritmo else 1.0
-        fator *= velocidade
-        if abs(fator - 1) > 1e-3:
+        fator = 1.0
+        if palavras >= 5:
+            if vel > ritmo * 1.1:
+                fator = float(np.clip(ritmo * 1.1 / vel, faixa[0], 1.0))
+            elif vel < ritmo * 0.9 and not pausas:
+                fator = float(np.clip(ritmo * 0.9 / vel, 1.0, faixa[1]))
+        if abs(fator - 1) > 0.015:
             p = _atempo(p, fator)
-        partes.append(p.astype(np.float32))
-    np.savez(final, **{f"f{k}": p for k, p in enumerate(partes)})
+        # volume: iguala o RMS das partes (trechos com voz) e limita o pico
+        voz_ = p[np.abs(p) > 0.02]
+        rms = float(np.sqrt(np.mean(voz_ ** 2))) if len(voz_) else 0.1
+        alvo_rms = alvo_rms or rms
+        p = p * (alvo_rms / max(rms, 1e-4))
+        pico = float(np.abs(p).max()) or 1.0
+        partes.append((p * min(1.0, 0.9 / pico)).astype(np.float32))
     return partes
 
 

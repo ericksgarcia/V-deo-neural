@@ -18,6 +18,7 @@ pergunta/opcoes (final).
 import json
 import math
 import os
+import re
 import subprocess
 import time
 
@@ -34,9 +35,14 @@ MIN_DUR = {"ao_vivo": 1.6, "replay": 2.0, "montagem": 2.4, "grafico": 2.4, "barr
 
 class Video:
     def __init__(self, adaptador, cenas, info, voz="Charon", escala=1.0, narrar=True, cache=".cache/tts",
-                 log=print):
+                 log=print, estilo=None, ritmo=3.2):
         self.A, self.cenas, self.info = adaptador, cenas, info
         self.voz, self.escala, self.narrar, self.cache, self.log = voz, escala, narrar, cache, log
+        self.estilo, self.ritmo = estilo or info.get("estilo_voz"), ritmo
+        for c in self.cenas:   # tags de pausa (<short pause>) vão só para a voz, nunca para a legenda
+            if "<" in c["fala"]:
+                c["fala_tts"] = c["fala"]
+                c["fala"] = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", c["fala"])).strip()
         self.fundo = K.Fundo()
         self.eventos = []
 
@@ -62,7 +68,7 @@ class Video:
                 ws = []
             c["palavras"] = fala.alinha(c["fala"], audio.falavel(c["fala"]), ws, dur_fala)
             c["fala_dur"] = dur_fala
-            c["dur"] = max(dur_fala + c.get("pausa", 0.35), MIN_DUR.get(c["tipo"], 2.0))
+            c["dur"] = max(dur_fala + c.get("pausa", 0.22), MIN_DUR.get(c["tipo"], 2.0))
             c["ini"] = t
             t += c["dur"]
         self.dur = t + 0.5
@@ -70,25 +76,21 @@ class Video:
         self._legendas()
         self._console()
 
-    def _narracao(self, textos, tentativas=3, minimo=0.85):
-        """Gera a voz e confere cada fala com o Whisper; se alguma sair errada, gera de novo
-        (até `tentativas` vezes) e fica com a versão cuja pior fala é a melhor."""
-        melhor = None
-        for n in range(tentativas):
-            vozes = audio.narra_lote(textos, self.cache, voz=self.voz, tentativa=n)
-            if vozes is None:
-                return None, None
-            ouvidos = [fala.transcreve(fala.para16k(a, audio.SR), idioma="pt")[1] for a in vozes]
-            notas = [fala.confere(tx, " ".join(w[2] for w in ws)) for tx, ws in zip(textos, ouvidos)]
-            rit = audio.ritmo_das_falas(textos, vozes)
-            pior = min(min(notas), 1.0 - max(0.0, max(rit) - 3.1) / 2)   # fala errada OU rápida demais
-            self.log(f"  narração (tentativa {n + 1}): pior fala {min(notas):.0%} (cena {int(np.argmin(notas))}), "
-                     f"ritmo {min(rit):.1f}-{max(rit):.1f} palavras/s")
-            if melhor is None or pior > melhor[0]:
-                melhor = (pior, vozes, ouvidos)
-            if pior >= minimo:
-                break
-        return melhor[1], melhor[2]
+    def _narracao(self, textos):
+        """Voz do episódio inteiro com UMA requisição ao TTS (sem tentativas: cada chamada gasta cota).
+        Depois, tudo é local: o Whisper confere cada fala e o motor só AVISA o que saiu torto."""
+        vozes = audio.narra_lote(
+            textos, self.cache, voz=self.voz, estilo=self.estilo, ritmo=self.ritmo,
+            antes=[c.get("antes", "") for c in self.cenas],
+            tts_textos=[c.get("fala_tts", c["fala"]) for c in self.cenas])
+        if vozes is None:
+            return None, None
+        ouvidos = [fala.transcreve(fala.para16k(a, audio.SR), idioma="pt")[1] for a in vozes]
+        notas = [fala.confere(tx, " ".join(w[2] for w in ws)) for tx, ws in zip(textos, ouvidos)]
+        rit = audio.ritmo_das_falas(textos, vozes)
+        self.log(f"  narração: pior fala {min(notas):.0%} (cena {int(np.argmin(notas))}), "
+                 f"ritmo {min(rit):.1f}-{max(rit):.1f} palavras/s")
+        return vozes, ouvidos
 
     def _tempos(self):
         """Converte tempo de vídeo em tempo de simulação para cada cena (com câmera lenta)."""

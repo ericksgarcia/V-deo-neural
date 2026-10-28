@@ -72,6 +72,9 @@ def main():
     ap.add_argument("--sem-voz", action="store_true")
     ap.add_argument("--rascunho", action="store_true", help="metade da resolução, para revisar rápido")
     ap.add_argument("--so-roteiro", action="store_true")
+    ap.add_argument("--so-voz", action="store_true",
+                    help="gera/carrega só a narração (1 requisição, depois cache) e mostra o relatório de ritmo")
+    ap.add_argument("--ritmo", type=float, default=3.2, help="palavras/s alvo de cada fala (ajuste local, sem API)")
     ap.add_argument("--saida", default="saida")
     a = ap.parse_args()
     os.makedirs(".cache", exist_ok=True)
@@ -105,7 +108,13 @@ def main():
     nome = f"ep{EPISODIO[a.desafio]:02d}_{a.desafio}{'_rascunho' if a.rascunho else ''}"
     with open(os.path.join(a.saida, nome + "_legenda.txt"), "w") as f:
         f.write(post + "\n")
-    v = Video(A, cenas, info, voz=a.voz, escala=0.5 if a.rascunho else 1.0, narrar=not a.sem_voz)
+    v = Video(A, cenas, info, voz=a.voz, escala=0.5 if a.rascunho else 1.0, narrar=not a.sem_voz, ritmo=a.ritmo)
+    if a.so_voz:
+        v.prepara()
+        for k, c in enumerate(v.cenas):
+            print(f"  {k:2d} {c['dur']:5.1f}s  {c['fala']}")
+        print(f"duração prevista: {v.dur:.1f}s")
+        return
     out = v.renderiza(os.path.join(a.saida, nome + ".mp4"))
     print(f"pronto: {out}  ({v.dur:.1f}s)\nanálise: {os.path.join(a.saida, nome + '_analise')}/")
 
