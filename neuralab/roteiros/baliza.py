@@ -131,21 +131,21 @@ def monta(hist, A):
                "desloca": (0, -80)}]
     cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas,
          titulo_gancho=[("A IA APRENDEU", BRANCO), ("A FAZER BALIZA", VERDE)],
-         fala="Essa IA aprendeu a fazer baliza sozinha.")
+         fala="Esse carro aprendeu a fazer baliza sozinho.")
     if tem_virada:
         cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas, pausa=0.2,
-             fala=f"Mas muda a posição inicial… e ela erra {erro_txt(1 - duro)}.")
+             fala=f"Mas se eu mudo o ponto de partida, ele erra {erro_txt(1 - duro)}.")
     else:
         cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas, pausa=0.2,
              fala="Ninguém ensinou como.")
 
     # ---------------------------------------------------------------- PREMISSA + GERAÇÃO 1 (com batidas de verdade)
     b0 = float(hist["m_bateu"][0])
-    cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"POPULAÇÃO: {n} CARROS", BRANCO), ("CÉREBROS ALEATÓRIOS", BRANCO)],
-         fala=f"{n} carros. Cérebros aleatórios. Só os melhores têm filhos.")
+    cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"{n} CARROS", BRANCO), ("CADA UM COM UMA IA QUE NÃO SABE NADA", BRANCO)],
+         fala=f"No começo, são {n} carros. Cada um é guiado por uma IA que não sabe nada: ela acelera e vira o volante ao acaso.")
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"GER 001 · BATERAM {pct(b0)}", VERMELHO)],
          carimbo={"texto": f"BATERAM {pct(b0)}", "cor": VERMELHO, "em": 0.5, "sub": "GERAÇÃO 1"},
-         fala=f"Geração um: {em_dez(b0)} batem." if b0 < 0.97 else "Geração um: todo mundo bate.")
+         fala=f"Resultado: {em_dez(b0)} batem." if b0 < 0.97 else "Resultado: todo mundo bate.")
     r0 = A.rodada(0)
     est0 = r0.reg["estado"][:, -1]
     caiu = [k for k in np.argsort(r0.morte) if r0.morte[k] >= 0 and est0[k] == 2]    # FALHA = 2
@@ -153,6 +153,14 @@ def monta(hist, A):
         pick = [caiu[int(i)] for i in np.linspace(len(caiu) * 0.15, len(caiu) * 0.85, 3)]
         cena(tipo="montagem", clipes=[(0, int(k)) for k in pick], destaques=D,
              log=[("BATEU. BATEU. BATEU.", VERMELHO)], fala="Bateu. Bateu. Bateu.")
+
+    # ---------------------------------------------------------------- A REGRA DO JOGO (explicada com calma)
+    g_sel = min(5, G - 1)
+    cena(tipo="ao_vivo", ger=g_sel, log=[("OS MELHORES SÃO COPIADOS", VERDE), ("OS PIORES SAEM", VERMELHO),
+                                         ("CADA RODADA = 1 GERAÇÃO", BRANCO)],
+         carimbo={"texto": "OS MELHORES FICAM", "cor": VERDE, "em": 0.4, "sub": "OS PIORES SAEM"},
+         fala="Aí vem a regra: a cada rodada, os carros que vão melhor são copiados, com pequenas mudanças. "
+              "Os piores saem. Cada rodada é uma geração.")
 
     # ---------------------------------------------------------------- CHEGA PERTO, MAS NINGUÉM ESTACIONA
     if ev["chega"] is not None and gs - ev["chega"] > 3:
@@ -163,8 +171,8 @@ def monta(hist, A):
              log=[(f"GER {g + 1:03d} · CHEGAM PERTO {pct(pe)}", AMARELO)],
              carimbo={"texto": f"{pct(pe)} CHEGAM PERTO", "cor": AMARELO, "em": 0.4,
                       "sub": "MAS NINGUÉM ESTACIONA" if ninguem else f"MAS {int(suc[g])} ESTACIONAM"},
-             fala=f"Geração {g + 1}: {em_dez(pe)} chegam perto da vaga… "
-                  + ("mas ninguém estaciona." if ninguem else f"mas só {int(suc[g])} estacionam."))
+             fala=f"Rodada após rodada, eles melhoram. Na geração {g + 1}, {em_dez(pe)} já chegam perto da vaga… "
+                  + ("mas nenhum consegue estacionar." if ninguem else f"mas só {int(suc[g])} conseguem estacionar."))
         marcos.append((g, "PERTO", AMARELO))
 
     # ---------------------------------------------------------------- O PRIMEIRO SUCESSO
@@ -177,7 +185,7 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "PRIMEIRO SUCESSO", "nome": f"GERAÇÃO {gs + 1}", "cor": VERDE,
                  "stat": f"DEPOIS DE {milhar(f_gs)} BATIDAS"},
          log=[(f"GER {gs + 1:03d} · PRIMEIRO SUCESSO", VERDE)],
-         fala=f"Geração {gs + 1}. Depois de {milhar(f_gs)} batidas, o primeiro carro dá ré… alinha… e para.")
+         fala=f"Geração {gs + 1}. Depois de {milhar(f_gs)} batidas, o primeiro carro dá ré… ajeita… e para na vaga.")
     marcos.append((gs, "1º", VERDE))
 
     # ---------------------------------------------------------------- COPIAR, MISTURAR, MELHORAR (montagem real)
@@ -188,37 +196,37 @@ def monta(hist, A):
         if k is not None:
             clipes.append((g, k))
     if len(clipes) >= 3:
-        cena(tipo="montagem", clipes=clipes[:4], log=[("OS MELHORES SÃO COPIADOS E MISTURADOS", BRANCO)],
-             fala="Os melhores são copiados e misturados. Os erros bons ficam.")
+        cena(tipo="montagem", clipes=clipes[:4], log=[("OS PRÓXIMOS COPIAM ESSE JEITO", BRANCO)],
+             fala="Os próximos carros copiam esse jeito, e vão melhorando.")
 
     # ---------------------------------------------------------------- O NÚMERO FINAL + O GRÁFICO
     cena(tipo="ao_vivo", ger=melhor_g, log=[(f"GER {melhor_g + 1:03d} · {fin_s}/{n} NA VAGA", VERDE)],
          carimbo={"texto": f"{fin_s} DE {n}", "cor": VERDE, "em": 0.5, "sub": "ESTACIONAM SOZINHOS"},
-         fala=f"Geração {melhor_g + 1}: {fin_s} de {n} estacionam sozinhos." + (" Mais da metade." if fin_s > n / 2 else ""))
+         fala=f"Na geração {melhor_g + 1}, {fin_s} de {n} carros estacionam sozinhos." + (" Mais da metade." if fin_s > n / 2 else ""))
     serie = suc / n
     cena(tipo="grafico", grupo="grafico", serie=serie, titulo="% QUE ESTACIONA",
          eras=[(gs, G - 1, "APRENDENDO", VERDE)], rotulo_y="CARROS NA VAGA POR GERAÇÃO",
          final=pct(float(serie[melhor_g])), log=[(f"{milhar(falhas_ate)} BATIDAS NO TOTAL", VERMELHO)],
-         fala=f"Do zero. Sem nenhuma aula. Só {milhar(falhas_ate)} batidas pelo caminho.")
+         fala=f"Do zero, sem nenhuma aula. Só tentativa e erro: foram {milhar(falhas_ate)} batidas.")
 
     # ---------------------------------------------------------------- A VIRADA: o teste de estresse
     if tem_virada:
-        itens = [("COMO TREINOU", base, VERDE), ("POSIÇÃO NOVA", duro, VERMELHO)]
-        sub = "o melhor carro · 400 partidas por teste · % que estaciona"
-        cena(tipo="barras", grupo="estresse", ger=melhor_g, itens=itens, titulo="TESTE DE ESTRESSE", sub=sub,
-             log=[("TESTE: MUDAR A POSIÇÃO INICIAL", AMARELO)], pausa=0.25,
-             fala="Aí peguei o melhor carro e mudei só uma coisa: onde ele começa.")
-        cena(tipo="barras", grupo="estresse", ger=melhor_g, itens=itens, titulo="TESTE DE ESTRESSE", sub=sub,
+        itens = [("TREINO", base, VERDE), ("NOVO LUGAR", duro, VERMELHO)]
+        sub = "o melhor carro · 400 tentativas · % que estaciona"
+        cena(tipo="barras", grupo="estresse", ger=melhor_g, itens=itens, titulo="E SE MUDAR O PONTO DE PARTIDA?", sub=sub,
+             log=[("TESTE: OUTRO PONTO DE PARTIDA", AMARELO)], pausa=0.25,
+             fala="Mas será que ele aprendeu a dirigir de verdade? Peguei o melhor carro e mudei só o ponto de partida.")
+        cena(tipo="barras", grupo="estresse", ger=melhor_g, itens=itens, titulo="E SE MUDAR O PONTO DE PARTIDA?", sub=sub,
              destaque=1, cor_destaque="vermelho", revela=0.0, rotulo_destaque=f"▼ -{(base - duro) * 100:.0f} pts",
              log=[(f"ESTACIONA {pct(base)} → {pct(duro)}", VERMELHO)],
-             fala=f"Era {pct(base)}. Caiu pra {pct(duro)}. Ele aprendeu o caminho do treino. "
-                  "Dirigir de verdade… ainda não.")
+             fala=f"No treino, ele acertava {pct(base)}. Agora, só {pct(duro)}. "
+                  "Ele aprendeu o trajeto do treino. Em outra situação, se perde.")
 
     # ---------------------------------------------------------------- CHAMADA + LAÇO (volta ao replay do gancho)
     cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="fim", inicio=max(m_h - 1.4, 0),
          escolha={"pergunta": "O QUE DERRUBA ELE?", "opcoes": [("LADEIRA", AMARELO), ("CHUVA", CIANO)], "em": 0.2},
          destaques={"ladeira": AMARELO, "chuva": CIANO, "votado": VERDE},
-         fala="Ladeira ou chuva: qual derruba ele primeiro? O mais votado vira o próximo vídeo.")
+         fala="O que derruba ele primeiro: uma ladeira ou a chuva? Comenta! O mais votado vira o próximo vídeo.")
 
     info = {"marca": "VÍDEO NEURAL", "serie": serie, "serie_rotulo": "% QUE ESTACIONA POR GERAÇÃO",
             "marcos": marcos, "rotulo_vivo": f"{n} CARROS",

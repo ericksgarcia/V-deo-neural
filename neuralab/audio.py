@@ -106,7 +106,7 @@ def _silencios(x, minimo=0.25, limiar=0.02):
     return np.array(out)
 
 
-def narra_lote(falas, cache, voz="Charon", modelo="gemini-3.8-flash-tts", velocidade=1.15, tentativa=0):
+def narra_lote(falas, cache, voz="Charon", modelo="gemini-3.8-flash-tts", velocidade=1.0, tentativa=0):
     """Narra todas as falas numa ÚNICA chamada (mesmo timbre do início ao fim) e corta por fala.
 
     O corte usa os tempos de cada palavra que o Whisper (local) ouve no áudio inteiro, alinhados

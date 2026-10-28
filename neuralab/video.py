@@ -62,7 +62,7 @@ class Video:
                 ws = []
             c["palavras"] = fala.alinha(c["fala"], audio.falavel(c["fala"]), ws, dur_fala)
             c["fala_dur"] = dur_fala
-            c["dur"] = max(dur_fala + c.get("pausa", 0.18), MIN_DUR.get(c["tipo"], 2.0))
+            c["dur"] = max(dur_fala + c.get("pausa", 0.35), MIN_DUR.get(c["tipo"], 2.0))
             c["ini"] = t
             t += c["dur"]
         self.dur = t + 0.5
