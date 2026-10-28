@@ -18,6 +18,12 @@ treino real  ->  roteiro tirado dos dados  ->  narração + legenda sincronizada
 | `python gerar.py foguete` | EP 01 · Foguete: de 0 a 84 de 150 pousos. |
 | `python gerar.py baliza` | EP 02 · Baliza: estacionar em paralelo entre dois carros. |
 
+**Narração:** uma única chamada ao TTS por episódio (mesmo timbre do início ao fim). A voz gerada acelera
+nas frases longas e arrasta nas curtas, então cada fala é ajustada para ~2,6 palavras/s (`ritmo` em
+`audio.narra_lote`) e o motor confere com o Whisper local se a voz disse o que estava escrito e se nenhuma
+fala ficou rápida demais, refazendo a narração até 3 vezes se precisar. Escreva frases curtas: elas saem
+mais naturais e dão respiro à legenda.
+
 Opções úteis: `--rascunho` (meia resolução, rápido), `--sem-voz` (só legenda), `--so-roteiro`,
 `--sementes 3,5,7` (treina várias e escolhe a melhor história), `--voz Fenrir`.
 

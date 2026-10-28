@@ -80,8 +80,10 @@ class Video:
                 return None, None
             ouvidos = [fala.transcreve(fala.para16k(a, audio.SR), idioma="pt")[1] for a in vozes]
             notas = [fala.confere(tx, " ".join(w[2] for w in ws)) for tx, ws in zip(textos, ouvidos)]
-            pior = min(notas)
-            self.log(f"  narração (tentativa {n + 1}): pior fala {pior:.0%} (cena {int(np.argmin(notas))})")
+            rit = audio.ritmo_das_falas(textos, vozes)
+            pior = min(min(notas), 1.0 - max(0.0, max(rit) - 3.1) / 2)   # fala errada OU rápida demais
+            self.log(f"  narração (tentativa {n + 1}): pior fala {min(notas):.0%} (cena {int(np.argmin(notas))}), "
+                     f"ritmo {min(rit):.1f}-{max(rit):.1f} palavras/s")
             if melhor is None or pior > melhor[0]:
                 melhor = (pior, vozes, ouvidos)
             if pior >= minimo:

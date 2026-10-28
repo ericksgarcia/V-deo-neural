@@ -142,7 +142,7 @@ def monta(hist, A):
     # ---------------------------------------------------------------- PREMISSA + GERAÇÃO 1 (com batidas de verdade)
     b0 = float(hist["m_bateu"][0])
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"{n} CARROS", BRANCO), ("CADA UM COM UMA IA QUE NÃO SABE NADA", BRANCO)],
-         fala=f"No começo, são {n} carros. Cada um é guiado por uma IA que não sabe nada: ela acelera e vira o volante ao acaso.")
+         fala=f"No começo, são {n} carros. Cada um é guiado por uma IA que não sabe nada. Ela acelera e vira o volante ao acaso.")
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"GER 001 · BATERAM {pct(b0)}", VERMELHO)],
          carimbo={"texto": f"BATERAM {pct(b0)}", "cor": VERMELHO, "em": 0.5, "sub": "GERAÇÃO 1"},
          fala=f"Resultado: {em_dez(b0)} batem." if b0 < 0.97 else "Resultado: todo mundo bate.")
@@ -159,7 +159,7 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=g_sel, log=[("OS MELHORES SÃO COPIADOS", VERDE), ("OS PIORES SAEM", VERMELHO),
                                          ("CADA RODADA = 1 GERAÇÃO", BRANCO)],
          carimbo={"texto": "OS MELHORES FICAM", "cor": VERDE, "em": 0.4, "sub": "OS PIORES SAEM"},
-         fala="Aí vem a regra: a cada rodada, os carros que vão melhor são copiados, com pequenas mudanças. "
+         fala="Aí vem a regra. A cada rodada, os carros que vão melhor são copiados, com pequenas mudanças. "
               "Os piores saem. Cada rodada é uma geração.")
 
     # ---------------------------------------------------------------- CHEGA PERTO, MAS NINGUÉM ESTACIONA
@@ -171,8 +171,8 @@ def monta(hist, A):
              log=[(f"GER {g + 1:03d} · CHEGAM PERTO {pct(pe)}", AMARELO)],
              carimbo={"texto": f"{pct(pe)} CHEGAM PERTO", "cor": AMARELO, "em": 0.4,
                       "sub": "MAS NINGUÉM ESTACIONA" if ninguem else f"MAS {int(suc[g])} ESTACIONAM"},
-             fala=f"Rodada após rodada, eles melhoram. Na geração {g + 1}, {em_dez(pe)} já chegam perto da vaga… "
-                  + ("mas nenhum consegue estacionar." if ninguem else f"mas só {int(suc[g])} conseguem estacionar."))
+             fala=f"Na geração {g + 1}, {em_dez(pe)} já chegam perto da vaga. "
+                  + ("Mas nenhum consegue estacionar." if ninguem else f"Mas só {int(suc[g])} conseguem estacionar."))
         marcos.append((g, "PERTO", AMARELO))
 
     # ---------------------------------------------------------------- O PRIMEIRO SUCESSO
@@ -215,7 +215,7 @@ def monta(hist, A):
         sub = "o melhor carro · 400 tentativas · % que estaciona"
         cena(tipo="barras", grupo="estresse", ger=melhor_g, itens=itens, titulo="E SE MUDAR O PONTO DE PARTIDA?", sub=sub,
              log=[("TESTE: OUTRO PONTO DE PARTIDA", AMARELO)], pausa=0.25,
-             fala="Mas será que ele aprendeu a dirigir de verdade? Peguei o melhor carro e mudei só o ponto de partida.")
+             fala="Mas será que ele aprendeu a dirigir de verdade? Peguei o melhor carro. Mudei só o ponto de partida.")
         cena(tipo="barras", grupo="estresse", ger=melhor_g, itens=itens, titulo="E SE MUDAR O PONTO DE PARTIDA?", sub=sub,
              destaque=1, cor_destaque="vermelho", revela=0.0, rotulo_destaque=f"▼ -{(base - duro) * 100:.0f} pts",
              log=[(f"ESTACIONA {pct(base)} → {pct(duro)}", VERMELHO)],

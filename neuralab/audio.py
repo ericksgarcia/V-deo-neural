@@ -106,38 +106,54 @@ def _silencios(x, minimo=0.25, limiar=0.02):
     return np.array(out)
 
 
-def narra_lote(falas, cache, voz="Charon", modelo="gemini-3.8-flash-tts", velocidade=1.0, tentativa=0):
+def narra_lote(falas, cache, voz="Charon", modelo="gemini-3.8-flash-tts", velocidade=1.0, tentativa=0,
+               ritmo=2.6, fator_min=0.72):
     """Narra todas as falas numa ÚNICA chamada (mesmo timbre do início ao fim) e corta por fala.
 
     O corte usa os tempos de cada palavra que o Whisper (local) ouve no áudio inteiro, alinhados
-    com o texto do roteiro; assim cada fala cai na cena certa. Devolve uma lista de áudios mono
-    float32 a 48 kHz, ou None se a API não estiver disponível.
+    com o texto do roteiro; assim cada fala cai na cena certa.
+
+    Ritmo: a voz gerada acelera nas frases longas (chega a ~4 palavras/s) e arrasta nas curtas. Cada fala
+    mais rápida que `ritmo` (palavras faladas por segundo) é desacelerada até o alvo, sem passar de
+    `fator_min` (abaixo disso o áudio começa a soar artificial); as lentas ficam como estão.
+
+    Devolve uma lista de áudios mono float32 a 48 kHz, ou None se a API não estiver disponível.
     O texto vai puro: instruções de estilo no prompt acabam sendo lidas em voz alta."""
     os.makedirs(cache, exist_ok=True)
     textos = [falavel(f) for f in falas]
     extra = f"|t{tentativa}" if tentativa else ""
-    chave = hashlib.sha1(f"{modelo}|{voz}|{velocidade}|{textos}{extra}".encode()).hexdigest()[:16]
-    arq = os.path.join(cache, chave + "_v2.npz")
-    if os.path.exists(arq):
-        z = np.load(arq)
+    base = hashlib.sha1(f"{modelo}|{voz}|{textos}{extra}".encode()).hexdigest()[:16]
+    final = os.path.join(cache, f"{base}_r{ritmo}_{fator_min}_{velocidade}.npz")
+    if os.path.exists(final):
+        z = np.load(final)
         return [z[f"f{k}"] for k in range(len(falas))]
-    antigo = os.path.join(cache, chave + ".npz")
-    if os.path.exists(antigo):  # cache da versão anterior: as partes juntas são o áudio inteiro
-        z = np.load(antigo)
-        x = np.concatenate([z[f"f{k}"] for k in range(len(falas))])
+    bruto = os.path.join(cache, base + "_bruto.npy")
+    if os.path.exists(bruto):
+        x = np.load(bruto)
     else:
         try:
-            x = _tts("\n\n".join(textos), voz, modelo)
+            x = _apara(_tts("\n\n".join(textos), voz, modelo))
         except Exception as e:  # sem rede/chave: segue só com legendas
             print(f"  [aviso] TTS indisponível ({e}); usando só legenda")
             return None
-        x = _apara(x)
-        if abs(velocidade - 1) > 1e-3:
-            x = _atempo(x, velocidade)
         x = (0.9 * x / (np.abs(x).max() + 1e-6)).astype(np.float32)
-    partes = _segmenta(x, falas)
-    np.savez(arq, completo=x, **{f"f{k}": p for k, p in enumerate(partes)})
+        np.save(bruto, x)
+    partes = []
+    for t, p in zip(textos, _segmenta(x, falas)):
+        palavras = len(t.split())
+        vel = palavras / max(len(p) / SR, 1e-3)
+        fator = min(max(ritmo / vel, fator_min), 1.0) if vel > ritmo else 1.0
+        fator *= velocidade
+        if abs(fator - 1) > 1e-3:
+            p = _atempo(p, fator)
+        partes.append(p.astype(np.float32))
+    np.savez(final, **{f"f{k}": p for k, p in enumerate(partes)})
     return partes
+
+
+def ritmo_das_falas(falas, partes):
+    """Palavras faladas por segundo de cada fala (para conferir o ritmo da narração)."""
+    return [len(falavel(f).split()) / max(len(p) / SR, 1e-3) for f, p in zip(falas, partes)]
 
 
 def _segmenta(x, falas):
