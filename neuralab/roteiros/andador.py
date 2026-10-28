@@ -107,31 +107,23 @@ def monta(hist, A):
                "desloca": (0, -110)}]
     cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas,
          titulo_gancho=[("A IA APRENDEU", BRANCO), ("A ANDAR", VERDE)],
-         fala="Esse robô nunca andou na vida. <short pause> Ninguém ensinou nada. Olha ele agora.")
-    if tem_virada:
-        quando = "nunca chega" if gelo == 0 else f"só chega {pct(gelo)} das vezes"
-        cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas, pausa=0.2,
-             fala=f"Mas tem uma pegadinha. <short pause> Troque o chão por gelo, e ele {quando}.")
-    else:
-        cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas, pausa=0.2,
-             fala="Mas tem uma pegadinha. <short pause> Ninguém ensinou como.")
+         fala="Esse robô nunca andou na vida. <short pause> Ninguém ensinou nada. Mas olha ele agora.")
 
     # ---------------------------------------------------------------- PREMISSA + GERAÇÃO 1
     c0 = int(quedas[0])
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"{n} ROBÔS", BRANCO), ("CADA UM COM UMA IA QUE NÃO SABE NADA", BRANCO)],
-         fala=f"Tudo começou assim: {n} robôs. Cada um com um cérebro de computador vazio. <short pause> "
-              f"A missão: chegar a {META:.0f} metros sem cair.")
+         fala=f"{n} robôs. Cérebro vazio. <short pause> A missão: chegar a {META:.0f} metros sem cair.")
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"GER 001 · CAÍRAM {c0}/{n}", VERMELHO)],
          carimbo={"texto": f"CAÍRAM {c0} DE {n}", "cor": VERMELHO, "em": 0.5, "sub": "GERAÇÃO 1"},
-         fala=("E aí? Quantos você acha que caíram? <long pause> Todos." if c0 == n else
-               f"E aí? Quantos você acha que caíram? <long pause> {c0} de {n}."))
+         fala=("Quantos caíram na primeira vez? <long pause> Todos." if c0 == n else
+               f"Quantos caíram na primeira vez? <long pause> {c0} de {n}."))
     # ---------------------------------------------------------------- A REGRA
     g_sel = min(4, G - 1)
     cena(tipo="ao_vivo", ger=g_sel, log=[("OS QUE VÃO MAIS LONGE SÃO COPIADOS", VERDE), ("OS QUE CAEM CEDO SAEM", VERMELHO),
                                          ("CADA RODADA = 1 GERAÇÃO", BRANCO)],
          carimbo={"texto": "OS MELHORES FICAM", "cor": VERDE, "em": 0.4, "sub": "OS PIORES SAEM"},
-         fala="Aí entra a regra cruel. Quem vai mais longe é copiado, com pequenas mudanças. "
-              "Quem cai cedo? <short pause> Eliminados. Cada rodada é uma geração.")
+         fala="Regra cruel: quem vai mais longe é copiado, com pequenas mudanças. "
+              "<short pause> Quem cai cedo, sai. Cada rodada é uma geração.")
 
     # ---------------------------------------------------------------- O PRIMEIRO A CHEGAR
     r_s = A.rodada(gs)
@@ -147,7 +139,7 @@ def monta(hist, A):
                  "stat": f"DEPOIS DE {milhar(q_gs)} QUEDAS"},
          log=[(f"GER {gs + 1:03d} · PRIMEIRO A CHEGAR", VERDE)],
          fala=f"Geração {gs + 1}. Depois de {milhar(q_gs)} quedas… <long pause> um robô cruza a linha. "
-              f"<short pause> {jeito.capitalize()}.")
+              f"<short pause> Mas {jeito}.")
     marcos.append((gs, "1º", VERDE))
 
     # ---------------------------------------------------------------- O PASSO (as pernas passam a alternar)
@@ -162,7 +154,7 @@ def monta(hist, A):
                  cartao={"numero": 2, "rotulo": "ROBÔ", "nome": "O PASSO", "cor": AMARELO,
                          "stat": f"{pct(pa)} ALTERNAM AS PERNAS"},
                  log=[(f"GER {g_alt + 1:03d} · {pct(pa)} ALTERNAM AS PERNAS", AMARELO)],
-                 fala=f"Geração {g_alt + 1}. <short pause> {pct(pa)} dos robôs já alternam as pernas. "
+                 fala=f"Geração {g_alt + 1}. <short pause> {pct(pa)} já alternam as pernas. "
                       "Um passo de cada vez.")
             marcos.append((g_alt, "PASSO", AMARELO))
 
@@ -171,8 +163,8 @@ def monta(hist, A):
     cena(tipo="grafico", grupo="grafico", serie=serie, titulo="% QUE CHEGA",
          eras=[(gs, G - 1, "APRENDENDO", VERDE)], rotulo_y="ROBÔS QUE CHEGAM POR GERAÇÃO",
          final=pct(float(serie[melhor_g])), log=[(f"GER {melhor_g + 1:03d} · {fin_s}/{n} CHEGAM", VERDE), (f"{milhar(quedas_ate)} QUEDAS NO TOTAL", VERMELHO)],
-         fala=f"Geração {melhor_g + 1}: de {n} robôs, {fin_s} cruzam a linha sozinhos. <short pause> "
-              f"Do zero, sem programação… e {milhar(quedas_ate)} quedas.")
+         fala=f"Geração {melhor_g + 1}: {fin_s} de {n} cruzam a linha sozinhos. <short pause> "
+              f"Sem programação. Foram {milhar(quedas_ate)} quedas no total.")
 
     # ---------------------------------------------------------------- A VIRADA: o gelo
     if tem_virada:
@@ -180,28 +172,27 @@ def monta(hist, A):
         sub = "o melhor robô · 400 tentativas · % que chega"
         cena(tipo="barras", grupo="gelo", ger=melhor_g, itens=itens, titulo="E SE O CHÃO FOR GELO?", sub=sub,
              log=[("TESTE: ATRITO DO CHÃO BAIXO", AMARELO)], pausa=0.25,
-             fala="Mas será que ele aprendeu a andar de verdade? <short pause> "
-                  "Peguei o melhor robô… e troquei o chão por gelo.")
+             fala="Mas ele aprendeu a andar de verdade? <short pause> Troquei o chão por gelo.")
         cena(tipo="barras", grupo="gelo", ger=melhor_g, itens=itens, titulo="E SE O CHÃO FOR GELO?", sub=sub,
              destaque=1, cor_destaque="vermelho", revela=0.0, rotulo_destaque=f"▼ -{(base - gelo) * 100:.0f} pts",
              log=[(f"CHEGA {pct(base)} → {pct(gelo)}", VERMELHO)],
-             fala=f"No chão normal, o melhor robô chegava {pct(base)} das vezes. <long pause> No gelo? "
+             fala=f"Chão normal: o melhor robô chegava {pct(base)} das vezes. <long pause> No gelo? "
                   f"{'Nenhuma.' if gelo == 0 else 'Só ' + pct(gelo) + '.'} <short pause> Ele só sabe andar no chão que conhece.")
 
     # ---------------------------------------------------------------- CHAMADA + LAÇO
     cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="fim", inicio=max(m_h - 1.4, 0),
          escolha={"pergunta": "O QUE DERRUBA ELE?", "opcoes": [("ESCADA", AMARELO), ("LADEIRA", CIANO)], "em": 0.2},
          destaques={"escada": AMARELO, "ladeira": CIANO, "votado": VERDE},
-         fala="Agora você decide. O que derruba ele primeiro? Escada ou ladeira? <short pause> "
-              "Comenta seu lado. O mais votado vira o próximo vídeo.")
+         fala="Agora você decide. Escada ou ladeira: qual derruba ele primeiro? <short pause> "
+              "Comenta seu lado. O mais votado vira o próximo episódio. Segue para não perder.")
 
     info = {"marca": "VÍDEO NEURAL", "serie": serie, "serie_rotulo": "% QUE CHEGA POR GERAÇÃO",
             "estilo_voz": ESTILO_VOZ, "marcos": marcos, "rotulo_vivo": f"{n} ROBÔS",
             "rodape": f"POP {n} · REDE {'-'.join(map(str, A.Desafio.camadas))} · {G} GERAÇÕES · "
                       "NADA FOI PROGRAMADO: SÓ SELEÇÃO, CRUZAMENTO E MUTAÇÃO"}
-    virada = (f" Aí troquei o chão por gelo e ele caiu de {pct(base)} para {pct(gelo)} de acerto. 🧊" if tem_virada else "")
-    post = (f"Esses robôs caíram {milhar(quedas_ate)} vezes e aprenderam a andar sozinhos.{virada}\n"
-            f"Simulação real: {n} robôs, {G} gerações, zero programação. Uma série em que a IA aprende sozinha.\n"
-            f"Qual derruba ele primeiro: ESCADA ou LADEIRA? O mais votado vira o próximo vídeo 👇\n\n"
-            f"#ia #inteligenciaartificial #robo #aprendizadodemaquina #curiosidades #tecnologia #evolucao")
+    virada = " Aí troquei o chão por gelo e ele despencou. 🧊" if tem_virada else ""
+    post = (f"Esse robô nunca andou na vida. Os robôs caíram {milhar(quedas_ate)} vezes e aprenderam sozinhos. 🤖{virada}\n"
+            f"Simulação real: {n} robôs, {G} gerações, zero programação. Episódio 3 da série em que a IA aprende sozinha.\n"
+            f"Escada ou ladeira, qual derruba ele primeiro? Comenta ESCADA ou LADEIRA. O mais votado vira o próximo vídeo 👇\n\n"
+            f"#inteligenciaartificial #ia #robo #aprendizadodemaquina #curiosidades #tecnologia #simulacao #aprendeusozinho")
     return cenas, info, post, ev
