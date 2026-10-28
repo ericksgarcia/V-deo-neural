@@ -16,9 +16,9 @@ import numpy as np
 
 from neuralab.video import Video
 
-DESAFIOS = ("penalti", "foguete", "baliza")
-GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260}
-EPISODIO = {"foguete": 1, "baliza": 2, "penalti": 4}
+DESAFIOS = ("penalti", "foguete", "baliza", "sumo")
+GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260, "sumo": 186}
+EPISODIO = {"foguete": 1, "baliza": 2, "penalti": 4, "sumo": 5}
 
 
 def treino_penalti(G, sementes):
@@ -36,6 +36,25 @@ def treino_penalti(G, sementes):
         ev = eventos(hist)
         nota = sum(ev[k] is not None for k in ("mira", "paciente", "leitura", "finta")) + 0.1 * ev["ciclos"]
         print(f"  semente {s}: acontecimentos detectados {nota:.1f}")
+        if melhor is None or nota > melhor[0]:
+            melhor = (nota, s, hist)
+    return melhor[1], melhor[2]
+
+
+def treino_sumo(sementes):
+    from neuralab.coevolucao_sumo import FASES, treina
+    from neuralab.roteiros.sumo import nota_historia
+    melhor = None
+    for s in sementes:
+        arq = os.path.join(".cache", f"sumo_{s}.npz")
+        if os.path.exists(arq):
+            hist = dict(np.load(arq))
+        else:
+            print(f"treinando sumô (semente {s}, {sum(f[2] for f in FASES)} gerações em fases)…")
+            hist = treina(semente=s, log=None)
+            np.savez_compressed(arq, **hist)
+        nota = nota_historia(hist)
+        print(f"  semente {s}: nota da história {nota:.1f}")
         if melhor is None or nota > melhor[0]:
             melhor = (nota, s, hist)
     return melhor[1], melhor[2]
@@ -81,7 +100,13 @@ def main():
     os.makedirs(a.saida, exist_ok=True)
     G = a.geracoes or GERACOES[a.desafio]
 
-    if a.desafio == "penalti":
+    if a.desafio == "sumo":
+        from neuralab.adaptadores.sumo import Sumo
+        from neuralab.roteiros.sumo import monta
+        s, hist = treino_sumo([int(x) for x in (a.sementes or "10").split(",")])
+        A = Sumo(hist)
+        cenas, info, post, _ = monta(hist, A)
+    elif a.desafio == "penalti":
         from neuralab.adaptadores.penalti import Penalti
         from neuralab.roteiros.penalti import monta
         sementes = [int(x) for x in (a.sementes or "3").split(",")]
