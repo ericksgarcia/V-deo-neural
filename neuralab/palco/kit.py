@@ -744,4 +744,7 @@ def rodape(ctx, s, a=1.0):
     cor(ctx, "ciano", 0.35 * a)
     ctx.rectangle(30, 1520, 1020, 1)
     ctx.fill()
-    texto(ctx, s, 30, 1556, 20, "sutil", a, familia=MONO)
+    tam = 20
+    while larg(ctx, s, tam, MONO) > 1020 and tam > 11:   # o rodapé sempre cabe na largura útil
+        tam -= 1
+    texto(ctx, s, 30, 1556, tam, "sutil", a, familia=MONO)

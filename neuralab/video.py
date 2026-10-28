@@ -345,6 +345,9 @@ class Video:
     def pacote(self, pasta):
         """Material para os analistas: roteiro com tempos, checagem da voz, quadros-chave."""
         os.makedirs(pasta, exist_ok=True)
+        for velho in os.listdir(pasta):      # nada de quadros de renders anteriores no mosaico
+            if velho.endswith((".png", ".jpg", ".md", ".json")):
+                os.remove(os.path.join(pasta, velho))
         linhas = ["# Pacote de análise", "", f"duração: {self.dur:.1f}s · {len(self.cenas)} cenas", "",
                   "| # | início | dur | tipo | ger | fala |", "|---|---|---|---|---|---|"]
         for k, c in enumerate(self.cenas):
