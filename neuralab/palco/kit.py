@@ -503,14 +503,19 @@ def faixa_escolha(ctx, t_local, pergunta, opcoes, ret=CENA):
 
 def selo_replay(ctx, t_local, a=1.0, ret=CENA):
     x, y, w, h = ret
-    if t_local < 0.3:  # cortina de transição
+    if 0 <= t_local < 0.3:  # transição: persianas escuras que se abrem, com filete ciano na borda
         k = t_local / 0.3
         for i in range(12):
             yy = y + i * h / 12
-            ww = w * suave(k * 1.6 - i * 0.05)
-            cor(ctx, "ciano" if i % 2 else (0.02, 0.05, 0.09), 0.9)
-            ctx.rectangle(x, yy, ww, h / 12 + 1)
+            aberto = suave(k * 1.7 - i * 0.05)
+            ww = w * (1 - aberto)
+            cor(ctx, (0.01, 0.02, 0.045), 0.92)
+            ctx.rectangle(x + w - ww, yy, ww, h / 12 + 1)
             ctx.fill()
+            if 0 < aberto < 1:
+                cor(ctx, "ciano", 0.8 * (1 - aberto))
+                ctx.rectangle(x + w - ww - 2, yy, 2, h / 12 + 1)
+                ctx.fill()
     # o rótulo "◀◀ REPLAY" fica na moldura (canto superior esquerdo, em amarelo)
 
 
@@ -632,7 +637,9 @@ def grafico_eras(ctx, ret, serie, total, eras, g_atual, titulo, rotulo_y, a=1.0,
         ctx.fill()
         if nome:
             texto(ctx, nome, (xa + xb) / 2, y0 - 22, 22, c, a, familia=MONO_B, alinha="c")
-    lo, hi = 0.5, 1.0   # eixo: 50% a 100% (é onde a história acontece)
+    s_ = np.asarray(serie, float)
+    lo = 0.5 if s_.min() >= 0.45 else 0.0       # eixo se adapta: 50-100% (gols) ou 0-100% (aprendizado)
+    hi = 1.0 if s_.max() > 0.6 else (0.6 if s_.max() > 0.3 else 0.4)
     yv = lambda v: y0 + hh - (np.clip(v, lo, hi) - lo) / (hi - lo) * hh
     if faixa_ref:
         a0, a1, rot = faixa_ref
@@ -671,15 +678,16 @@ def barras(ctx, ret, itens, titulo, sub, progresso, destaque=None, atual=None, c
     texto(ctx, titulo, x + w / 2, y + 120, 48, "texto", a, familia=TITULO, alinha="c")
     texto(ctx, sub, x + w / 2, y + 162, 24, "sutil", a, familia=MONO_B, alinha="c")
     n = len(itens)
-    alt = min(72, (h - 260) / max(n, 1))
-    bx = x + 250
-    bw = 560
+    alt = min(150 if n <= 3 else 72, (h - 260) / max(n, 1))
+    fs = 30 if n > 3 else 40
+    bx = x + (250 if n > 3 else 330)
+    bw = 560 if n > 3 else 480
     for k, (rot, v, c) in enumerate(itens):
         yy = y + 210 + k * alt
         p = suave(progresso * 1.5 - k * 0.07)
         dest, at = destaque == k, atual == k
         cc = cor_destaque if dest else ("texto" if at else c)
-        texto(ctx, rot, x + 40, yy + alt * 0.62, 30, cc if (dest or at) else "texto", a, familia=MONO_B)
+        texto(ctx, rot, x + 40, yy + alt * 0.62, fs - 2, cc if (dest or at) else "texto", a, familia=MONO_B)
         cor(ctx, "ciano2", 0.2 * a)
         ctx.rectangle(bx, yy + 10, bw, alt - 22)
         ctx.fill()
@@ -688,7 +696,7 @@ def barras(ctx, ret, itens, titulo, sub, progresso, destaque=None, atual=None, c
         ctx.fill()
         if dest:
             brilho(ctx, bx + bw * v * p, yy + alt / 2, 50, cc, 0.7 * a)
-        texto(ctx, f"{v * p * 100:.0f}%", bx + bw * v * p + 14, yy + alt * 0.66, 30, cc if (dest or at) else "texto",
+        texto(ctx, f"{v * p * 100:.0f}%", bx + bw * v * p + 14, yy + alt * 0.66, fs + 6, cc if (dest or at) else "texto",
               a, familia=MONO_B)
         if dest:
             texto(ctx, "◀ MELHOR", bx + bw * v * p + 110, yy + alt * 0.66, 24, cc, a, familia=MONO_B)

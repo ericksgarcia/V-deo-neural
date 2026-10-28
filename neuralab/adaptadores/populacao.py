@@ -78,6 +78,8 @@ class AdaptadorPopulacao(Adaptador):
         return None
 
     def medidores(self, rod, t, foco):
+        if foco is not None:   # replay de 1 lance: o HUD mostra o saldo da geração inteira
+            t = rod.duracao
         s, f = rod.contagem(t)
         return [(self.rotulos[0], f"{s}/{rod.n}", s / rod.n, VERDE),
                 (self.rotulos[1], f"{f}/{rod.n}", f / rod.n, VERMELHO)]
