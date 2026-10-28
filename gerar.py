@@ -45,9 +45,11 @@ def treino_simples(nome, G, sementes):
     from neuralab.desafios import DESAFIOS as D
     from neuralab.evolucao import treina
     from neuralab.roteiros.simples import nota_historia
+    if nome == "baliza":
+        from neuralab.roteiros.baliza import nota_historia
     melhor = None
     for s in sementes:
-        arq = os.path.join(".cache", f"treino_{nome}_{G}_150_{s}.npz")
+        arq = os.path.join(".cache", f"treino_{nome}_{G}_150_{s}_v2.npz")
         if os.path.exists(arq):
             hist = dict(np.load(arq))
         else:
@@ -86,11 +88,15 @@ def main():
     else:
         from neuralab.adaptadores.baliza import Baliza
         from neuralab.adaptadores.foguete import Foguete
-        from neuralab.roteiros.simples import monta
         sementes = [int(x) for x in (a.sementes or "3,5,7,11").split(",")]
         s, hist = treino_simples(a.desafio, G, sementes)
         A = {"foguete": Foguete, "baliza": Baliza}[a.desafio](hist)
-        cenas, info, post, _ = monta(a.desafio, hist, A)
+        if a.desafio == "baliza":
+            from neuralab.roteiros.baliza import monta
+            cenas, info, post, _ = monta(hist, A)
+        else:
+            from neuralab.roteiros.simples import monta
+            cenas, info, post, _ = monta(a.desafio, hist, A)
     print(f"usando semente {s}\nroteiro:")
     for k, c in enumerate(cenas):
         print(f"  {k:2d} {c['tipo']:<8} {c['fala']}")

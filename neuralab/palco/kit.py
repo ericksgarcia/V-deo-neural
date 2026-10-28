@@ -30,10 +30,10 @@ C = {
 }
 
 # layout (y) — o que importa fica longe da coluna de botões do TikTok (x > ~950, y 800-1500)
-TOPO = (150, 190)        # y, altura da fileira de painéis de cima
-CENA = (30, 360, 1020, 830)
-LEGENDA_Y = 1105
-BAIXO = (1212, 280)
+TOPO = (150, 150)        # y, altura da fileira de painéis de cima
+CENA = (30, 312, 1020, 868)   # a cena termina em y=1180; a legenda tem faixa própria logo abaixo
+LEGENDA_Y = 1292
+BAIXO = (1345, 165)
 
 
 def cor(ctx, c, a=1.0):
@@ -228,13 +228,13 @@ def moldura_cena(ctx, t, rotulo_cam="CAM 01", velocidade=None, tempo_sim=None, r
         ctx.move_to(mx + dx * 14, my + dy * 14)
         ctx.line_to(mx + dx * 34, my + dy * 34)
     ctx.stroke()
-    texto(ctx, f"● {rotulo_cam}", x + 30, y + 46, 18, "ciano", 0.9, familia=MONO_B)
-    texto(ctx, "2.5D · 30 FPS", x + 30, y + 70, 15, "sutil", familia=MONO)
-    if tempo_sim is not None:
-        texto(ctx, f"T+{tempo_sim:05.2f}s", x + w - 30, y + 46, 18, "ciano", 0.9, familia=MONO_B, alinha="d")
+    replay = rotulo_cam.startswith("◀◀")
+    texto(ctx, rotulo_cam if replay else f"● {rotulo_cam}", x + 30, y + 52, 24, "amarelo" if replay else "ciano",
+          0.95, familia=MONO_B)
     if velocidade is not None:
-        rot = "CÂMERA LENTA" if velocidade < 0.9 else ("TEMPO REAL" if velocidade < 1.15 else f"ACELERADO {velocidade:.1f}x")
-        texto(ctx, rot, x + w - 30, y + 70, 15, "amarelo" if velocidade < 0.9 else "sutil", familia=MONO,
+        rot = f"LENTO {velocidade:.1f}x" if velocidade < 0.9 else ("TEMPO REAL" if velocidade < 1.15
+                                                                    else f"ACELERADO {velocidade:.1f}x")
+        texto(ctx, rot, x + w - 30, y + 52, 22, "amarelo" if velocidade < 0.9 else "sutil", familia=MONO_B,
               alinha="d")
 
 
@@ -325,36 +325,39 @@ def linha_tempo(ctx, x, y, w, h, serie, g, total, marcos=(), c="ciano", a=1.0):
 
 def contador_geracao(ctx, x, y, w, h, g, total, serie, marcos, rotulo_serie, a=1.0):
     painel(ctx, x, y, w, h, "GERAÇÃO", indice=1, a=a)
-    texto(ctx, f"{g:03d}", x + 16, y + 98, 64, "texto", a, familia=MONO_B)
-    texto(ctx, f"/{total}", x + 18 + larg(ctx, f"{g:03d}", 64, MONO_B), y + 98, 24, "sutil", a, familia=MONO)
-    linha_tempo(ctx, x + 18, y + 128, w - 36, 34, serie, g, total, marcos, a=a)
-    texto(ctx, rotulo_serie, x + 18, y + h - 10, 13, "sutil", a, familia=MONO)
+    texto(ctx, f"{g:03d}", x + 16, y + 88, 58, "texto", a, familia=MONO_B)
+    texto(ctx, f"/{total}", x + 20 + larg(ctx, f"{g:03d}", 58, MONO_B), y + 88, 24, "sutil", a, familia=MONO)
+    linha_tempo(ctx, x + 18, y + 108, w - 36, 28, serie, g, total, marcos, a=a)
 
 
 # ------------------------------------------------------------------ console e rede
 
-def console(ctx, x, y, w, h, linhas, t, a=1.0):
+def console(ctx, x, y, w, h, linhas, t, a=1.0, n=4, tam=22):
     """Terminal de eventos. linhas: [(instante, texto, cor)]; as novas aparecem digitando."""
-    painel(ctx, x, y, w, h, "LOG DO EXPERIMENTO", indice=5, a=a)
-    vis = [l for l in linhas if l[0] <= t][-7:]
-    yy = y + h - 20 - (len(vis) - 1) * 32
+    painel(ctx, x, y, w, h, "LOG DO EXPERIMENTO", indice=4, a=a)
+    vis = [l for l in linhas if l[0] <= t][-n:]
+    passo = 30
+    yy = y + h - 18 - (len(vis) - 1) * passo
+    maxw = w - 60
     for k, (t0, s, c) in enumerate(vis):
+        while s and larg(ctx, s, tam, MONO) > maxw:   # corta com reticências
+            s = s[:-2] + "…"
         idade = t - t0
-        n = int(len(s) * min(idade / 0.5, 1))
-        alfa = a * (0.45 + 0.55 * (k == len(vis) - 1))
-        texto(ctx, ">", x + 16, yy, 19, "ciano", alfa, familia=MONO_B)
-        texto(ctx, s[:n], x + 38, yy, 19, c, alfa, familia=MONO)
+        n_ch = int(len(s) * min(idade / 0.5, 1))
+        alfa = a * (0.5 + 0.5 * (k == len(vis) - 1))
+        texto(ctx, ">", x + 14, yy, tam, "ciano", alfa, familia=MONO_B)
+        texto(ctx, s[:n_ch], x + 36, yy, tam, c, alfa, familia=MONO)
         if k == len(vis) - 1 and (t * 2) % 1 < 0.5:
             cor(ctx, "ciano", alfa)
-            ctx.rectangle(x + 40 + larg(ctx, s[:n], 19, MONO), yy - 16, 10, 19)
+            ctx.rectangle(x + 38 + larg(ctx, s[:n_ch], tam, MONO), yy - tam * 0.8, 10, tam)
             ctx.fill()
-        yy += 32
+        yy += passo
 
 
 def rede(ctx, x, y, w, h, camadas, pesos, ativ, t, saidas=(), titulo="CÉREBRO DO LÍDER", c="ciano", a=1.0):
     """Rede neural: nós acendem com a ativação; pulsos correm nas ligações mais fortes."""
-    painel(ctx, x, y, w, h, titulo, c=c, indice=4, a=a)
-    x0, y0, ww, hh = x + 24, y + 48, w - 170, h - 66
+    painel(ctx, x, y, w, h, titulo, c=c, indice=5, a=a)
+    x0, y0, ww, hh = x + 24, y + 44, w - 160, h - 56
     cols = len(camadas)
     pos = []
     for ci, n in enumerate(camadas):
@@ -399,32 +402,103 @@ def rede(ctx, x, y, w, h, camadas, pesos, ativ, t, saidas=(), titulo="CÉREBRO D
 
 # ------------------------------------------------------------------ cartões e selos
 
-def cartao_descoberta(ctx, t_local, dur, c, numero, rotulo, nome, stat, y=372):
-    """Holograma 'DESCOBERTA #n' que entra com falha digital (glitch) e sai deslizando."""
-    entra, sai = t_local / 0.4, (dur - t_local) / 0.3
-    if entra <= 0 or sai <= 0:
+def cartao_descoberta(ctx, t_local, dur, c, numero, rotulo, nome, stat, ret=CENA):
+    """'DESCOBERTA #n': entra grande (com falha digital) por ~1,3 s e encolhe para um selo no canto."""
+    if t_local < 0:
         return
-    k = suave(min(entra, sai, 1))
-    x, w, h = 60, 960, 230
+    x0, y0, w0, h0 = ret
+    sai = suave((dur - t_local) / 0.3)
+    grande = 1 - suave((t_local - 1.3) / 0.35)
+    entra = suave(t_local / 0.35)
+    # interpola entre o cartão grande (topo da cena) e o selo compacto (canto superior esquerdo)
+    gx, gy, gw, gh = x0 + 30, y0 + 80, w0 - 60, 220
+    sx, sy, sw, sh = x0 + 20, y0 + 74, 560, 92
+    k = grande
+    x, y = sx + (gx - sx) * k, sy + (gy - sy) * k
+    w, h = sw + (gw - sw) * k, sh + (gh - sh) * k
+    a = min(entra, sai)
+    if a <= 0:
+        return
     ctx.save()
-    if entra < 1:  # fatias deslocadas na entrada
+    if t_local < 0.35:
         rng = np.random.default_rng(int(t_local * 60))
         ctx.translate((rng.random() - 0.5) * 40 * (1 - entra), 0)
-    ctx.translate(0, (1 - k) * -40)
-    chanfro(ctx, x, y, w, h, 30)
-    cor(ctx, (0.01, 0.02, 0.04), 0.9 * k)
+    chanfro(ctx, x, y, w, h, 22 + 8 * k)
+    cor(ctx, (0.02, 0.035, 0.07), 0.95 * a)
     ctx.fill_preserve()
-    _neon(ctx, c, k, 2)
-    # varredura
-    sy = y + (t_local * 300) % h
-    cor(ctx, c, 0.12 * k)
-    ctx.rectangle(x, sy, w, 3)
-    ctx.fill()
-    texto(ctx, f"DESCOBERTA #{numero:02d}  ·  {rotulo}", x + 34, y + 50, 22, c, k, familia=MONO_B, espaco=1)
-    tam = 96 if larg(ctx, nome, 96, TITULO) < w - 70 else 72
-    texto(ctx, nome, x + 30, y + 150, tam, "texto", k, familia=TITULO)
-    texto(ctx, stat, x + 34, y + 200, 24, c, k, familia=MONO_B)
+    _neon(ctx, c, a, 2)
+    if k > 0.05:
+        sy_ = y + (t_local * 300) % h
+        cor(ctx, c, 0.12 * a * k)
+        ctx.rectangle(x, sy_, w, 3)
+        ctx.fill()
+    tam_rot = 20 + 4 * k
+    texto(ctx, f"DESCOBERTA #{numero:02d}  ·  {rotulo}", x + 24, y + 30 + 18 * k, tam_rot, c, a, familia=MONO_B,
+          espaco=1)
+    tam_nome = 40 + 52 * k
+    if larg(ctx, nome, tam_nome, TITULO) > w - 50:
+        tam_nome *= (w - 50) / larg(ctx, nome, tam_nome, TITULO)
+    texto(ctx, nome, x + 22, y + 74 + 72 * k, tam_nome, "texto", a, familia=TITULO)
+    if k > 0.3:
+        texto(ctx, stat, x + 26, y + 196, 26, c, a * k, familia=MONO_B)
     ctx.restore()
+
+
+def carimbo(ctx, s, c, t_local, ret=CENA, sub=None):
+    """Número grande na cena (ex.: 'FORA 42%'), entra com um pulo; serve de 'interruptor' visual."""
+    if t_local < 0:
+        return
+    x0, y0, w0, h0 = ret
+    k = suave(t_local / 0.25)
+    pop = 1 + 0.25 * (1 - k)
+    ctx.save()
+    ctx.translate(x0 + w0 - 40, y0 + 150)
+    ctx.scale(pop, pop)
+    texto(ctx, s, 0, 0, 64, c, k, familia=TITULO, alinha="d", contorno=12)
+    if sub:
+        texto(ctx, sub, 0, 40, 24, "texto", k, familia=MONO_B, alinha="d", contorno=6)
+    ctx.restore()
+
+
+def titulo_gancho(ctx, linhas, t_local, ret=CENA):
+    """Promessa do vídeo, fixa e grande no topo da cena desde o quadro 0."""
+    x0, y0, w0, h0 = ret
+    for j, (s, c) in enumerate(linhas):
+        tam = 76
+        if larg(ctx, s, tam, TITULO) > w0 - 80:
+            tam *= (w0 - 80) / larg(ctx, s, tam, TITULO)
+        texto(ctx, s, x0 + w0 / 2, y0 + 150 + j * 84, tam, c, 1, familia=TITULO, alinha="c", contorno=14)
+
+
+def faixa_escolha(ctx, t_local, pergunta, opcoes, ret=CENA):
+    """Chamada final sobre a cena (não é tela própria): pergunta + dois botões pulsando."""
+    x0, y0, w0, h0 = ret
+    k = suave(t_local / 0.35)
+    if k <= 0:
+        return
+    y = y0 + 90
+    chanfro(ctx, x0 + 24, y, w0 - 48, 250, 26)
+    cor(ctx, (0.02, 0.035, 0.07), 0.9 * k)
+    ctx.fill_preserve()
+    _neon(ctx, "ciano", k, 1.5)
+    tam = 52
+    if larg(ctx, pergunta, tam, TITULO) > w0 - 120:
+        tam *= (w0 - 120) / larg(ctx, pergunta, tam, TITULO)
+    texto(ctx, pergunta, x0 + w0 / 2, y + 70, tam, "texto", k, familia=TITULO, alinha="c")
+    bw = (w0 - 120) / 2
+    for j, (nome, c) in enumerate(opcoes):
+        bx = x0 + 40 + j * (bw + 40)
+        pulso = 1 + 0.04 * math.sin(t_local * 6 + j * 3)
+        ctx.save()
+        ctx.translate(bx + bw / 2, y + 170)
+        ctx.scale(pulso, pulso)
+        chanfro(ctx, -bw / 2, -50, bw, 100, 20)
+        cor(ctx, c, 0.18 * k)
+        ctx.fill_preserve()
+        _neon(ctx, c, k, 2.5)
+        tn = 40 if larg(ctx, nome, 40, TITULO) < bw - 40 else 40 * (bw - 40) / larg(ctx, nome, 40, TITULO)
+        texto(ctx, nome, 0, 14, tn, "texto", k, familia=TITULO, alinha="c")
+        ctx.restore()
 
 
 def selo_replay(ctx, t_local, a=1.0, ret=CENA):
@@ -437,11 +511,7 @@ def selo_replay(ctx, t_local, a=1.0, ret=CENA):
             cor(ctx, "ciano" if i % 2 else (0.02, 0.05, 0.09), 0.9)
             ctx.rectangle(x, yy, ww, h / 12 + 1)
             ctx.fill()
-    bx, by = x + 26, y + 88
-    chanfro(ctx, bx, by, 220, 46, 12)
-    cor(ctx, "vermelho", 0.92 * a)
-    ctx.fill()
-    texto(ctx, "◀◀ REPLAY", bx + 110, by + 32, 24, "branco", a, familia=MONO_B, alinha="c")
+    # o rótulo "◀◀ REPLAY" fica na moldura (canto superior esquerdo, em amarelo)
 
 
 def tele_circulo(ctx, x, y, rx, ry, prog, a=1.0):
@@ -519,13 +589,13 @@ def legenda(ctx, blocos, t, destaques, y=LEGENDA_Y):
         return
     ini, _, palavras = atual
     pop = 1 + 0.16 * (1 - suave((t - ini) / 0.1))
-    tam = 96
+    tam = 88
     esp = larg(ctx, " ", tam, TITULO)
     ws = [larg(ctx, p, tam, TITULO) for p in palavras]
     total = sum(ws) + esp * (len(ws) - 1)
-    if total > 940:
-        f = 940 / total
-        tam, ws, esp, total = tam * f, [w * f for w in ws], esp * f, 940
+    if total > 840:
+        f = 840 / total
+        tam, ws, esp, total = tam * f, [w * f for w in ws], esp * f, 840
     ctx.save()
     ctx.translate(W / 2, y)
     ctx.scale(pop, pop)
@@ -540,70 +610,90 @@ def legenda(ctx, blocos, t, destaques, y=LEGENDA_Y):
 
 # ------------------------------------------------------------------ telas de dados
 
-def grafico_eras(ctx, ret, serie, total, eras, g_atual, titulo, rotulo_y, a=1.0):
-    """Gráfico grande da série ao longo das gerações com faixas coloridas por 'era'."""
+def grafico_eras(ctx, ret, serie, total, eras, g_atual, titulo, rotulo_y, a=1.0, faixa_ref=None, final=None):
+    """Gráfico grande da série por geração com faixas coloridas por 'era' (rótulos horizontais no topo).
+
+    faixa_ref=(min, max, rótulo): faixa de referência horizontal (ex.: futebol profissional).
+    final: texto grande na ponta da curva quando ela chega ao fim."""
     x, y, w, h = ret
-    x0, y0, ww, hh = x + 90, y + 150, w - 140, h - 300
-    texto(ctx, titulo, x + w / 2, y + 100, 40, "texto", a, familia=TITULO, alinha="c")
+    x0, y0, ww, hh = x + 100, y + 220, w - 160, h - 330
+    texto(ctx, titulo, x + w / 2, y + 120, 44, "texto", a, familia=TITULO, alinha="c")
     n = max(2, min(int(g_atual), len(serie)))
     for g0, g1, nome, c in eras:
         if g0 > n:
             continue
         xa = x0 + g0 / total * ww
         xb = x0 + min(g1, n) / total * ww
-        cor(ctx, c, 0.14 * a)
-        ctx.rectangle(xa, y0, xb - xa, hh)
+        cor(ctx, c, 0.2 * a)
+        ctx.rectangle(xa, y0, max(xb - xa, 3), hh)
         ctx.fill()
-        if xb - xa > 40:
-            ctx.save()
-            ctx.translate(xa + 22, y0 + hh - 16)
-            ctx.rotate(-math.pi / 2)
-            texto(ctx, nome, 0, 0, 22, c, a, familia=MONO_B)
-            ctx.restore()
-    for k in range(5):
-        yy = y0 + hh * k / 4
+        cor(ctx, c, 0.9 * a)
+        ctx.rectangle(xa, y0 - 8, max(xb - xa, 3), 5)
+        ctx.fill()
+        if nome:
+            texto(ctx, nome, (xa + xb) / 2, y0 - 22, 22, c, a, familia=MONO_B, alinha="c")
+    lo, hi = 0.5, 1.0   # eixo: 50% a 100% (é onde a história acontece)
+    yv = lambda v: y0 + hh - (np.clip(v, lo, hi) - lo) / (hi - lo) * hh
+    if faixa_ref:
+        a0, a1, rot = faixa_ref
+        cor(ctx, "verde", 0.16 * a)
+        ctx.rectangle(x0, yv(a1), ww, yv(a0) - yv(a1))
+        ctx.fill()
+        texto(ctx, rot, x0 + 14, yv(a1) - 10, 22, "verde", a, familia=MONO_B)
+    for k in range(6):
+        v = lo + (hi - lo) * k / 5
         cor(ctx, "ciano2", 0.4 * a)
-        ctx.rectangle(x0, yy, ww, 1)
+        ctx.rectangle(x0, yv(v), ww, 1)
         ctx.fill()
-        texto(ctx, f"{100 - 25 * k}%", x0 - 12, yy + 6, 18, "sutil", a, familia=MONO, alinha="d")
+        texto(ctx, f"{v * 100:.0f}%", x0 - 12, yv(v) + 8, 22, "sutil", a, familia=MONO_B, alinha="d")
     xs = x0 + np.arange(n) / total * ww
-    ys = y0 + hh - np.clip(np.asarray(serie[:n]), 0, 1) * hh
+    ys = yv(np.asarray(serie[:n]))
     ctx.move_to(xs[0], ys[0])
     for u, v in zip(xs[1:], ys[1:]):
         ctx.line_to(u, v)
     cor(ctx, "texto", 0.25 * a)
-    ctx.set_line_width(9)
+    ctx.set_line_width(10)
     ctx.stroke_preserve()
     cor(ctx, "texto", a)
-    ctx.set_line_width(3)
+    ctx.set_line_width(3.5)
     ctx.stroke()
-    brilho(ctx, xs[-1], ys[-1], 22, "branco", 0.9 * a)
-    texto(ctx, rotulo_y, x0, y0 - 18, 20, "sutil", a, familia=MONO)
-    texto(ctx, f"GERAÇÃO {n}", x0 + ww, y0 + hh + 40, 20, "sutil", a, familia=MONO, alinha="d")
+    brilho(ctx, xs[-1], ys[-1], 26, "branco", 0.9 * a)
+    texto(ctx, rotulo_y, x0, y + h - 60, 22, "sutil", a, familia=MONO_B)
+    texto(ctx, f"GERAÇÃO {n}", x0 + ww, y + h - 60, 22, "sutil", a, familia=MONO_B, alinha="d")
+    if final and n >= len(serie) - 1:
+        texto(ctx, final, min(xs[-1], x0 + ww - 10), ys[-1] - 30, 64, "texto", a, familia=TITULO, alinha="d",
+              contorno=10)
 
 
-def barras(ctx, ret, itens, titulo, sub, progresso, destaque=None, a=1.0):
-    """Barras horizontais animadas. itens: [(rotulo, valor 0-1, cor)]."""
+def barras(ctx, ret, itens, titulo, sub, progresso, destaque=None, atual=None, cor_destaque="vermelho", a=1.0):
+    """Barras horizontais (animam uma vez). itens: [(rotulo, valor 0-1, cor)]."""
     x, y, w, h = ret
-    texto(ctx, titulo, x + w / 2, y + 100, 40, "texto", a, familia=TITULO, alinha="c")
-    texto(ctx, sub, x + w / 2, y + 140, 22, "sutil", a, familia=MONO, alinha="c")
+    texto(ctx, titulo, x + w / 2, y + 120, 48, "texto", a, familia=TITULO, alinha="c")
+    texto(ctx, sub, x + w / 2, y + 162, 24, "sutil", a, familia=MONO_B, alinha="c")
     n = len(itens)
-    alt = min(56, (h - 260) / max(n, 1))
+    alt = min(72, (h - 260) / max(n, 1))
+    bx = x + 250
+    bw = 560
     for k, (rot, v, c) in enumerate(itens):
-        yy = y + 190 + k * alt
-        p = suave(progresso * 1.6 - k * 0.06)
-        dest = destaque == k
-        texto(ctx, rot, x + 60, yy + alt * 0.62, 21, "amarelo" if dest else "texto", a, familia=MONO_B)
-        bx, bw = x + 290, w - 420
-        cor(ctx, "ciano2", 0.25 * a)
-        ctx.rectangle(bx, yy + 8, bw, alt - 18)
+        yy = y + 210 + k * alt
+        p = suave(progresso * 1.5 - k * 0.07)
+        dest, at = destaque == k, atual == k
+        cc = cor_destaque if dest else ("texto" if at else c)
+        texto(ctx, rot, x + 40, yy + alt * 0.62, 30, cc if (dest or at) else "texto", a, familia=MONO_B)
+        cor(ctx, "ciano2", 0.2 * a)
+        ctx.rectangle(bx, yy + 10, bw, alt - 22)
         ctx.fill()
-        cor(ctx, "amarelo" if dest else c, (0.95 if dest else 0.7) * a)
-        ctx.rectangle(bx, yy + 8, bw * v * p, alt - 18)
+        cor(ctx, cc, (1.0 if (dest or at) else 0.55) * a)
+        ctx.rectangle(bx, yy + 10, bw * v * p, alt - 22)
         ctx.fill()
         if dest:
-            brilho(ctx, bx + bw * v * p, yy + alt / 2, 40, "amarelo", 0.7 * a)
-        texto(ctx, f"{v * p * 100:.0f}%", bx + bw + 14, yy + alt * 0.62, 21, "texto", a, familia=MONO_B)
+            brilho(ctx, bx + bw * v * p, yy + alt / 2, 50, cc, 0.7 * a)
+        texto(ctx, f"{v * p * 100:.0f}%", bx + bw * v * p + 14, yy + alt * 0.66, 30, cc if (dest or at) else "texto",
+              a, familia=MONO_B)
+        if dest:
+            texto(ctx, "◀ MELHOR", bx + bw * v * p + 110, yy + alt * 0.66, 24, cc, a, familia=MONO_B)
+        if at:
+            texto(ctx, "◀ ATUAL", bx + bw * v * p + 110, yy + alt * 0.66, 24, "texto", a, familia=MONO_B)
 
 
 def tela_final(ctx, ret, t_local, pergunta, opcoes, a=1.0):

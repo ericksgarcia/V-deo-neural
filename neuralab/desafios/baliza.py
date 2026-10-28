@@ -27,6 +27,9 @@ class Baliza:
     meia_vaga = 3.6  # espaço livre = 7,2 m (1,6x o carro)
     estacionados = [(-(3.6 + COMP / 2), 1.25), (3.6 + COMP / 2, 1.25)]
     v_max, ester_max, forca_acel = 3.0, 0.6, 3.0
+    # tolerâncias do "estacionou": centro (m), lateral (m), inclinação (sen) e velocidade (m/s)
+    tol_x, tol_y, tol_ang, tol_v = 1.0, 0.45, 0.12, 0.6
+    ga = {}   # ajustes do algoritmo genético para este desafio (elite, taxa, forca)
 
     def __init__(self, n, rng, ruido=0.3):
         self.n = n
@@ -38,6 +41,7 @@ class Baliza:
         self.t_fim = np.full(n, -1)
         self.acel = np.zeros(n)
         self.bateu = np.zeros(n, bool)
+        self.min_dist = np.full(n, 99.0)
         self.parado_bem = np.zeros(n)
 
     def observa(self):
@@ -71,13 +75,15 @@ class Baliza:
         self.acel = np.where(vivo, saida[:, 0], 0)
 
         x, y, h, v, e = self.s.T
+        self.min_dist = np.where(vivo, np.minimum(self.min_dist, np.hypot(x, y - self.vaga_y)), self.min_dist)
         bate = vivo & self.colide(x, y, h)
         self.bateu |= bate
         self.estado[bate] = FALHA
         self.t_fim[bate] = t
-        bom = vivo & ~bate & (np.abs(x) < 1.0) & (np.abs(y - self.vaga_y) < 0.45) & (np.abs(np.sin(h)) < 0.12)
+        bom = (vivo & ~bate & (np.abs(x) < self.tol_x) & (np.abs(y - self.vaga_y) < self.tol_y)
+               & (np.abs(np.sin(h)) < self.tol_ang))
         self.parado_bem = np.where(bom, self.parado_bem + 1, 0)
-        ok = bom & (np.abs(v) < 0.6)
+        ok = bom & (np.abs(v) < self.tol_v)
         self.estado[ok] = SUCESSO
         self.t_fim[ok] = t
 
@@ -93,6 +99,15 @@ class Baliza:
     def aptidao(self):
         f = 3 * np.exp(-self.erro() / 1.5) * (1 + np.exp(-np.abs(self.s[:, 3]))) - 0.5 * self.bateu
         return f + (self.estado == SUCESSO) * 6
+
+    def metricas(self):
+        """Números por geração que o roteiro usa para contar a história."""
+        suc = self.estado == SUCESSO
+        return {
+            "perto": float((self.min_dist < 2.5).mean()),          # chegaram a 2,5 m do centro da vaga
+            "bateu": float(self.bateu.mean()),
+            "tempo": float((self.t_fim[suc] * self.dt).mean()) if suc.any() else 0.0,   # s até estacionar
+        }
 
     def chegou_mas_bateu(self):
         x, y, h, v, e = self.s.T

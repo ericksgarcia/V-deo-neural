@@ -29,7 +29,7 @@ from .palco import arte as R, kit as K
 from .palco.holo import Holo
 
 FPS = 30
-MIN_DUR = {"ao_vivo": 1.6, "replay": 2.0, "grafico": 3.0, "barras": 3.0, "final": 3.5}
+MIN_DUR = {"ao_vivo": 1.6, "replay": 2.0, "montagem": 2.4, "grafico": 2.4, "barras": 2.2, "final": 3.5}
 
 
 class Video:
@@ -43,19 +43,19 @@ class Video:
     # ------------------------------------------------------------------ preparo
     def prepara(self):
         textos = [c["fala"] for c in self.cenas]
-        vozes = audio.narra_lote(textos, self.cache, voz=self.voz) if self.narrar else None
+        vozes, ouvidos = self._narracao(textos) if self.narrar else (None, None)
         t = 0.0
         self.relatorio_fala = []
         for k, c in enumerate(self.cenas):
             a = vozes[k] if vozes else None
             c["audio"] = a
             if a is not None:
-                _, ws, _ = fala.transcreve(fala.para16k(a, audio.SR), idioma="pt")
+                ws = ouvidos[k]
                 dur_fala = len(a) / audio.SR
                 ouvido = " ".join(w[2] for w in ws)
-                nota = fala.confere(audio.falavel(c["fala"]), ouvido)
+                nota = fala.confere(c["fala"], ouvido)
                 self.relatorio_fala.append({"cena": k, "fala": c["fala"], "ouvido": ouvido, "semelhanca": round(nota, 3)})
-                if nota < 0.8:
+                if nota < 0.85:
                     self.log(f"  [atenção] narração da cena {k} difere do roteiro ({nota:.0%}): '{ouvido}'")
             else:
                 dur_fala = len(c["fala"].split()) / 2.8
@@ -69,6 +69,24 @@ class Video:
         self._tempos()
         self._legendas()
         self._console()
+
+    def _narracao(self, textos, tentativas=3, minimo=0.85):
+        """Gera a voz e confere cada fala com o Whisper; se alguma sair errada, gera de novo
+        (até `tentativas` vezes) e fica com a versão cuja pior fala é a melhor."""
+        melhor = None
+        for n in range(tentativas):
+            vozes = audio.narra_lote(textos, self.cache, voz=self.voz, tentativa=n)
+            if vozes is None:
+                return None, None
+            ouvidos = [fala.transcreve(fala.para16k(a, audio.SR), idioma="pt")[1] for a in vozes]
+            notas = [fala.confere(tx, " ".join(w[2] for w in ws)) for tx, ws in zip(textos, ouvidos)]
+            pior = min(notas)
+            self.log(f"  narração (tentativa {n + 1}): pior fala {pior:.0%} (cena {int(np.argmin(notas))})")
+            if melhor is None or pior > melhor[0]:
+                melhor = (pior, vozes, ouvidos)
+            if pior >= minimo:
+                break
+        return melhor[1], melhor[2]
 
     def _tempos(self):
         """Converte tempo de vídeo em tempo de simulação para cada cena (com câmera lenta)."""
@@ -84,7 +102,7 @@ class Video:
             if c0["tipo"] == "replay":
                 D = self.A.duracao_foco(rod, c0["foco"])
                 chaves = self.A.chaves_lento(rod, c0["foco"])
-                mapa = _mapa_lento(D, chaves, total * 0.96, c0.get("lento", 0.7))
+                mapa = _mapa_lento(D, chaves, total * 0.96, c0.get("lento", 0.7), inicio=c0.get("inicio", 0.0))
             else:
                 D = rod.duracao
                 vel = c0.get("vel") or float(np.clip(D / (0.9 * total), 0.6, 3.0))
@@ -96,6 +114,29 @@ class Video:
 
     def tempo_sim(self, c, tl):
         return float(c["mapa"](c["off"] + tl))
+
+    def tempo_grupo(self, c, t):
+        """Tempo desde o início do grupo de cenas (gráficos/barras não reanimam a cada cena)."""
+        c0 = self._primeira_do_grupo(c)
+        cs = [x for x in self.cenas if x is c0 or (c.get("grupo") and x.get("grupo") == c.get("grupo"))]
+        return t - c0["ini"], sum(x["dur"] for x in cs)
+
+    def _estado(self, c, tl):
+        """(rodada, tempo de simulação, modo, foco) do que a cena mostra agora."""
+        if c["tipo"] == "montagem":   # vários replays curtos em sequência, um a cada pedaço da cena
+            clipes = c["clipes"]
+            sd = c["dur"] / len(clipes)
+            j = min(int(tl / sd), len(clipes) - 1)
+            g, foco = clipes[j]
+            rod = self.A.rodada(g)
+            a, b = self.A.janela_lance(rod, foco)
+            u = (tl - j * sd) / sd
+            return rod, a + (b - a) * u, "replay", foco
+        g = c.get("ger", self.A.total_ger - 1)
+        rod = self.A.rodada(g)
+        if c["tipo"] in ("ao_vivo", "replay"):
+            return rod, self.tempo_sim(c, tl), c["tipo"], (c.get("foco") if c["tipo"] == "replay" else None)
+        return rod, rod.duracao, c["tipo"], None
 
     def _legendas(self):
         blocos = []
@@ -129,27 +170,29 @@ class Video:
         tl = t - c["ini"]
         info = self.info
         K.cabecalho(ctx, info["marca"], self.A.experimento, self.A.titulo, t)
-        sim = c["tipo"] in ("ao_vivo", "replay")
-        g = c.get("ger", self.A.total_ger - 1)
-        rod = self.A.rodada(g)
-        ts = self.tempo_sim(c, tl) if sim else rod.duracao
-        foco = c.get("foco") if c["tipo"] == "replay" else None
+        rod, ts, modo, foco = self._estado(c, tl)
+        sim = modo in ("ao_vivo", "replay")
+        g = rod.g
+        if c["tipo"] == "grafico":   # o contador acompanha a ponta da curva
+            tg, dg = self.tempo_grupo(c, t)
+            g = int((self.A.total_ger - 1) * min(tg / (dg * 0.6), 1))
         # fileira de cima
         K.contador_geracao(ctx, 30, K.TOPO[0], 330, K.TOPO[1], g + 1, self.A.total_ger, info["serie"],
                            info.get("marcos", []), info.get("serie_rotulo", ""))
-        for j, (tit, rot, val, cor) in enumerate(self.A.medidores(rod, ts, foco)[:2]):
+        for j, (tit, rot, val, cor) in enumerate(self.A.medidores(self.A.rodada(g) if c["tipo"] == "grafico" else rod,
+                                                                   ts, foco)[:2]):
             x = 375 + j * 345
             K.painel(ctx, x, K.TOPO[0], 330, K.TOPO[1], tit, c=cor, indice=2 + j)
-            K.medidor_anel(ctx, x + 165, K.TOPO[0] + 108, 56, val, cor, rot)
+            K.medidor_anel(ctx, x + 165, K.TOPO[0] + 80, 44, val, cor, rot)
         # cena
         ctx.save()
         K.recorte_cena(ctx)
         palco = None
         if sim:
             x0, y0, w0, h0 = K.CENA
-            cam = self.A.camera(rod, ts, c["tipo"], foco)
+            cam = self.A.camera(rod, ts, modo, foco)
             h = Holo(w0, h0, cam)
-            self.A.desenha(h, rod, ts, c["tipo"], foco)
+            self.A.desenha(h, rod, ts, modo, foco)
             cena_sup = h.finaliza(bloom=0.8)
             R.cromatica(cena_sup)
             R.varredura(h, t)
@@ -162,32 +205,50 @@ class Video:
         vel = None
         if sim:
             dt = 0.05
-            vel = (self.tempo_sim(c, tl + dt) - ts) / dt
-        rot_cam = {"ao_vivo": "AO VIVO · GERAÇÃO INTEIRA", "replay": "REPLAY · 1 LANCE"}.get(c["tipo"], "ANÁLISE")
-        K.moldura_cena(ctx, t, rot_cam, vel, ts if sim else None)
-        if c["tipo"] == "replay":
-            K.selo_replay(ctx, tl if c is self._primeira_do_grupo(c) else 1.0)
-            ctx.save()
-            K.recorte_cena(ctx)
-            self._telestrador(ctx, palco, rod, c, ts, tl)
-            ctx.restore()
+            vel = (self._estado(c, tl + dt)[1] - ts) / dt
+        if modo == "replay":
+            rot_cam = f"◀◀ REPLAY · GER {rod.g + 1:03d}"
+        elif modo == "ao_vivo":
+            rot_cam = f"AO VIVO · GER {rod.g + 1:03d} · {self.info.get('rotulo_vivo', 'GERAÇÃO INTEIRA')}"
+        else:
+            rot_cam = "ANÁLISE"
+        K.moldura_cena(ctx, t, rot_cam, vel if sim and vel > 0 else None)
+        if modo == "replay":
+            ini_clip = tl if c["tipo"] == "replay" else (tl % (c["dur"] / len(c["clipes"])))
+            if c["tipo"] != "replay" or c is self._primeira_do_grupo(c):
+                K.selo_replay(ctx, ini_clip)
+            if c["tipo"] == "replay":
+                ctx.save()
+                K.recorte_cena(ctx)
+                self._telestrador(ctx, palco, rod, c, ts, tl)
+                ctx.restore()
+        if c.get("titulo_gancho"):
+            K.titulo_gancho(ctx, c["titulo_gancho"], tl)
+        if c.get("carimbo"):
+            k = c["carimbo"]
+            K.carimbo(ctx, k["texto"], k["cor"], tl - k.get("em", 0.2), sub=k.get("sub"))
         if c.get("cartao"):
             k = c["cartao"]
             K.cartao_descoberta(ctx, tl, c["dur"], k["cor"], k["numero"], k["rotulo"], k["nome"], k["stat"])
             if sons and abs(tl) < 1 / FPS:
                 self.eventos.append((t, "glitch", 1))
+        if c.get("escolha"):
+            k = c["escolha"]
+            K.faixa_escolha(ctx, tl - k.get("em", 0.0), k["pergunta"], k["opcoes"])
         K.legenda(ctx, [(a, b, w) for a, b, w, _ in self.blocos], t,
                   next((d for a, b, w, d in self.blocos if a <= t < b), {}))
         # fileira de baixo
         cb = self.A.cerebro(rod, ts, foco)
-        K.rede(ctx, 30, K.BAIXO[0], 520, K.BAIXO[1], cb["camadas"], cb["pesos"], cb["ativ"], t, cb["saidas"],
+        K.console(ctx, 30, K.BAIXO[0], 570, K.BAIXO[1], self.linhas_log, t)
+        K.rede(ctx, 615, K.BAIXO[0], 435, K.BAIXO[1], cb["camadas"], cb["pesos"], cb["ativ"], t, cb["saidas"],
                cb["titulo"], c=cb["cor"])
-        K.console(ctx, 565, K.BAIXO[0], 485, K.BAIXO[1], self.linhas_log, t)
         K.rodape(ctx, info.get("rodape", ""))
         K.scanlines(ctx, t)
         if sons and sim:
-            ts0 = self.tempo_sim(c, max(tl - 1 / FPS, 0)) if tl > 0 else -1e-9
-            for te, tipo, inten in self.A.sons(rod, ts0, ts, c["tipo"], foco):
+            r0, ts0, _, f0 = self._estado(c, max(tl - 1 / FPS, 0))
+            if tl <= 0 or r0 is not rod or f0 != foco:
+                ts0 = ts - 1 / FPS
+            for te, tipo, inten in self.A.sons(rod, ts0, ts, modo, foco):
                 self.eventos.append((t, tipo, inten))
         if t > self.dur - 0.4 and getattr(self, "primeiro", None) is not None:  # laço perfeito
             ctx.identity_matrix()
@@ -230,12 +291,16 @@ class Video:
         x, y, w, h = K.CENA
         ctx.set_source_rgba(0.01, 0.02, 0.035, 0.94)
         ctx.paint()
+        tg, dg = self.tempo_grupo(c, c["ini"] + tl)
         if c["tipo"] == "grafico":
             K.grafico_eras(ctx, K.CENA, c["serie"], self.A.total_ger, c.get("eras", []),
-                           self.A.total_ger * min(tl / (c["dur"] * 0.75), 1), c["titulo"], c.get("rotulo_y", ""))
+                           self.A.total_ger * min(tg / (dg * 0.6), 1), c["titulo"], c.get("rotulo_y", ""),
+                           faixa_ref=c.get("faixa_ref"), final=c.get("final"))
         elif c["tipo"] == "barras":
-            K.barras(ctx, K.CENA, c["itens"], c["titulo"], c.get("sub", ""), tl / max(c["dur"] * 0.6, 0.1),
-                     c.get("destaque") if tl > c.get("revela", 0) else None)
+            K.barras(ctx, K.CENA, c["itens"], c["titulo"], c.get("sub", ""), tg / 1.6,
+                     c.get("destaque") if tl > c.get("revela", 0) else None,
+                     atual=c.get("atual") if tl > c.get("revela", 0) else None,
+                     cor_destaque=c.get("cor_destaque", "vermelho"))
         elif c["tipo"] == "final":
             K.tela_final(ctx, K.CENA, tl, c["pergunta"], c["opcoes"])
 
@@ -306,9 +371,11 @@ class Video:
                         "-frames:v", "1", os.path.join(pasta, "mosaico.jpg")], check=False)
 
 
-def _mapa_lento(D, chaves, total_video, forca=0.7, largura=0.28):
-    """Função tempo_de_video -> tempo_de_simulação que desacelera perto das chaves."""
-    ts = np.linspace(0, D, 600)
+def _mapa_lento(D, chaves, total_video, forca=0.7, largura=0.28, inicio=0.0):
+    """Função tempo_de_video -> tempo_de_simulação que desacelera perto das chaves.
+
+    inicio: pula o começo do lance (s de simulação) para entrar direto na ação."""
+    ts = np.linspace(min(inicio, D * 0.9), D, 600)
     taxa = np.ones_like(ts)
     for k in chaves:
         taxa = np.minimum(taxa, 1 - forca * np.exp(-((ts - k) ** 2) / (2 * largura ** 2)))

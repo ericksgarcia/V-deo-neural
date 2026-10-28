@@ -58,7 +58,10 @@ def treina(Desafio, geracoes=150, populacao=150, semente=7, log=print):
         hist["quase"].append(amb.chegou_mas_bateu())
         hist["melhor"].append(float(apt.max()))
         hist["semente"].append(sem)
+        if hasattr(amb, "metricas"):
+            for k, v in amb.metricas().items():
+                hist.setdefault("m_" + k, []).append(v)
         if log and (g % 10 == 0 or g == geracoes - 1):
             log(f"geração {g + 1:3d}: {suc:3d}/{populacao} sucesso | quase {hist['quase'][-1]:3d} | melhor {apt.max():.2f}")
-        genes = proxima_geracao(genes, apt, rng)
+        genes = proxima_geracao(genes, apt, rng, **getattr(Desafio, "ga", {}))
     return {k: np.array(v) for k, v in hist.items()}

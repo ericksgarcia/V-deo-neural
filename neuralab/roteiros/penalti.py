@@ -65,57 +65,66 @@ def lado(x):
     return "ESQUERDA" if x < 0 else "DIREITA"
 
 
+def segmentos(cond, minimo=3):
+    """[(ini, fim)] dos trechos em que cond é verdadeira por pelo menos `minimo` gerações."""
+    out, ini = [], None
+    for g, v in enumerate(list(cond) + [False]):
+        if v and ini is None:
+            ini = g
+        elif not v and ini is not None:
+            if g - ini >= minimo:
+                out.append((ini, g))
+            ini = None
+    return out
+
+
 def monta(hist, A):
     ev = eventos(hist)
     M, G = ev["M"], ev["G"]
-    m = lambda chave, g: float(hist["m_" + chave][g])
-    cenas = []
-    marcos = []
+    cenas, marcos = [], []
 
     def cena(**kw):
-        kw.setdefault("destaques", {})
+        kw.setdefault("destaques", D)
         cenas.append(kw)
         return kw
 
-    D = {"mentir": BAT, "corpo": BAT, "pênalti": BRANCO, "goleiro": GOL, "goleiros": GOL, "batedor": BAT, "batedores": BAT, "enganar": BAT, "mentindo": BAT,
-         "ler": GOL, "lê": GOL, "espera": GOL, "fora": VERMELHO, "ninguém": VERDE}
-
-    # 1-2 · GANCHO: o comportamento mais impressionante, já no primeiro segundo
-    gf, kf = melhor_lance(A, [ev["finta"] + d for d in range(0, 30)] if ev["finta"] is not None else [], "finta")
-    if gf is not None:
-        rod = A.rodada(gf)
-        j = rod.jogo
-        tc, tp = float(j.chute_t[kf]), float(j.pulo_t[kf])
-        marcas = [{"tipo": "seta", "em": max(tc - 0.45, 0.05), "alvo": "batedor", "ate": "frente_corpo",
-                   "texto": f"CORPO: {lado(j.corpo_antes[kf])}", "desloca": (0, -40), "rotulo_no_fim": True},
-                  {"tipo": "circulo", "em": tp, "alvo": "goleiro", "segue": True, "texto": "CAIU!"},
-                  {"tipo": "circulo", "em": float(rod.fim[kf]), "alvo": "bola_fim", "rx": 60, "ry": 60,
-                   "texto": "BOLA: " + lado(j.alvo[kf]), "desloca": (0, 110)}]
-        cena(tipo="replay", ger=gf, foco=kf, grupo="gancho", marcas=marcas, destaques=D,
-             fala="Coloquei duas IAs pra bater pênalti… e o batedor aprendeu a mentir com o corpo.")
-        cena(tipo="replay", ger=gf, foco=kf, grupo="gancho", marcas=marcas, destaques=D,
-             fala="Ninguém ensinou isso pra ele.", pausa=0.3)
-
-    # 3-5 · PREMISSA + GERAÇÃO 1
-    log1 = [("EXPERIMENTO 004 // PÊNALTI", BRANCO), ("100 BATEDORES × 100 GOLEIROS", BRANCO)]
-    cena(tipo="ao_vivo", ger=0, grupo="g1", destaques=D, log=log1,
-         fala="Dois times de IA. Cem batedores contra cem goleiros.")
-    cena(tipo="ao_vivo", ger=0, grupo="g1", destaques=D,
-         fala="Cérebros aleatórios. Nenhum deles sabe o que é futebol.")
-    cena(tipo="ao_vivo", ger=0, grupo="g1", destaques=D, log=[(f"GER 001 · FORA {pct(m('fora', 0))}", VERMELHO)],
-         fala=f"Geração um: {em_dez(m('fora', 0))} chutes vão pra fora.")
-
-    # 6 · REGRA DO JOGO (seleção)
-    cena(tipo="ao_vivo", ger=min(8, G - 1), destaques=D, log=[("SELEÇÃO: OS MELHORES TÊM FILHOS", BRANCO)],
-         fala="A cada geração, só os melhores de cada lado têm filhos.")
-
-    # 7-8 · PRIMEIRO APRENDIZADO DE CADA LADO (em ordem cronológica)
+    D = {"mentir": BAT, "corpo": BAT, "goleiro": GOL, "goleiros": GOL, "batedor": BAT, "batedores": BAT,
+         "mentindo": BAT, "ler": GOL, "lê": GOL, "espera": GOL, "fora": VERMELHO, "ninguém": VERDE,
+         "melhores": VERDE, "treinando": GOL}
     numero = [0]
 
     def prox():
         numero[0] += 1
         return numero[0]
 
+    # ---------------------------------------------------------------- 0-1 · GANCHO (o resultado, já no 1º quadro)
+    gf, kf = melhor_lance(A, [ev["finta"] + d for d in range(0, 30)] if ev["finta"] is not None else [], "finta")
+    marcas_finta = []
+    if gf is not None:
+        rod = A.rodada(gf)
+        j = rod.jogo
+        tc, tp = float(j.chute_t[kf]), float(j.pulo_t[kf])
+        marcas_finta = [
+            {"tipo": "seta", "em": max(tc - 0.45, 0.05), "alvo": "batedor", "ate": "frente_corpo",
+             "texto": f"CORPO: {lado(j.corpo_antes[kf])}", "desloca": (0, -40), "rotulo_no_fim": True},
+            {"tipo": "circulo", "em": tp, "alvo": "goleiro", "segue": True, "texto": "CAIU!", "rx": 80, "ry": 70},
+            {"tipo": "circulo", "em": float(rod.fim[kf]), "alvo": "bola_fim", "rx": 50, "ry": 50,
+             "texto": "BOLA: " + lado(j.alvo[kf]), "desloca": (0, 100)}]
+        inicio = max(tc - 1.1, 0.0)
+        gancho = [("A IA APRENDEU", BRANCO), ("A MENTIR", BAT)]
+        cena(tipo="replay", ger=gf, foco=kf, grupo="gancho", marcas=marcas_finta, inicio=inicio, titulo_gancho=gancho,
+             fala="Coloquei duas IAs pra bater pênalti… e o batedor aprendeu a mentir com o corpo.")
+        cena(tipo="replay", ger=gf, foco=kf, grupo="gancho", marcas=marcas_finta, inicio=inicio,
+             fala="Ninguém ensinou isso pra ele.", pausa=0.25)
+
+    # ---------------------------------------------------------------- 2-3 · PREMISSA + GERAÇÃO 1 (curta)
+    cena(tipo="ao_vivo", ger=0, grupo="g1", log=[("100 BATEDORES × 100 GOLEIROS", BRANCO), ("CÉREBROS ALEATÓRIOS", BRANCO)],
+         fala="Cem batedores contra cem goleiros. Cérebros aleatórios. Só os melhores têm filhos.")
+    cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"GER 001 · FORA {pct(M['fora'][0])}", VERMELHO)],
+         carimbo={"texto": f"FORA {pct(M['fora'][0])}", "cor": "vermelho", "em": 0.6, "sub": "GERAÇÃO 1"},
+         fala=f"Geração um: {em_dez(M['fora'][0])} vão pra fora.")
+
+    # ---------------------------------------------------------------- 4-5 · PRIMEIROS APRENDIZADOS (cronológico)
     blocos = []
     if ev["paciente"] is not None:
         g0 = ev["paciente"]
@@ -129,8 +138,8 @@ def monta(hist, A):
             rod = A.rodada(gp)
             antes, depois = M["pulo_antes"][:5].max(), M["pulo_antes"][g0]
             marcas = [{"tipo": "circulo", "em": float(rod.jogo.chute_t[kp]) - 0.25, "alvo": "goleiro", "segue": True,
-                       "texto": "ESPERANDO..."}]
-            cena(tipo="replay", ger=gp, foco=kp, marcas=marcas, destaques=D,
+                       "texto": "ESPERANDO...", "rx": 80, "ry": 70}]
+            cena(tipo="replay", ger=gp, foco=kp, marcas=marcas, inicio=max(float(rod.jogo.chute_t[kp]) - 1.0, 0),
                  cartao={"numero": prox(), "rotulo": "GOLEIRO", "nome": "A PACIÊNCIA", "cor": GOL,
                          "stat": f"PULA ANTES DO CHUTE  {pct(antes)} → {pct(depois)}"},
                  log=[("NOVO PADRÃO: GOLEIRO_ESPERA", GOL)],
@@ -138,26 +147,29 @@ def monta(hist, A):
             marcos.append((g0, "PACIENTE", GOL))
         else:
             g = g0
-            cena(tipo="ao_vivo", ger=g, destaques=D,
+            cena(tipo="ao_vivo", ger=g,
                  cartao={"numero": prox(), "rotulo": "BATEDOR", "nome": "A MIRA", "cor": BAT,
-                         "stat": f"PRA FORA {pct(m('fora', 0))} → {pct(M['fora'][g])} · CHUTE EM {M['tempo_chute'][g]:.1f}s"},
-                 log=[(f"GER {g + 1:03d} · FORA {pct(M['fora'][g])} · CHUTE {M['tempo_chute'][g]:.1f}s", BAT)],
+                         "stat": f"PRA FORA {pct(M['fora'][0])} → {pct(M['fora'][g])} · CHUTE EM {M['tempo_chute'][g]:.1f}s"},
+                 carimbo={"texto": f"{M['tempo_chute'][g]:.1f} s".replace(".", ","), "cor": "amarelo", "em": 1.6,
+                          "sub": "ATÉ O CHUTE"},
+                 log=[(f"GER {g + 1:03d} · FORA {pct(M['fora'][g])}", BAT)],
                  fala=f"Geração {g + 1}: o batedor quase não chuta mais pra fora. E bate em um segundo.")
             marcos.append((g0, "MIRA", BAT))
 
-    # 9-12 · CALMARIA... E A VIRADA DO GOLEIRO
+    # ---------------------------------------------------------------- 6-11 · CALMARIA ENGANOSA → VIRADA DO GOLEIRO
     if ev["leitura"] is not None:
         gl = ev["leitura"]
         ini = (ev["mira"] or 0) + 5
         media = float(M["gol"][ini:gl].mean())
-        meio = (ini + gl) // 2
+        m0 = (ini + gl) // 2   # segunda metade do platô: é quando o goleiro já está treinando
+        meio = m0 + int(np.argmin(np.abs(M["gol"][m0:gl] - media)))   # e o HUD mostra o número falado
         treinando = M["leitura"][meio] > M["leitura"][ini] + 0.1 or M["pulo_antes"][meio] > M["pulo_antes"][ini] + 0.1
-        cena(tipo="ao_vivo", ger=meio, destaques=D,
-             log=[(f"GER {ini + 1:03d}-{gl:03d} · GOLS ~{pct(media)} · PLACAR TRAVADO", BRANCO)] +
-                 ([(f"GER {meio + 1:03d} · GOLEIRO PULA ANTES {pct(M['pulo_antes'][meio])}", GOL)] if treinando else []),
-             fala=f"Daí pra frente, o placar trava. {em_dez(media).capitalize()} bolas entram."
-                  + (" Mas o goleiro está treinando." if treinando else ""))
-        cena(tipo="ao_vivo", ger=gl, destaques=D, pausa=0.45, fala=f"Até que, na geração {gl + 1}…")
+        cena(tipo="ao_vivo", ger=meio,
+             carimbo={"texto": f"GOLS {pct(M['gol'][meio])}", "cor": "texto", "em": 0.3, "sub": "PLACAR TRAVADO"},
+             log=[(f"GER {ini + 1:03d}-{gl:03d} · GOLS ~{pct(media)}", BRANCO)] +
+                 ([(f"GOLEIRO PULA ANTES {pct(M['pulo_antes'][meio])}", GOL)] if treinando else []),
+             fala=f"{em_dez(media).capitalize()} entram." + (" Mas o goleiro está treinando…" if treinando else ""))
+        cena(tipo="ao_vivo", ger=gl, pausa=0.4, fala=f"Até que, na geração {gl + 1}…")
         g2, k2 = melhor_lance(A, range(gl, gl + 15), "leitura")
         if g2 is not None:
             rod = A.rodada(g2)
@@ -166,87 +178,101 @@ def monta(hist, A):
             marcas = [{"tipo": "seta", "em": max(tc - 0.45, 0.05), "alvo": "batedor", "ate": "frente_corpo",
                        "texto": f"CORPO: {lado(j.corpo_antes[k2])}", "desloca": (0, -40), "rotulo_no_fim": True},
                       {"tipo": "circulo", "em": float(j.pulo_t[k2]), "alvo": "goleiro", "segue": True,
-                       "texto": "LEU!"}]
-            cena(tipo="replay", ger=g2, foco=k2, marcas=marcas, destaques=D, grupo="leitura",
+                       "texto": "LEU!", "rx": 80, "ry": 70}]
+            cena(tipo="replay", ger=g2, foco=k2, marcas=marcas, grupo="leitura", inicio=max(tc - 1.0, 0),
                  cartao={"numero": prox(), "rotulo": "GOLEIRO", "nome": "A LEITURA", "cor": GOL,
                          "stat": f"ACERTA O LADO EM {pct(M['leitura'][gl])} DOS PULOS"},
                  log=[("NOVO PADRÃO: LER_O_CORPO", GOL)],
                  fala="O goleiro aprende a ler o corpo do batedor.")
-            cena(tipo="replay", ger=g2, foco=k2, marcas=marcas, destaques=D, grupo="leitura",
+            cena(tipo="replay", ger=g2, foco=k2, marcas=marcas, grupo="leitura", inicio=max(tc - 1.0, 0),
                  fala="O corpo aponta. Ele pula. O corpo aponta. Ele pula.")
             marcos.append((gl, "LEITURA", GOL))
         gq = ev["queda"]
-        pior = float(M["gol"][gq])
-        cena(tipo="ao_vivo", ger=gq, destaques=D, log=[(f"ALERTA · GOLS {pct(pior)}", VERMELHO)],
-             fala=f"E o gol cai pra {pct(pior)}.")
+        cena(tipo="ao_vivo", ger=gq, log=[(f"ALERTA · GOLS {pct(M['gol'][gq])}", VERMELHO)],
+             carimbo={"texto": f"GOLS {pct(M['gol'][gq])}", "cor": GOL, "em": 0.5, "sub": "A MENOR EM 80 GERAÇÕES"
+                      if gq > 80 and M["gol"][gq - 80:gq].min() >= M["gol"][gq] else None},
+             fala=f"E o gol cai pra {pct(M['gol'][gq])}.")
 
-    # 13-14 · A RESPOSTA DO BATEDOR
+    # ---------------------------------------------------------------- 12-14 · A RESPOSTA DO BATEDOR
     if ev.get("finta") is not None and gf is not None:
         gfi = ev["finta"]
-        cena(tipo="replay", ger=gf, foco=kf, destaques=D, grupo="finta2",
+        rod = A.rodada(gf)
+        cena(tipo="replay", ger=gf, foco=kf, grupo="finta2", marcas=marcas_finta,
+             inicio=max(float(rod.jogo.chute_t[kf]) - 1.1, 0),
              cartao={"numero": prox(), "rotulo": "BATEDOR", "nome": "A FINTA", "cor": BAT,
-                     "stat": f"FINTAS QUE VIRAM GOL  {pct(m('finta_gol', gf))}"},
+                     "stat": f"FINTAS QUE VIRAM GOL  {pct(M['finta_gol'][gf])}"},
              log=[("NOVO PADRÃO: FINTA_DE_CORPO", BAT)],
-             marcas=cenas[0]["marcas"],
              fala=f"{gfi - ev['queda']} gerações depois, o batedor responde… mentindo.")
-        cena(tipo="replay", ger=gf, foco=kf, destaques=D, grupo="finta2", marcas=cenas[0]["marcas"],
+        cena(tipo="replay", ger=gf, foco=kf, grupo="finta2", marcas=marcas_finta,
+             inicio=max(float(rod.jogo.chute_t[kf]) - 1.1, 0),
              fala="O corpo mostra um canto. A bola vai no outro.")
         marcos.append((gfi, "FINTA", BAT))
-        gd = ev["desaprende"]
-        parou = M["pulo_antes"][gd] < 0.5 * M["pulo_antes"][ev["queda"]]
-        cena(tipo="ao_vivo", ger=gd, destaques=D,
-             log=[(f"GER {gd + 1:03d} · ACERTA O LADO {pct(M['leitura'][gd])} · PULA ANTES {pct(M['pulo_antes'][gd])}", GOL)],
-             fala="Agora, quem lê o corpo cai na mentira." + (" E o goleiro para de pular antes." if parou else ""))
+        # montagem: o ciclo se repete (lances reais de ciclos posteriores, alternando leitura e finta)
+        ciclos_l = segmentos(M["leitura"] >= 0.8)
+        ciclos_f = segmentos(M["finta"] >= 0.45)
+        clipes = []
+        for (la, lb), fa in zip(ciclos_l[1:], ciclos_f[1:] + [None] * 4):
+            gl2, kl2 = melhor_lance(A, range(la, lb + 3), "leitura")
+            if gl2 is not None:
+                clipes.append((gl2, kl2))
+            if fa:
+                gf2, kf2 = melhor_lance(A, range(fa[0], fa[1] + 3), "finta")
+                if gf2 is not None:
+                    clipes.append((gf2, kf2))
+        if len(clipes) >= 2:
+            cena(tipo="montagem", clipes=clipes[:4], log=[(f"CICLOS LEITURA ↔ FINTA: {ev['ciclos']}", BRANCO)],
+                 fala="E não para. Ler, mentir, desconfiar, ler de novo.")
 
-    # 15-16 · O CICLO + EQUILÍBRIO
+    # ---------------------------------------------------------------- 15 · O GRÁFICO DA CORRIDA ARMAMENTISTA
     final = float(M["gol"][-1])
-    eras = []
-    if ev["paciente"] is not None:
-        eras.append((ev["paciente"], ev["leitura"] or G, "ESPERA", GOL))
-    if ev["leitura"] is not None:
-        eras.append((ev["leitura"], ev.get("finta") or G, "LEITURA", GOL))
-    if ev.get("finta") is not None:
-        eras.append((ev["finta"], ev.get("desaprende", G) + 1, "FINTA", BAT))
-    cena(tipo="grafico", serie=M["gol"], eras=eras, titulo="% DE GOLS POR GERAÇÃO", rotulo_y="GOLS",
-         log=[(f"CICLOS LEITURA ↔ FINTA: {ev['ciclos']}", BRANCO)], destaques=D,
-         fala=f"E não para. Ler, mentir, desconfiar, ler de novo. A leitura apareceu {ev['ciclos']} vezes em {G} gerações.")
-    cena(tipo="grafico", serie=M["gol"], eras=eras, titulo="% DE GOLS POR GERAÇÃO", rotulo_y="GOLS",
-         destaques=D, log=[(f"GER {G:03d} · GOLS {pct(final)}", VERDE)],
-         fala=f"No fim: {pct(final)} de gol." + (" A mesma faixa do futebol profissional." if 0.74 <= final <= 0.82 else ""))
+    eras = [(a, b, "LEITURA", GOL) for a, b in segmentos(M["leitura"] >= 0.8)]
+    eras += [(a, b, "FINTA", BAT) for a, b in segmentos(M["finta"] >= 0.45)]
+    pro = 0.74 <= final <= 0.82
+    cena(tipo="grafico", grupo="grafico", serie=M["gol"], eras=eras, titulo="% DE GOLS POR GERAÇÃO",
+         rotulo_y="CADA FAIXA = UMA DESCOBERTA", faixa_ref=(0.75, 0.80, "FUTEBOL PROFISSIONAL ~75-80%") if pro else None,
+         final=pct(final), log=[(f"GER {G:03d} · GOLS {pct(final)}", VERDE)],
+         fala=f"A leitura apareceu {ev['ciclos']} vezes em {G} gerações. No fim: {pct(final)} de gol."
+              + (" A mesma faixa do futebol profissional." if pro else ""))
 
-    # 17-19 · TORNEIO: o final irônico
-    gens = sorted(set(list(range(0, G, max(G // 15, 1))) + [G - 1]))
-    taxas = [torneio(hist, G - 1, g, 1500) for g in gens]
-    i_min = int(np.argmin(taxas[:-1]))
-    itens = [(f"GOLEIRO G{g + 1:03d}", 1 - tx, GOL) for g, tx in zip(gens, taxas)]
-    cena(tipo="barras", itens=itens, titulo="QUEM DEFENDE MAIS?", sub="contra o batedor final · 1.500 cobranças",
-         destaques=D, log=[(f"TORNEIO: {len(gens)} GOLEIROS × BATEDOR FINAL", BRANCO)],
-         fala="Aí eu coloquei o batedor final contra goleiros do passado. Quem defende melhor?",
-         pausa=0.4)
-    g_m, t_m, t_f = gens[i_min], taxas[i_min], taxas[-1]
+    # ---------------------------------------------------------------- 16-17 · TORNEIO: o final irônico
+    grade = sorted(set(list(range(0, G, 10)) + [G - 1]))
+    taxas = {g: torneio(hist, G - 1, g, 1500) for g in grade}
+    g_m = min((g for g in grade if g != G - 1), key=lambda g: taxas[g])
+    t_m, t_f = taxas[g_m], taxas[G - 1]
+    outros = [g for g in grade if g not in (g_m, G - 1)]
+    mostra = sorted(set([outros[int(i)] for i in np.linspace(0, len(outros) - 1, 6)] + [g_m, G - 1]))
+    itens = [(f"G{g + 1:03d}", taxas[g], GOL) for g in mostra]
+    sub = "gols sofridos contra o batedor final · menor = melhor"
+    cena(tipo="barras", grupo="torneio", itens=itens, titulo="QUEM DEFENDE MELHOR?", sub=sub,
+         log=[(f"TORNEIO: {len(grade)} GOLEIROS × BATEDOR FINAL", BRANCO)], pausa=0.3,
+         fala="Aí eu coloquei o batedor final contra goleiros do passado. Quem defende melhor?")
     if t_m < t_f - 0.05:
-        cena(tipo="barras", itens=itens, destaque=i_min, titulo="QUEM DEFENDE MAIS?", revela=0.0,
-             sub="contra o batedor final · 1.500 cobranças", destaques=D,
-             log=[(f"MELHOR: G{g_m + 1:03d} · GOLS SOFRIDOS {pct(t_m)} (ATUAL {pct(t_f)})", AMARELO)],
-             fala=f"Não é o goleiro atual: contra ele, {pct(t_f)} de gol. É o da geração {g_m + 1}. Só {pct(t_m)}.")
-        cena(tipo="barras", itens=itens, destaque=i_min, titulo="QUEM DEFENDE MAIS?", revela=0.0,
-             sub="contra o batedor final · 1.500 cobranças", destaques=D,
-             fala="O batedor aprendeu a vencer o goleiro de hoje. E esqueceu como vencer o de ontem.")
-    # 20 · CHAMADA
-    cena(tipo="final", pergunta="E AÍ, QUAL É O SEU TIME?", opcoes=[("TIME BATEDOR", BAT), ("TIME GOLEIRO", GOL)],
-         destaques={"batedor": BAT, "goleiro": GOL, "mentiroso": BAT, "ler": GOL},
-         fala="O mentiroso ou o que aprendeu a ler? Time batedor ou time goleiro?")
+        cena(tipo="barras", grupo="torneio", itens=itens, titulo="QUEM DEFENDE MELHOR?", sub=sub, revela=0.0,
+             destaque=mostra.index(g_m), atual=mostra.index(G - 1), cor_destaque=GOL,
+             log=[(f"MELHOR: G{g_m + 1:03d} · {pct(t_m)} (ATUAL {pct(t_f)})", GOL)],
+             fala=f"Não é o goleiro atual: {pct(t_f)} de gol. É o da geração {g_m + 1}. Só {pct(t_m)}.")
+        cena(tipo="barras", grupo="torneio", itens=itens, titulo="QUEM DEFENDE MELHOR?", sub=sub, revela=0.0,
+             destaque=mostra.index(g_m), atual=mostra.index(G - 1), cor_destaque=GOL,
+             fala="O batedor aprendeu a vencer o goleiro de hoje. E esqueceu o de ontem.")
 
-    serie = M["gol"]
+    # ---------------------------------------------------------------- 18 · CHAMADA + LAÇO (emenda na 1ª fala)
+    if gf is not None:
+        rod = A.rodada(gf)
+        cena(tipo="replay", ger=gf, foco=kf, inicio=max(float(rod.jogo.chute_t[kf]) - 1.1, 0),
+             escolha={"pergunta": "QUAL É O SEU TIME?", "opcoes": [("BATEDOR", BAT), ("GOLEIRO", GOL)], "em": 0.2},
+             destaques={"batedor": BAT, "goleiro": GOL},
+             fala="Time batedor ou time goleiro? Porque tudo começou quando eu…")
+
     info = {
         "marca": "VÍDEO NEURAL",
-        "serie": serie,
+        "serie": M["gol"],
         "serie_rotulo": "% DE GOL POR GERAÇÃO",
         "marcos": marcos,
+        "rotulo_vivo": "100 COBRANÇAS",
         "rodape": f"POP 100×100 · REDES 8-10-3 / 9-10-2 · {G} GERAÇÕES · NADA FOI PROGRAMADO, SÓ SELEÇÃO",
     }
     post = (f"Coloquei duas IAs pra bater pênalti uma contra a outra por {G} gerações. "
-            f"O batedor aprendeu a fintar. Simulação real, nenhum número inventado.\n"
+            f"O batedor aprendeu a mentir com o corpo. Simulação real, nenhum número inventado.\n"
             f"Time batedor ou time goleiro? 👇\n\n#ia #futebol #penalti #inteligenciaartificial #machinelearning "
             f"#simulacao #goleiro #tecnologia")
     return cenas, info, post, ev

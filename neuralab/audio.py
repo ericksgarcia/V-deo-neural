@@ -106,43 +106,68 @@ def _silencios(x, minimo=0.25, limiar=0.02):
     return np.array(out)
 
 
-def narra_lote(falas, cache, voz="Charon", modelo="gemini-3.8-flash-tts", velocidade=1.15):
-    """Narra todas as falas numa ÚNICA chamada (mesmo timbre do início ao fim) e corta nos silêncios.
+def narra_lote(falas, cache, voz="Charon", modelo="gemini-3.8-flash-tts", velocidade=1.15, tentativa=0):
+    """Narra todas as falas numa ÚNICA chamada (mesmo timbre do início ao fim) e corta por fala.
 
-    Devolve uma lista de áudios mono float32 a 48 kHz, ou None se a API não estiver disponível.
+    O corte usa os tempos de cada palavra que o Whisper (local) ouve no áudio inteiro, alinhados
+    com o texto do roteiro; assim cada fala cai na cena certa. Devolve uma lista de áudios mono
+    float32 a 48 kHz, ou None se a API não estiver disponível.
     O texto vai puro: instruções de estilo no prompt acabam sendo lidas em voz alta."""
     os.makedirs(cache, exist_ok=True)
     textos = [falavel(f) for f in falas]
-    chave = hashlib.sha1(f"{modelo}|{voz}|{velocidade}|{textos}".encode()).hexdigest()[:16]
-    arq = os.path.join(cache, chave + ".npz")
+    extra = f"|t{tentativa}" if tentativa else ""
+    chave = hashlib.sha1(f"{modelo}|{voz}|{velocidade}|{textos}{extra}".encode()).hexdigest()[:16]
+    arq = os.path.join(cache, chave + "_v2.npz")
     if os.path.exists(arq):
         z = np.load(arq)
         return [z[f"f{k}"] for k in range(len(falas))]
-    try:
-        x = _tts("\n\n".join(textos), voz, modelo)
-    except Exception as e:  # sem rede/chave: segue só com legendas
-        print(f"  [aviso] TTS indisponível ({e}); usando só legenda")
-        return None
-    x = _apara(x)
-    # fronteiras esperadas proporcionais ao texto, encaixadas no silêncio mais próximo
-    tam = np.cumsum([len(t) for t in textos])
-    esperado = tam[:-1] / tam[-1] * len(x) / SR
-    gaps = _silencios(x)
-    cortes, ant = [], 0.0
-    for k, e in enumerate(esperado):
-        cand = gaps[(gaps > ant + 0.4) & (gaps < len(x) / SR - 0.4 * (len(esperado) - k))]
-        c = float(cand[np.argmin(np.abs(cand - e))]) if len(cand) else e
-        cortes.append(c)
-        ant = c
-    lim = [0] + [int(c * SR) for c in cortes] + [len(x)]
-    partes = []
-    for a, b in zip(lim[:-1], lim[1:]):
-        p = _apara(x[a:b])
+    antigo = os.path.join(cache, chave + ".npz")
+    if os.path.exists(antigo):  # cache da versão anterior: as partes juntas são o áudio inteiro
+        z = np.load(antigo)
+        x = np.concatenate([z[f"f{k}"] for k in range(len(falas))])
+    else:
+        try:
+            x = _tts("\n\n".join(textos), voz, modelo)
+        except Exception as e:  # sem rede/chave: segue só com legendas
+            print(f"  [aviso] TTS indisponível ({e}); usando só legenda")
+            return None
+        x = _apara(x)
         if abs(velocidade - 1) > 1e-3:
-            p = _atempo(p, velocidade)
-        partes.append((0.9 * p / (np.abs(x).max() + 1e-6)).astype(np.float32))
-    np.savez(arq, **{f"f{k}": p for k, p in enumerate(partes)})
+            x = _atempo(x, velocidade)
+        x = (0.9 * x / (np.abs(x).max() + 1e-6)).astype(np.float32)
+    partes = _segmenta(x, falas)
+    np.savez(arq, completo=x, **{f"f{k}": p for k, p in enumerate(partes)})
     return partes
+
+
+def _segmenta(x, falas):
+    """Corta o áudio inteiro em uma parte por fala, alinhando o texto com as palavras do Whisper."""
+    import difflib
+    from .fala import _canon, para16k, transcreve
+    _, ws, _ = transcreve(para16k(x, SR), idioma="pt")
+    roteiro = [(tok, k) for k, f in enumerate(falas) for tok in _canon(f).split()]
+    ouvido = [(tok, j) for j, w in enumerate(ws) for tok in _canon(w[2]).split()]
+    sm = difflib.SequenceMatcher(None, [a for a, _ in roteiro], [a for a, _ in ouvido], autojunk=False)
+    ini = [None] * len(falas)
+    fim = [None] * len(falas)
+    for bloco in sm.get_matching_blocks():
+        for d in range(bloco.size):
+            k = roteiro[bloco.a + d][1]
+            j = ouvido[bloco.b + d][1]
+            ini[k] = ws[j][0] if ini[k] is None else min(ini[k], ws[j][0])
+            fim[k] = ws[j][1] if fim[k] is None else max(fim[k], ws[j][1])
+    dur = len(x) / SR
+    # falas sem nenhuma palavra reconhecida: interpola entre as vizinhas
+    for k in range(len(falas)):
+        if ini[k] is None:
+            a = fim[k - 1] if k > 0 and fim[k - 1] is not None else 0.0
+            b = next((ini[j] for j in range(k + 1, len(falas)) if ini[j] is not None), dur)
+            ini[k], fim[k] = a, b
+    cortes = [0.0]
+    for k in range(len(falas) - 1):
+        cortes.append(max((fim[k] + ini[k + 1]) / 2, cortes[-1]))
+    cortes.append(dur)
+    return [_apara(x[int(a * SR):int(b * SR)]).astype(np.float32) for a, b in zip(cortes[:-1], cortes[1:])]
 
 
 def _atempo(x, fator):

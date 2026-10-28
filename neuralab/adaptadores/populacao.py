@@ -56,6 +56,27 @@ class AdaptadorPopulacao(Adaptador):
         m = rod.morte[foco]
         return [m * rod.dt] if m >= 0 else []
 
+    def janela_lance(self, rod, foco):
+        """Trecho essencial de um lance (para montagens): do começo até 0,5 s depois do fim."""
+        m = rod.morte[foco]
+        return 0.0, ((m + 1) * rod.dt + 0.5) if m >= 0 else rod.duracao
+
+    def busca(self, rod, tipo):
+        """Índice de um lance da geração: 'primeiro' (sucesso mais rápido), 'lento' (sucesso mais demorado),
+        'quase' (falha que terminou mais perto do alvo), 'falha' (falha qualquer)."""
+        est = rod.reg["estado"][:, -1]
+        suc = np.where(est == SUCESSO)[0]
+        fal = np.where(est == FALHA)[0]
+        if tipo == "primeiro" and len(suc):
+            return int(suc[np.argmin(rod.morte[suc])])
+        if tipo == "lento" and len(suc):
+            return int(suc[np.argmax(rod.morte[suc])])
+        if tipo in ("quase", "falha") and len(fal):
+            if tipo == "quase":
+                return int(fal[np.argmax(rod.apt[fal])])
+            return int(fal[0])
+        return None
+
     def medidores(self, rod, t, foco):
         s, f = rod.contagem(t)
         return [(self.rotulos[0], f"{s}/{rod.n}", s / rod.n, VERDE),

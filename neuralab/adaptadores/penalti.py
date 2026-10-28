@@ -76,6 +76,9 @@ class Penalti(Adaptador):
         self.hist = hist
         self.total_ger = len(hist["bat"])
         self._cache = {}
+        k = 7  # mesmas médias móveis do roteiro: o HUD mostra exatamente os números falados
+        sv = lambda x: np.convolve(np.pad(x, (k // 2, k // 2), mode="edge"), np.ones(k) / k, "valid")
+        self.suave = {c: sv(hist["m_" + c]) for c in ("gol", "defesa", "fora")}
 
     def rodada(self, g):
         if g not in self._cache:
@@ -85,6 +88,11 @@ class Penalti(Adaptador):
     # ------------------------------------------------------------ lances
     def duracao_foco(self, rod, foco):
         return float(rod.fim[foco]) + 1.0
+
+    def janela_lance(self, rod, foco):
+        """Trecho essencial de um lance (para montagens rápidas): do preparo do chute até o resultado."""
+        tc = float(rod.jogo.chute_t[foco])
+        return max(tc - 0.7, 0.0), float(rod.fim[foco]) + 0.45
 
     def chaves_lento(self, rod, foco):
         j = rod.jogo
@@ -116,15 +124,20 @@ class Penalti(Adaptador):
 
     # ------------------------------------------------------------ câmera
     def camera(self, rod, t, modo, foco):
+        """Enquadramento fixo da marca até a rede (batedor, bola e goleiro sempre juntos).
+
+        No replay, aproxima de leve (até 1,15x) entre o chute e o resultado; no ao vivo, quando as
+        bolas chegam, aproxima do gol para mostrar o mapa de chutes."""
+        geral = Camera2D(centro=(0.2, 5.3), escala=54, t=t)
+        j = rod.jogo
         if modo != "replay" or foco is None:
-            return Camera2D(centro=(0.0, 7.9), escala=68, t=t)
-        j, reg = rod.jogo, rod.reg
-        tc = float(j.chute_t[foco])
-        x, y = pos_batedor(float(reg["r"][foco, rod.i(min(t, tc))]))
-        perto_bat = Camera2D(centro=(x * 0.6 + 0.4, y + 0.9), escala=105, t=t)
-        perto_gol = Camera2D(centro=(float(np.clip(j.alvo[foco], -3, 3)) * 0.45, 9.6), escala=92, t=t)
-        cam = perto_bat.mistura(perto_gol, (t - (tc - 0.05)) / (VOO + 0.15))
-        tf = float(rod.fim[foco])
+            tc = float(np.median(j.chute_t[rod.vitrine]))
+            gol = Camera2D(centro=(0.0, 9.4), escala=88, t=t)
+            return geral.mistura(gol, (t - tc - 0.1) / 0.6)
+        tc, tf = float(j.chute_t[foco]), float(rod.fim[foco])
+        perto = Camera2D(centro=(float(np.clip(j.alvo[foco], -3, 3)) * 0.25, 6.2), escala=62, t=t)
+        k = min((t - (tc - 0.3)) / 0.5, 1.0) - max((t - tf - 0.6) / 0.6, 0.0)
+        cam = geral.mistura(perto, k)
         if 0 <= t - tf < 0.35:  # tremida no impacto
             cam.tremor = 9 * (1 - (t - tf) / 0.35)
         return cam
@@ -134,14 +147,13 @@ class Penalti(Adaptador):
         h.fundo(brilho_centro=(0.03, 0.05, 0.1))
         h.grade(1.0, alfa=0.045)
         R.poeira(h, t, alfa=0.3)
-        R.placa(h, -9.16, -3.2, 9.16, LINHA_GOL, t, CIANO)
+        R.placa(h, -20.16, -5.5, 20.16, LINHA_GOL, t, CIANO)            # grande área
         h.linha([(-20, LINHA_GOL), (20, LINHA_GOL)], CIANO, 3, 0.8)
         h.linha([(-9.16, LINHA_GOL), (-9.16, LINHA_GOL - 5.5), (9.16, LINHA_GOL - 5.5), (9.16, LINHA_GOL)],
                 CIANO, 2, 0.55)
-        h.ponto_luz((0, 0), 9, BRANCO, 0.9)
-        h.pulso((0, 0), (t % 1.4), CIANO, 0.7, 1.4, 2)
-        R.medida(h, (9.16, LINHA_GOL - 5.5), (9.16, LINHA_GOL), "5,5 m", desloca=-0.8)
-        R.medida(h, (-4.6, 0), (-4.6, LINHA_GOL), "11 m", desloca=-0.2)
+        h.circulo((0, 0), 0.14, BRANCO, 0.9, 2, 0.6)                       # marca do pênalti
+        h.pulso((0, 0), (t % 1.6), CIANO, 0.8, 1.6, 2)
+        h.texto("MARCA · 11 m", (0, -0.75), 20, CIANO, 0.55)
         # rede (ondula perto do ponto onde a bola entrou)
         for x in np.linspace(-MEIO_GOL, MEIO_GOL, 19):
             dx = 0.0
@@ -157,14 +169,20 @@ class Penalti(Adaptador):
         for x in (-MEIO_GOL, MEIO_GOL):
             h.ponto_luz((x, LINHA_GOL), 16, BRANCO)
 
-    def _goleiro(self, h, j, reg, k, i, t, alfa=1.0, cheio=True):
+    def _goleiro(self, h, j, reg, k, i, t, alfa=1.0, cheio=True, escala=2.0):
         x = float(reg["xg"][k, i])
         pt = float(j.pulo_t[k])
         q = 0.0 if pt < 0 or t < pt else min((t - pt) / (PULO_DUR * 0.6), 1.0)
         c = (x, LINHA_GOL - 0.45)
         if cheio:
+            if q > 0:  # rastro do mergulho (duas poses anteriores, apagadas)
+                for atras, a2 in ((0.12, 0.18), (0.06, 0.3)):
+                    q2 = max(q - atras / (PULO_DUR * 0.6), 0.0)
+                    x2 = float(reg["xg"][k, max(i - int(atras / DT), 0)])
+                    R.avatar(h, (x2, c[1]), -math.pi / 2, AZUL, t, None, alfa=a2 * alfa, bracos=0.7, mergulho=q2,
+                             lado_mergulho=int(j.pulo_dir[k]) or 1, base=False, detalhe=False, escala=escala)
             R.avatar(h, c, -math.pi / 2, AZUL, t, "1", alfa=alfa, bracos=0.7, mergulho=q,
-                     lado_mergulho=int(j.pulo_dir[k]) or 1)
+                     lado_mergulho=int(j.pulo_dir[k]) or 1, escala=escala)
         else:  # fantasma barato: só o eixo do corpo
             ang = 0.0 if q > 0.4 else math.pi / 2
             d = 0.35 + 0.6 * q
@@ -183,7 +201,7 @@ class Penalti(Adaptador):
         if cone and corre:
             h.cone((x, y), corpo_ang, 0.38, 6.0, AMARELO, 0.22 * alfa)
         R.avatar(h, (x, y), frente, AMARELO, t, "10", alfa=alfa, corpo_ang=corpo_ang,
-                 passo=(r * 4.5) if corre and r < 1 else None)
+                 passo=(r * 4.5) if corre and r < 1 else None, escala=2.0)
 
     def _resultado(self, h, j, k, t, alfa=1.0, forte=True):
         if j.t_fim[k] < 0 or t < j.t_fim[k] * DT:
@@ -217,22 +235,28 @@ class Penalti(Adaptador):
             R.bola(h, (bx, by), t, rastro=rastro)
             self._resultado(h, j, k, t)
             return
-        # ao vivo: 100 cobranças sobrepostas (as cores somam e viram mapa de calor)
+        # ao vivo: 100 cobranças ao mesmo tempo. Batedores translúcidos, leque de chutes, mapa de resultados.
         self.cenario(h, t)
         for k in rod.vitrine:
-            if k == rod.lider:
-                continue
-            self._goleiro(h, j, reg, k, i, t, alfa=0.22, cheio=False)
-            self._resultado(h, j, k, t, alfa=0.55, forte=False)
-            (bx, by), fim = _bola_pos(j, k, t)
-            if j.chute_t[k] >= 0 and t >= j.chute_t[k] and not fim:
-                h.ponto_luz((bx, by), 8, BRANCO, 0.7)
             r = float(reg["r"][k, i])
-            if r < 1 and (j.chute_t[k] < 0 or t < j.chute_t[k]):
-                h.ponto_luz(pos_batedor(r), 6, AMARELO, 0.35)
+            tc = float(j.chute_t[k])
+            if tc < 0 or t < tc + 0.2:   # batedor fantasma correndo
+                bx, by = pos_batedor(r)
+                h.ponto_luz((bx, by), 14, AMARELO, 0.22)
+                h.circulo((bx, by), 0.22, AMARELO, 0.25, 1.2, 0.05)
+            if tc >= 0 and t >= tc:      # leque: trajetória de cada chute
+                u = min((t - tc) / VOO, 1.0)
+                h.linha([(0, 0), (j.alvo[k] * u, LINHA_GOL * u)], AMARELO, 1.2, 0.16, halo=False)
+                if u < 1:
+                    h.ponto_luz((j.alvo[k] * u, LINHA_GOL * u), 7, BRANCO, 0.8)
+            self._goleiro(h, j, reg, k, i, t, alfa=0.22, cheio=False)
+            self._resultado(h, j, k, t, alfa=0.7, forte=False)
+            if j.estado[k] == FORA and j.t_fim[k] >= 0 and t >= j.t_fim[k] * DT:   # × vermelho fora das traves
+                x = float(np.clip(j.alvo[k], -MEIO_GOL - 1.6, MEIO_GOL + 1.6))
+                for dx in (-0.15, 0.15):
+                    h.linha([(x - dx, LINHA_GOL + 0.75), (x + dx, LINHA_GOL + 1.05)], VERMELHO, 2.5, 0.8)
         k = rod.lider
         self._goleiro(h, j, reg, k, i, t)
-        self._batedor(h, j, reg, k, i, t, cone=False)
         (bx, by), _ = _bola_pos(j, k, t)
         R.bola(h, (bx, by), t)
 
@@ -256,8 +280,8 @@ class Penalti(Adaptador):
     # ------------------------------------------------------------ HUD
     def medidores(self, rod, t, foco):
         g = rod.g
-        return [("BATEDOR", "GOLS", float(self.hist["m_gol"][g]), AMARELO),
-                ("GOLEIRO", "DEFESAS", float(self.hist["m_defesa"][g]), AZUL)]
+        return [("BATEDOR", "GOLS", float(self.suave["gol"][g]), AMARELO),
+                ("GOLEIRO", "DEFESAS", float(self.suave["defesa"][g]), AZUL)]
 
     def cerebro(self, rod, t, foco):
         k = foco if foco is not None else rod.lider

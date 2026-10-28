@@ -192,21 +192,44 @@ def bola(h, c, t, alfa=1.0, rastro=None, cor=BRANCO, raio=0.16):
         h.linha([c, p], cor, 1, 0.6 * alfa, halo=False)
 
 
-def veiculo_topo(h, c, ang, comp, larg, cor, t, alfa=1.0, farois=True, re=False, base=False):
-    """Carro visto de cima: carroceria, para-brisa, faróis com cone de luz, lanternas."""
-    caixa = _cap(c, comp, larg / 2 * 0.9, ang, n=6)
-    h.forma(caixa, cor, alfa, 2.4, 0.2)
-    cab = _rot([(-0.1 * comp, -larg * 0.36), (0.18 * comp, -larg * 0.33), (0.18 * comp, larg * 0.33),
-                (-0.1 * comp, larg * 0.36)], ang, c)
-    h.forma(cab, clareia(cor, 0.3), 0.8 * alfa, 1.4, 0.25)
-    if farois:
-        for lado in (-1, 1):
-            f = _rot([(comp * 0.47, lado * larg * 0.3)], ang, c)[0]
-            h.ponto_luz(f, 7, BRANCO, alfa)
-            h.cone(f, ang, 0.5, comp * 0.9, clareia(cor, 0.6), 0.18 * alfa)
+def veiculo_topo(h, c, ang, comp, larg, cor, t, alfa=1.0, farois=True, re=False, freio=False, esterco=0.0,
+                 simples=False):
+    """Carro visto de cima: carroceria com capô e porta-malas, vidros, rodas (as da frente giram com o
+    volante), faróis com cone de luz, lanterna de freio (vermelha) e de ré (branca)."""
+    L, W = comp, larg
+    P = lambda pts: _rot(np.asarray(pts, float), ang, c)
+    corpo = [(L * .5, W * .28), (L * .46, W * .42), (L * .30, W * .5), (-L * .30, W * .5), (-L * .46, W * .44),
+             (-L * .5, W * .30), (-L * .5, -W * .30), (-L * .46, -W * .44), (-L * .30, -W * .5), (L * .30, -W * .5),
+             (L * .46, -W * .42), (L * .5, -W * .28)]
+    if simples:   # multidão: só o contorno
+        h.forma(P(corpo), cor, alfa, 1.4, 0.35)
+        return
+    # rodas
+    for ex in (1, -1):
+        for lado in (1, -1):
+            wc = P([(ex * L * .31, lado * (W * .5))])[0]
+            wa = ang + (esterco if ex > 0 else 0.0)
+            h.forma(_rot([(-0.36, -0.14), (0.36, -0.14), (0.36, 0.14), (-0.36, 0.14)], wa, wc), (0.6, 0.65, 0.8),
+                    0.9 * alfa, 1.2, 0.8, oclusor=True)
+    h.forma(P(corpo), cor, alfa, 2.6, 0.2, oclusor=True)
+    # capô e porta-malas (vincos), cabine de vidro
+    h.linha(P([(L * .22, W * .38), (L * .22, -W * .38)]), cor, 1.2, 0.45 * alfa, halo=False)
+    h.linha(P([(-L * .30, W * .38), (-L * .30, -W * .38)]), cor, 1.2, 0.45 * alfa, halo=False)
+    vidro = [(L * .20, W * .36), (L * .09, W * .42), (-L * .22, W * .42), (-L * .30, W * .34),
+             (-L * .30, -W * .34), (-L * .22, -W * .42), (L * .09, -W * .42), (L * .20, -W * .36)]
+    h.forma(P(vidro), clareia(cor, 0.35), 0.75 * alfa, 1.4, 0.3)
+    h.linha(P([(L * .20, 0), (-L * .30, 0)]), clareia(cor, 0.4), 1.0, 0.35 * alfa, halo=False)   # teto
+    # luzes
     for lado in (-1, 1):
-        r = _rot([(-comp * 0.48, lado * larg * 0.3)], ang, c)[0]
-        h.ponto_luz(r, 8 if re else 6, BRANCO if re else VERMELHO, alfa)
+        f = P([(L * .49, lado * W * .30)])[0]
+        h.ponto_luz(f, 9, BRANCO, 0.9 * alfa)
+        if farois:
+            h.cone(f, ang, 0.42, comp * 1.1, clareia(cor, 0.6), 0.17 * alfa)
+        r = P([(-L * .49, lado * W * .30)])[0]
+        if re:
+            h.ponto_luz(r, 12, BRANCO, alfa)
+            h.cone(r, ang + math.pi, 0.35, comp * 0.9, BRANCO, 0.12 * alfa)
+        h.ponto_luz(r, 12 if freio else 6, VERMELHO, (1.0 if freio else 0.6) * alfa)
 
 
 def foguete_lado(h, c, ang, escala, cor, t, alfa=1.0, motor=0.0):
