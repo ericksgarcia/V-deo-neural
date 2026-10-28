@@ -496,6 +496,11 @@ SONS = {"boom": boom, "batida": batida, "chute": chute, "rede": rede, "defesa": 
         "ding": lambda i, k: ding(i > 1)}
 
 
+# Regra do canal: efeitos NUNCA competem com a voz. Cada efeito é limitado a este pico (≈ -14 dBFS)
+# e ainda é abaixado enquanto a voz fala.
+SFX_PICO = 0.2
+
+
 def mixa(dur, falas, eventos, semente=0, ambiente=None, musica=0.55):
     """falas: [(t, audio)], eventos: [(t, tipo, intensidade)] -> estéreo float32."""
     n = int(dur * SR)
@@ -507,6 +512,9 @@ def mixa(dur, falas, eventos, semente=0, ambiente=None, musica=0.55):
     for k, (t, tipo, inten) in enumerate(eventos):
         f = SONS[tipo]
         s = f(inten, k)
+        pico = float(np.abs(s).max()) if len(s) else 0.0
+        if pico > SFX_PICO:
+            s = s * (SFX_PICO / pico)
         i = int(max(t, 0) * SR)
         sfx[i:i + len(s)] += s[: len(sfx) - i]
     mus = np.zeros_like(voz)
@@ -516,7 +524,7 @@ def mixa(dur, falas, eventos, semente=0, ambiente=None, musica=0.55):
         amb[: min(n, len(ambiente))] = ambiente[:n]
     env = np.convolve(np.abs(voz), np.ones(4800) / 4800, "same")
     duck = 1 - 0.6 * np.clip(env / 0.05, 0, 1)
-    mix = voz * 1.0 + sfx * 1.1 + mus * duck * musica + amb * (0.6 + 0.4 * duck)
+    mix = voz * 1.0 + sfx * (1.0 - 0.5 * np.clip(env / 0.05, 0, 1)) + mus * duck * musica + amb * (0.6 + 0.4 * duck)
     mix = mix[:n]
     fade = int(0.25 * SR)
     mix[-fade:] *= np.linspace(1, 0, fade)

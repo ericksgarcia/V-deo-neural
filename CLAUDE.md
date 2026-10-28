@@ -29,3 +29,5 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
 - Do Gemini só o TTS (a menos que seja gratuito). Transcrição = Whisper local.
 - Língua: português do Brasil, frases curtas, linguagem simples, gancho forte, pergunta ao espectador.
 - Não copiar vídeos de referência (@circuito_cero.1): entender a ideia e fazer melhor.
+- **Efeitos sonoros baixos**: nunca competem com a voz. Cada efeito é limitado a pico ≈ -14 dBFS
+  (`SFX_PICO` em `neuralab/audio.py`) e é abaixado enquanto a voz fala. Pico geral do mix bem abaixo de 0 dB.
