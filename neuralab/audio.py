@@ -168,7 +168,7 @@ ESTILO_PADRAO = (
 
 
 def narra_lote(falas, cache, voz="Charon", modelo="gemini-3.8-flash-tts", estilo=None, antes=None,
-               tts_textos=None, ritmo=3.2, faixa=(0.86, 1.14), reserva=True, forcar=False):
+               tts_textos=None, ritmo=4.0, faixa=(0.84, 1.1), reserva=True, forcar=False):
     """Narra todas as falas com UMA ÚNICA requisição (mesmo timbre do início ao fim) e molda tudo localmente.
 
     falas  : textos visíveis de cada cena (sem tags).
@@ -211,29 +211,67 @@ def narra_lote(falas, cache, voz="Charon", modelo="gemini-3.8-flash-tts", estilo
     if x is None:
         print("  [aviso] nenhuma voz disponível; usando só legenda")
         return None
-    return _molda(x, falas, textos, ritmo, faixa, [("<" in t) for t in (tts_textos or falas)])
+    return _molda(x, falas, textos, ritmo, faixa)
+
+
+def _pausas(p, minimo=0.25, limiar=0.02):
+    """[(inicio, fim)] em amostras dos silêncios de pelo menos `minimo` s no meio da fala."""
+    h = int(0.01 * SR)
+    n = len(p) // h
+    sil = np.abs(p[: n * h]).reshape(n, h).max(1) < limiar
+    runs, i = [], 0
+    while i < n:
+        if sil[i]:
+            j = i
+            while j < n and sil[j]:
+                j += 1
+            if (j - i) * 0.01 >= minimo and i > 0 and j < n:
+                runs.append((i * h, j * h))
+            i = j
+        else:
+            i += 1
+    return runs
+
+
+def _enxuga(p, curta=0.15, inclina=0.30, longa=0.55, minimo=0.25):
+    """Encurta os silêncios de uma fala: pausa g -> clip(curta + inclina*(g - minimo), curta, longa).
+    Assim a pausa curta fica ~0,15 s e a dramática (tag <long pause>) no máximo ~0,55 s: o suspense continua,
+    a narração deixa de arrastar. Emenda com fades de 8 ms para não estalar."""
+    runs = _pausas(p, minimo)
+    if not runs:
+        return p
+    f = int(0.008 * SR)
+    pedacos, pos = [], 0
+    for a, b in runs:
+        g = (b - a) / SR
+        novo = int(np.clip(curta + inclina * (g - minimo), curta, longa) * SR)
+        fala_ = p[pos:a + f].copy()
+        if len(fala_) > 2 * f:
+            fala_[-f:] *= np.linspace(1, 0, f)
+        pedacos += [fala_, np.zeros(novo, np.float32)]
+        pos = max(b - f, a)
+        entrada = p[pos:pos + f].copy()                  # a fala seguinte entra com fade para não estalar
+        p = np.concatenate([p[:pos], entrada * np.linspace(0, 1, len(entrada)), p[pos + f:]])
+    pedacos.append(p[pos:])
+    return np.concatenate(pedacos).astype(np.float32)
 
 
 def _molda(x, falas, textos, ritmo, faixa, com_pausas=None):
-    """Corta o áudio inteiro por fala e ajusta ritmo e volume de cada uma (tudo local, sem API).
+    """Corta o áudio inteiro por fala e molda ritmo, pausas e volume de cada uma (tudo local, sem API).
 
-    Falas rápidas demais (> 1,1 x ritmo) são desaceleradas até lá. Falas lentas só são aceleradas se não
-    tiverem pausas dramáticas marcadas (as pausas baixam a média de propósito)."""
+    ritmo = palavras por segundo ENQUANTO FALA (sem contar os silêncios). Falas mais rápidas que isso são
+    desaceleradas até lá (nunca além de `faixa`); depois os silêncios longos são encurtados."""
     partes = []
     alvo_rms = None
-    com_pausas = com_pausas or [False] * len(falas)
-    for t, p, pausas in zip(textos, _segmenta(x, falas), com_pausas):
+    for t, p in zip(textos, _segmenta(x, falas)):
         palavras = len(t.split())
-        vel = palavras / max(len(p) / SR, 1e-3)
-        fator = 1.0
-        if palavras >= 5:
-            if vel > ritmo * 1.1:
-                fator = float(np.clip(ritmo * 1.1 / vel, faixa[0], 1.0))
-            elif vel < ritmo * 0.9 and not pausas:
-                fator = float(np.clip(ritmo * 0.9 / vel, 1.0, faixa[1]))
-        if abs(fator - 1) > 0.015:
-            p = _atempo(p, fator)
-        # volume: iguala o RMS das partes (trechos com voz) e limita o pico
+        parado = sum(b - a for a, b in _pausas(p)) / SR
+        vel = palavras / max(len(p) / SR - parado, 1e-3)
+        if palavras >= 5 and vel > ritmo:
+            p = _atempo(p, float(np.clip(ritmo / vel, faixa[0], 1.0)))
+        elif palavras >= 5 and vel < ritmo * 0.85:
+            p = _atempo(p, float(np.clip(ritmo * 0.85 / vel, 1.0, faixa[1])))
+        p = _enxuga(p)
         voz_ = p[np.abs(p) > 0.02]
         rms = float(np.sqrt(np.mean(voz_ ** 2))) if len(voz_) else 0.1
         alvo_rms = alvo_rms or rms

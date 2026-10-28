@@ -74,7 +74,7 @@ def main():
     ap.add_argument("--so-roteiro", action="store_true")
     ap.add_argument("--so-voz", action="store_true",
                     help="gera/carrega só a narração (1 requisição, depois cache) e mostra o relatório de ritmo")
-    ap.add_argument("--ritmo", type=float, default=3.2, help="palavras/s alvo de cada fala (ajuste local, sem API)")
+    ap.add_argument("--ritmo", type=float, default=4.0, help="teto de palavras/s enquanto fala, sem contar pausas (ajuste local, sem API)")
     ap.add_argument("--saida", default="saida")
     a = ap.parse_args()
     os.makedirs(".cache", exist_ok=True)
