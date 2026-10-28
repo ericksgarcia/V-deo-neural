@@ -12,7 +12,7 @@ houver **dois lados** (co-evolução gera viradas sozinha) ou uma "descoberta" c
 | 5 | **Drone na tempestade** | de lado | vento, raios, "aprendeu a usar o vento a favor" | não |
 | 6 | **Sumô de IAs** | de cima | empurra-empurra, truque de desviar no último segundo | sim |
 | 7 | **Goleiro x atacante 1 contra 1** | de cima | drible vs saída do goleiro | sim |
-| 8 | **Polícia e ladrão num labirinto** | de cima | emboscadas, atalhos, esconderijos | sim |
+| 8 | **Polícia e ladrão** (feito, EP05; arena com paredes) | de cima | emboscadas, atalhos, esconderijos | sim |
 | 9 | **Arremesso de basquete** | de lado | trajetória, "descobriu o arremesso de tabela" | não |
 | 10 | **Corrida de carrinhos** | de cima | ultrapassagem, fechar a porta, batidas | sim (todos contra todos) |
 
