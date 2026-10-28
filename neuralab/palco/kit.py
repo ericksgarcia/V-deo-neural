@@ -493,9 +493,10 @@ def faixa_escolha(ctx, t_local, pergunta, opcoes, ret=CENA):
     if larg(ctx, pergunta, tam, TITULO) > w0 - 120:
         tam *= (w0 - 120) / larg(ctx, pergunta, tam, TITULO)
     texto(ctx, pergunta, x0 + w0 / 2, y + 70, tam, "texto", k, familia=TITULO, alinha="c")
-    bw = (w0 - 120) / 2
+    n = len(opcoes)
+    bw = (w0 - 80 - 30 * (n - 1)) / n
     for j, (nome, c) in enumerate(opcoes):
-        bx = x0 + 40 + j * (bw + 40)
+        bx = x0 + 40 + j * (bw + 30)
         pulso = 1 + 0.04 * math.sin(t_local * 6 + j * 3)
         ctx.save()
         ctx.translate(bx + bw / 2, y + 170)
