@@ -96,7 +96,8 @@ def monta(hist, A):
     if gs is None:
         raise RuntimeError("Nenhum carro estacionou: treine mais gerações ou troque a semente.")
     suc = hist["sucessos"]
-    falhas_ate = int(hist["falhas"].sum())
+    batidas = hist["m_bateu"] * n                      # carros que bateram de verdade (não conta tempo esgotado)
+    falhas_ate = int(round(batidas.sum()))
     final = int(suc[gf])
     cenas, marcos = [], []
     D = DESTAQUES
@@ -141,7 +142,7 @@ def monta(hist, A):
     m_s = float(r_s.morte[k_s]) * r_s.dt
     marcas_s = [{"tipo": "circulo", "em": max(m_s - 0.9, 0), "alvo": "alvo", "texto": "PAROU!", "rx": 90, "ry": 60,
                  "desloca": (0, -80)}]
-    f_gs = int(hist["falhas"][:gs + 1].sum())
+    f_gs = int(round(batidas[:gs + 1].sum()))
     cena(tipo="replay", ger=gs, foco=k_s, marcas=marcas_s,
          cartao={"numero": 1, "rotulo": "PRIMEIRO SUCESSO", "nome": f"GERAÇÃO {gs + 1}", "cor": VERDE,
                  "stat": f"DEPOIS DE {milhar(f_gs)} BATIDAS"},
@@ -186,7 +187,7 @@ def monta(hist, A):
              titulo="TESTE DE ESTRESSE", sub="o melhor carro · 400 partidas por teste · % que estaciona",
              destaque=1, cor_destaque="vermelho", revela=0.0,
              log=[(f"ESTACIONA {pct(base)} → {pct(duro)}", VERMELHO)],
-             fala=f"Era {pct(base)}. Caiu pra {pct(duro)}. Ele decorou o caminho. Não aprendeu a dirigir.")
+             fala=f"Era {pct(base)}. Caiu pra {pct(duro)}. Ele aprendeu um caminho. Não aprendeu a dirigir.")
     # ---------------------------------------------------------------- CHAMADA + LAÇO
     cena(tipo="replay", ger=g_h, foco=heroi, grupo="fim", escolha={
         "pergunta": "PRÓXIMO DESAFIO?", "opcoes": [("LADEIRA", AMARELO), ("CHUVA", CIANO)], "em": 0.2},
