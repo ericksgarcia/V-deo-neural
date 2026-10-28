@@ -49,7 +49,7 @@ def treino_simples(nome, G, sementes):
         from neuralab.roteiros.baliza import nota_historia
     melhor = None
     for s in sementes:
-        arq = os.path.join(".cache", f"treino_{nome}_{G}_150_{s}_v2.npz")
+        arq = os.path.join(".cache", f"treino_{nome}_{G}_150_{s}_v3.npz")
         if os.path.exists(arq):
             hist = dict(np.load(arq))
         else:
@@ -68,13 +68,13 @@ def main():
     ap.add_argument("desafio", choices=DESAFIOS)
     ap.add_argument("--geracoes", type=int)
     ap.add_argument("--sementes", default=None, help="ex.: 3,5,7 — testa várias e fica com a melhor história")
-    ap.add_argument("--voz", default="Charon", help="voz do Gemini TTS (Charon, Fenrir, Orus, Kore...)")
+    ap.add_argument("--voz", default="Achird", help="voz do Gemini TTS (Achird, Charon, Fenrir, Orus, Kore...)")
     ap.add_argument("--sem-voz", action="store_true")
     ap.add_argument("--rascunho", action="store_true", help="metade da resolução, para revisar rápido")
     ap.add_argument("--so-roteiro", action="store_true")
     ap.add_argument("--so-voz", action="store_true",
                     help="gera/carrega só a narração (1 requisição, depois cache) e mostra o relatório de ritmo")
-    ap.add_argument("--ritmo", type=float, default=4.0, help="teto de palavras/s enquanto fala, sem contar pausas (ajuste local, sem API)")
+    ap.add_argument("--ritmo", type=float, default=3.4, help="teto de palavras/s enquanto fala, sem contar pausas (ajuste local, sem API)")
     ap.add_argument("--saida", default="saida")
     a = ap.parse_args()
     os.makedirs(".cache", exist_ok=True)

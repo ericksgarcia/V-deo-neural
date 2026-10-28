@@ -81,26 +81,26 @@ class Baliza(AdaptadorPopulacao):
         self.cenario(h, t, rod, lider)
         if modo == "replay" and foco is not None:
             ks = [foco]
-        else:   # multidão: 1 em cada 3 (a soma de luz de 150 carros viraria uma mancha branca)
-            ks = sorted(set(range(0, rod.n, 8)) | {rod.lider})
+        else:   # multidão de fantasmas: erros somem, acertos ficam (ver AdaptadorPopulacao.aparencia)
+            ks = [k for k in self.fantasmas(rod) if k != lider] + [lider]   # o destaque por cima de todos
         for k in ks:
             m = rod.morte[k]
             fim = i if m < 0 else min(i, m)
-            x, y, hd, v, e = s[k, min(i, fim)]
             destaque = k == lider
-            if est[k, i] == SUCESSO:
-                cor = VERDE
-            elif est[k, i] == FALHA:
-                cor = VERMELHO
-            else:
-                cor = AMARELO if destaque else CIANO
-            # rastro de pneu (só o destaque é nítido; a multidão vira névoa)
+            ap = self.aparencia(rod, k, i, destaque) if modo != "replay" else None
+            if modo == "replay":
+                cor = VERDE if est[k, i] == SUCESSO else (VERMELHO if est[k, i] == FALHA else AMARELO)
+                ap = (cor, 1.0, 0.85)
+            if ap is None:
+                continue
+            cor, a_corpo, a_rastro = ap
+            x, y, hd, v, e = s[k, min(i, fim)]
             tr = s[k, max(0, fim - 70): fim + 1: 3]
             if len(tr) > 1:
                 h.rastro([(a - 1.3 * math.cos(b), c - 1.3 * math.sin(b)) for a, c, b in tr[:, :3]], cor,
-                         3 if destaque else 1.0, 0.85 if destaque else 0.07)
+                         3 if destaque else 1.0, a_rastro)
             freio = bool(ac[k, i] * v < -0.25) and est[k, i] == 0
-            R.veiculo_topo(h, (float(x), float(y)), float(hd), COMP, LARG, cor, t, 1.0 if destaque else 0.07,
+            R.veiculo_topo(h, (float(x), float(y)), float(hd), COMP, LARG, cor, t, a_corpo,
                            farois=destaque and est[k, i] == 0, re=bool(v < -0.1) and est[k, i] == 0, freio=freio,
                            esterco=float(e), simples=not destaque)
             if m >= 0 and est[k, m] == FALHA and 0 <= (i - m) * rod.dt < 0.8:
@@ -108,12 +108,15 @@ class Baliza(AdaptadorPopulacao):
                 if destaque:
                     h.pulso((float(x), float(y)), idade, VERMELHO, 3.0, 0.7, 5)
                     h.ponto_luz((float(x), float(y)), 70 * (1 - idade), (1.0, 0.6, 0.2), 0.8 * (1 - idade))
-                h.particulas((float(x), float(y)), idade, (1.0, 0.7, 0.3), n=14 if destaque else 5, alcance=2.0,
+                h.particulas((float(x), float(y)), idade, (1.0, 0.7, 0.3), n=14 if destaque else 4, alcance=2.0,
                              dur=0.8, semente=int(k))
-            if est[k, i] == SUCESSO and destaque:
+            if est[k, i] == SUCESSO and (destaque or modo == "replay" or a_corpo > 0.5):
                 idade = (i - m) * rod.dt if m >= 0 else 0
-                h.pulso((float(x), float(y)), idade, VERDE, 3.5, 0.9, 5)
-                h.texto("✓ NA VAGA", (float(x), float(y) + 1.9), 26, VERDE, min(idade * 3, 1))
+                if destaque or modo == "replay":
+                    h.pulso((float(x), float(y)), idade, VERDE, 3.5, 0.9, 5)
+                    h.texto("✓ NA VAGA", (float(x), float(y) + 1.9), 26, VERDE, min(idade * 3, 1))
+                elif idade < 1.2:
+                    h.pulso((float(x), float(y)), idade, VERDE, 2.5, 0.5, 3)
 
     def ponto(self, rod, foco, nome, t):
         x, y = rod.reg["s"][foco, rod.i(t), :2]

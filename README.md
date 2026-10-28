@@ -25,7 +25,7 @@ fala ficou rápida demais, refazendo a narração até 3 vezes se precisar. Escr
 mais naturais e dão respiro à legenda.
 
 Opções úteis: `--rascunho` (meia resolução, rápido), `--sem-voz` (só legenda), `--so-roteiro`,
-`--sementes 3,5,7` (treina várias e escolhe a melhor história), `--voz Fenrir`.
+`--sementes 3,5,7` (treina várias e escolhe a melhor história), `--voz Achird` (padrão; veja `docs/NARRACAO.md`).
 
 Saída em `saida/`: o vídeo, `*_legenda.txt` (texto do post) e `*_analise/` (roteiro com tempos,
 checagem da voz, quadros-chave e mosaico, que são o material dos analistas).
@@ -40,6 +40,16 @@ export GEMINI_API_KEY=...                # só para a narração (TTS); sem ela 
 
 **Custos:** a única API usada é o **TTS do Gemini**, só para a voz. Transcrição e sincronia da legenda
 usam o **Whisper local** (faster-whisper, grátis). A análise dos vídeos é feita pelos analistas do Claude Code.
+
+## Treino e visual (desde o EP03)
+
+- **Treino robusto** (`evolucao.treina`): cada indivíduo é testado em 4 largadas (a 1ª é a padrão, as outras cada vez
+  mais variadas) e a nota é 80% média + 20% pior caso. O melhor aprende a regra, não decora a largada. Medido na baliza
+  (semente 5): 51%/20% (largada normal/difícil) no treino clássico contra 100%/66% no robusto. `hist["robusto"]` guarda o
+  acerto nas largadas extras e entra na escolha da semente. `treina(..., robusto=False)` volta ao clássico.
+- **Multidão de fantasmas** (`AdaptadorPopulacao.fantasmas/aparencia`): até 90 indivíduos ao mesmo tempo, quase
+  transparentes (a soma aditiva de luz vira uma névoa que mostra por onde a turma passa). Quem erra pisca vermelho e
+  se dissolve em ~1 s; quem acerta fica verde e nítido, sempre incluído. Poucos acertos aparecem com força.
 
 ## Como a base funciona (para fazer QUALQUER vídeo)
 

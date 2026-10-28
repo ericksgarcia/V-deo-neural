@@ -12,16 +12,6 @@ from ..rede import Arquitetura
 
 BRANCO, MAGENTA = (0.92, 0.96, 1.0), (1.0, 0.3, 0.8)
 
-# Direção de voz (vai em speechMetadata.style, nunca no texto): o arco emocional do episódio inteiro.
-ESTILO_VOZ = (
-    "You are a gripping, charismatic Brazilian Portuguese (pt-BR) storyteller narrating a short vertical video, "
-    "talking to one person like a friend who just discovered something amazing. Natural spoken Brazilian rhythm; "
-    "pace brisk and conversational, about three words per second, never rushed, never dragging. Emotional arc: "
-    "open intrigued and confident, then conspiratorial, as if sharing a secret; explain the rules calmly and "
-    "clearly with a hint of dry humor and say 'Eliminados' coldly; ask the viewer questions as if you really "
-    "want their guess and leave a beat before the answer; build tension before the first success and let "
-    "'Na vaga' land triumphant and relieved; slow down and sound proud on the big numbers; deliver the drop in "
-    "the stress test with honest surprise; finish playful and provocative, inviting the viewer to pick a side.")
 DESTAQUES = {"baliza": VERDE, "ré": AMARELO, "bateu": VERMELHO, "vezes": VERMELHO, "bate": VERMELHO,
              "vaga": MAGENTA, "ninguém": VERDE, "sozinhos": VERDE, "autoescola": VERDE, "estaciona": VERDE,
              "melhores": VERDE, "fácil": AMARELO, "metro": AMARELO, "falham": VERMELHO}
@@ -81,7 +71,8 @@ def nota_historia(hist):
     sm = suave(suc)
     G = len(suc)
     gs = int(np.argmax(suc > 0))
-    return float(sm.max() / n + 0.4 * max(1 - abs(gs / G - 0.3) * 2, 0) + 0.3 * (sm[-1] / max(sm.max(), 1)))
+    rob = float(suave(hist["robusto"])[-1]) if "robusto" in hist else 0.0     # acerto em largadas variadas
+    return float(sm.max() / n + 0.4 * max(1 - abs(gs / G - 0.3) * 2, 0) + 0.3 * (sm[-1] / max(sm.max(), 1)) + 0.5 * rob)
 
 
 def teste_estresse(hist, g, n=400, ruido=1.4, semente=11):
@@ -129,7 +120,10 @@ def monta(hist, A):
     melhor_g = int(np.argmax(suave(suc.astype(float))))
     fin_s = int(suc[melhor_g])
     base, duro = teste_estresse(hist, melhor_g)
-    tem_virada = base - duro >= 0.15
+    queda = base - duro
+    caso = ("resistiu" if queda < 0.15 and duro >= 0.4 else "caiu_pouco" if queda >= 0.15 and duro >= 0.5
+            else "caiu_muito" if queda >= 0.15 else None)       # None = os dois resultados são fracos: sem teste
+    tem_virada = caso is not None
     cenas, marcos = [], []
     D = DESTAQUES
 
@@ -146,23 +140,26 @@ def monta(hist, A):
                "desloca": (0, -80)}]
     cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas,
          titulo_gancho=[("A IA APRENDEU", BRANCO), ("A FAZER BALIZA", VERDE)],
-         fala="Esse carro não sabia dirigir. <short pause> Ninguém ensinou nada. Olha o que ele faz agora.")
-    if tem_virada:
+         fala="Esse carro nunca tinha visto uma rua. <short pause> Ninguém ensinou nada a ele. <long pause> Olha o que ele faz.")
+    if caso == "caiu_muito":
         cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas, pausa=0.2,
-             fala=f"Mas tem uma pegadinha. <short pause> Mude a largada, e ele erra {erro_txt(1 - duro)}.")
+             fala=f"Mas tem um detalhe. <short pause> Mude a largada, e ele erra {erro_txt(1 - duro)}.")
+    elif tem_virada:
+        cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas, pausa=0.2,
+             fala=f"E o mais estranho. <short pause> Eu mudei a largada… e ele ainda acerta {pct(duro)}.")
     else:
         cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas, pausa=0.2,
-             fala="Mas tem uma pegadinha. <short pause> Ninguém ensinou como.")
+             fala="Mas tem um detalhe. <short pause> Ninguém ensinou como.")
 
     # ---------------------------------------------------------------- PREMISSA + GERAÇÃO 1 (com batidas de verdade)
     b0 = float(hist["m_bateu"][0])
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"{n} CARROS", BRANCO), ("CADA UM COM UMA IA QUE NÃO SABE NADA", BRANCO)],
-         fala=f"Tudo começou assim: {n} carros. Cada um com um cérebro de computador vazio. <short pause> "
-              "Ele acelera e vira o volante… ao acaso.")
+         fala=f"Eu comecei com {n} carros. Cada um com um cérebro vazio. <short pause> "
+              "Eles aceleram e viram o volante… sem saber por quê.")
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"GER 001 · BATERAM {pct(b0)}", VERMELHO)],
          carimbo={"texto": f"BATERAM {pct(b0)}", "cor": VERMELHO, "em": 0.5, "sub": "GERAÇÃO 1"},
-         fala=(f"E aí? Quantos você acha que bateram? <long pause> {em_dez(b0).capitalize()}."
-               if b0 < 0.97 else "E aí? Quantos você acha que bateram? <long pause> Todos."))
+         fala=(f"Chuta aí: quantos bateram? <long pause> {em_dez(b0).capitalize()}."
+               if b0 < 0.97 else "Chuta aí: quantos bateram? <long pause> Todos."))
     r0 = A.rodada(0)
     est0 = r0.reg["estado"][:, -1]
     caiu = [k for k in np.argsort(r0.morte) if r0.morte[k] >= 0 and est0[k] == 2]    # FALHA = 2
@@ -170,15 +167,15 @@ def monta(hist, A):
         pick = [caiu[int(i)] for i in np.linspace(len(caiu) * 0.15, len(caiu) * 0.85, 3)]
         cena(tipo="montagem", clipes=[(0, int(k)) for k in pick], destaques=D,
              log=[("BATEU. BATEU. BATEU.", VERMELHO)],
-             fala="Bateu. <short pause> Bateu. <short pause> Bateu.")
+             fala="Bateu. <short pause> De novo. <short pause> E de novo.")
 
     # ---------------------------------------------------------------- A REGRA DO JOGO (explicada com calma)
     g_sel = min(5, G - 1)
     cena(tipo="ao_vivo", ger=g_sel, log=[("OS MELHORES SÃO COPIADOS", VERDE), ("OS PIORES SAEM", VERMELHO),
-                                         ("CADA RODADA = 1 GERAÇÃO", BRANCO)],
+                                         ("4 LARGADAS POR CARRO", BRANCO), ("CADA RODADA = 1 GERAÇÃO", BRANCO)],
          carimbo={"texto": "OS MELHORES FICAM", "cor": VERDE, "em": 0.4, "sub": "OS PIORES SAEM"},
-         fala="Aí entra a regra cruel. Os melhores são copiados e misturados, com pequenas mudanças. "
-              "Os piores? <short pause> Eliminados. Cada rodada é uma geração.")
+         fala="A regra é simples. Quem vai melhor vira pai da próxima turma. <short pause> "
+              "Quem bate… <short pause> sai do jogo. Cada carro tenta quatro largadas diferentes, e vale a nota de todas.")
 
     # ---------------------------------------------------------------- CHEGA PERTO, MAS NINGUÉM ESTACIONA
     if ev["chega"] is not None and gs - ev["chega"] > 3:
@@ -189,8 +186,8 @@ def monta(hist, A):
              log=[(f"GER {g + 1:03d} · CHEGAM PERTO {pct(pe)}", AMARELO)],
              carimbo={"texto": f"{pct(pe)} CHEGAM PERTO", "cor": AMARELO, "em": 0.4,
                       "sub": "MAS NINGUÉM ESTACIONA" if ninguem else f"MAS {int(suc[g])} ESTACIONAM"},
-             fala=f"Geração {g + 1}. {em_dez(pe).capitalize()} chegam a menos de dois metros e meio do centro da vaga. "
-                  + ("<short pause> Mas nenhum… <long pause> consegue estacionar." if ninguem
+             fala=f"Geração {g + 1}. {em_dez(pe).capitalize()} chegam a menos de dois metros e meio da vaga. "
+                  + ("<short pause> Mas nenhum… <long pause> consegue parar na vaga." if ninguem
                      else f"<short pause> Mas só {int(suc[g])}… <long pause> conseguem estacionar."))
         marcos.append((g, "PERTO", AMARELO))
 
@@ -217,7 +214,7 @@ def monta(hist, A):
             clipes.append((g, k))
     if len(clipes) >= 3:
         cena(tipo="montagem", clipes=clipes[:4], log=[("OS PRÓXIMOS COPIAM ESSE JEITO", BRANCO)],
-             fala="Os carros seguintes herdam esse jeito. <short pause> E vão melhorando, rodada após rodada.")
+             fala="Os filhos herdam esse jeito. <short pause> E a cada rodada, ficam um pouco melhores.")
 
     # ---------------------------------------------------------------- O NÚMERO FINAL + O GRÁFICO
     cena(tipo="ao_vivo", ger=melhor_g, log=[(f"GER {melhor_g + 1:03d} · {fin_s}/{n} NA VAGA", VERDE)],
@@ -228,35 +225,43 @@ def monta(hist, A):
     cena(tipo="grafico", grupo="grafico", serie=serie, titulo="% QUE ESTACIONA",
          eras=[(gs, G - 1, "APRENDENDO", VERDE)], rotulo_y="CARROS NA VAGA POR GERAÇÃO",
          final=pct(float(serie[melhor_g])), log=[(f"{milhar(falhas_ate)} BATIDAS NO TOTAL", VERMELHO)],
-         fala=f"Começou do zero. Sem aula, sem professor. Só tentativa e erro… <short pause> e {milhar(falhas_ate)} batidas.")
+         fala=f"Zero aulas. Zero professor. <short pause> Só tentativa e erro… <short pause> e {milhar(falhas_ate)} batidas.")
 
     # ---------------------------------------------------------------- A VIRADA: o teste de estresse
     if tem_virada:
-        itens = [("TREINO", base, VERDE), ("NOVA LARGADA", duro, VERMELHO)]
+        itens = [("TREINO", base, VERDE), ("NOVA LARGADA", duro, VERMELHO if caso == "caiu_muito" else AMARELO)]
         sub = "o melhor carro · 400 tentativas · % que estaciona"
         cena(tipo="barras", grupo="estresse", ger=melhor_g, itens=itens, titulo="E SE MUDAR A LARGADA?", sub=sub,
              log=[("TESTE: LARGADA MAIS VARIADA", AMARELO)], pausa=0.25,
              fala="Mas será que ele aprendeu a dirigir de verdade? <short pause> "
-                  "Peguei o melhor carro… e deixei a largada mais variada.")
+                  "Peguei o melhor carro… e deixei a largada bem mais torta.")
+        final = {
+            "resistiu": f"Ele acertava {pct(base)}. <long pause> Agora acerta {pct(duro)}. "
+                        "<short pause> Ele não decorou a largada. Ele entendeu o caminho.",
+            "caiu_pouco": f"No treino, ele acertava {pct(base)}. <long pause> Na largada nova, {pct(duro)}. "
+                          "<short pause> Perdeu um pouco, mas o jeito de estacionar ficou.",
+            "caiu_muito": f"No treino, o melhor carro acertava {pct(base)}. <long pause> Na largada nova? "
+                          f"Só {pct(duro)}. <short pause> Fora do que treinou, ele se perde.",
+        }[caso]
         cena(tipo="barras", grupo="estresse", ger=melhor_g, itens=itens, titulo="E SE MUDAR A LARGADA?", sub=sub,
-             destaque=1, cor_destaque="vermelho", revela=0.0, rotulo_destaque=f"▼ -{(base - duro) * 100:.0f} pts",
-             log=[(f"ESTACIONA {pct(base)} → {pct(duro)}", VERMELHO)],
-             fala=f"No treino, o melhor carro acertava {pct(base)}. <long pause> Na largada nova? Só {pct(duro)}. "
-                  "<short pause> Fora do que treinou, ele se perde.")
+             destaque=1, cor_destaque="vermelho" if caso == "caiu_muito" else "amarelo", revela=0.0,
+             rotulo_destaque=f"▼ -{queda * 100:.0f} pts" if queda >= 0.02 else "≈ IGUAL",
+             log=[(f"ESTACIONA {pct(base)} → {pct(duro)}", VERMELHO if caso == "caiu_muito" else AMARELO)],
+             fala=final)
 
     # ---------------------------------------------------------------- CHAMADA + LAÇO (volta ao replay do gancho)
     cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="fim", inicio=max(m_h - 1.4, 0),
          escolha={"pergunta": "O QUE DERRUBA ELE?", "opcoes": [("LADEIRA", AMARELO), ("CHUVA", CIANO)], "em": 0.2},
          destaques={"ladeira": AMARELO, "chuva": CIANO, "votado": VERDE},
-         fala="Agora você decide. O que derruba ele primeiro? Ladeira ou chuva? <short pause> "
-              "Comenta seu lado. O mais votado vira o próximo vídeo.")
+         fala="Agora é com você. O que derruba ele primeiro? <short pause> Ladeira… ou chuva? <long pause> "
+              "Comenta o seu lado. O mais votado vira o próximo vídeo.")
 
     info = {"marca": "VÍDEO NEURAL", "serie": serie, "serie_rotulo": "% QUE ESTACIONA POR GERAÇÃO",
-            "estilo_voz": ESTILO_VOZ,
             "marcos": marcos, "rotulo_vivo": f"{n} CARROS",
             "rodape": f"POP {n} · REDE {'-'.join(map(str, A.Desafio.camadas))} · {G} GERAÇÕES · "
                       "NADA FOI PROGRAMADO: SÓ SELEÇÃO, CRUZAMENTO E MUTAÇÃO"}
-    virada = f" Aí mudei UM detalhe e ela caiu de {pct(base)} para {pct(duro)}. 🚗💥" if tem_virada else ""
+    virada = (f" Aí mudei UM detalhe e ela caiu de {pct(base)} para {pct(duro)}. 🚗💥" if caso == "caiu_muito" else
+              f" Mudei a largada e ela ainda acertou {pct(duro)}. 🚗" if tem_virada else "")
     post = (f"Esses carros bateram {milhar(falhas_ate)} vezes e aprenderam a estacionar sozinhos.{virada}\n"
             f"Simulação real: {n} carros, {G} gerações, zero aula. Uma série em que a IA aprende sozinha.\n"
             f"Qual derruba ela primeiro: LADEIRA ou CHUVA? O mais votado vira o próximo vídeo 👇\n\n"
