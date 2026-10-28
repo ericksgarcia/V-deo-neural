@@ -24,7 +24,7 @@ def robo(h, x, y, th, a, k, toca, cor, alfa=1.0, nitido=True, t=0.0):
         joelho = (quadril[0] + COXA * math.sin(at), quadril[1] - COXA * math.cos(at))
         ac = at - k[j]
         pe = (joelho[0] + CANELA * math.sin(ac), joelho[1] - CANELA * math.cos(ac))
-        cj = cor if j == 0 else tuple(v * 0.55 for v in cor)
+        cj = cor if j == 0 else tuple(0.5 * v + 0.5 * m for v, m in zip(cor, MAGENTA))
         h.linha([quadril, joelho, pe], cj, lw * 1.5, alfa * (1.0 if j == 0 else 0.7), halo=nitido)
         if nitido:
             h.circulo(joelho, 0.055, clareia(cj, 0.4), alfa, 1.4, 0.5)
@@ -53,12 +53,13 @@ class Andador(AdaptadorPopulacao):
 
     # ------------------------------------------------------------ câmera
     def camera(self, rod, t, modo, foco):
-        geral = Camera2D(centro=(META / 2 + 0.2, 1.75), escala=64, t=t)
+        x_l = float(rod.reg["s"][rod.lider, rod.i(t), 0])
+        geral = Camera2D(centro=(min(max(x_l + 2.0, 4.0), META - 3.5), 2.4), escala=108, t=t)
         if modo != "replay" or foco is None:
             return geral
         i = rod.i(t)
         x = float(rod.reg["s"][foco, i, 0])
-        perto = Camera2D(centro=(min(max(x + 1.0, 2.2), META - 1.6), 1.45), escala=128, t=t)
+        perto = Camera2D(centro=(min(max(x + 1.0, 2.2), META - 1.6), 2.0), escala=140, t=t)
         k = min(t / 0.8, 1.0)
         cam = geral.mistura(perto, k)
         m = rod.morte[foco]
@@ -89,7 +90,7 @@ class Andador(AdaptadorPopulacao):
             h.forma([(META + (j % 2) * 0.28, j * 0.29), (META + (j % 2) * 0.28 + 0.28, j * 0.29),
                      (META + (j % 2) * 0.28 + 0.28, j * 0.29 + 0.29), (META + (j % 2) * 0.28, j * 0.29 + 0.29)],
                     VERDE, 0.5, 0.6, 0.55 if j % 2 == 0 else 0.1)
-        h.texto(f"CHEGADA · {META:.0f} m", (META, 2.62), 20, VERDE, 0.9)
+        h.texto(f"{META:.0f} m", (META, 2.62), 22, VERDE, 0.9)
 
     # ------------------------------------------------------------ desenho
     def desenha(self, h, rod, t, modo, foco):

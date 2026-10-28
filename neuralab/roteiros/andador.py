@@ -106,13 +106,12 @@ def monta(hist, A):
     marcas = [{"tipo": "circulo", "em": max(m_h - 0.6, 0), "alvo": "alvo", "texto": "CHEGOU!", "rx": 90, "ry": 110,
                "desloca": (0, -110)}]
     cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas,
-         titulo_gancho=[("A IA APRENDEU", BRANCO), ("A ANDAR", VERDE)],
-         fala="Esse robô nunca andou na vida. <short pause> Ninguém ensinou nada. Mas olha ele agora.")
+         fala="Esse robô nunca andou. <short pause> Olha ele agora.")
 
     # ---------------------------------------------------------------- PREMISSA + GERAÇÃO 1
     c0 = int(quedas[0])
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"{n} ROBÔS", BRANCO), ("CADA UM COM UMA IA QUE NÃO SABE NADA", BRANCO)],
-         fala=f"{n} robôs. Cérebro vazio. <short pause> A missão: chegar a {META:.0f} metros sem cair.")
+         fala=f"{n} robôs. Cérebro vazio. <short pause> Meta: {META:.0f} metros sem cair.")
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"GER 001 · CAÍRAM {c0}/{n}", VERMELHO)],
          carimbo={"texto": f"CAÍRAM {c0} DE {n}", "cor": VERMELHO, "em": 0.5, "sub": "GERAÇÃO 1"},
          fala=("Quantos caíram na primeira vez? <long pause> Todos." if c0 == n else
@@ -122,8 +121,7 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=g_sel, log=[("OS QUE VÃO MAIS LONGE SÃO COPIADOS", VERDE), ("OS QUE CAEM CEDO SAEM", VERMELHO),
                                          ("CADA RODADA = 1 GERAÇÃO", BRANCO)],
          carimbo={"texto": "OS MELHORES FICAM", "cor": VERDE, "em": 0.4, "sub": "OS PIORES SAEM"},
-         fala="Regra cruel: quem vai mais longe é copiado, com pequenas mudanças. "
-              "<short pause> Quem cai cedo, sai. Cada rodada é uma geração.")
+         fala="Regra cruel: quem vai mais longe é copiado. <short pause> Quem cai cedo, sai.")
 
     # ---------------------------------------------------------------- O PRIMEIRO A CHEGAR
     r_s = A.rodada(gs)
@@ -154,8 +152,7 @@ def monta(hist, A):
                  cartao={"numero": 2, "rotulo": "ROBÔ", "nome": "O PASSO", "cor": AMARELO,
                          "stat": f"{pct(pa)} ALTERNAM AS PERNAS"},
                  log=[(f"GER {g_alt + 1:03d} · {pct(pa)} ALTERNAM AS PERNAS", AMARELO)],
-                 fala=f"Geração {g_alt + 1}. <short pause> {pct(pa)} já alternam as pernas. "
-                      "Um passo de cada vez.")
+                 fala=f"Geração {g_alt + 1}. <short pause> {pct(pa)} já alternam as pernas.")
             marcos.append((g_alt, "PASSO", AMARELO))
 
     # ---------------------------------------------------------------- O NÚMERO FINAL + O GRÁFICO
@@ -163,8 +160,8 @@ def monta(hist, A):
     cena(tipo="grafico", grupo="grafico", serie=serie, titulo="% QUE CHEGA",
          eras=[(gs, G - 1, "APRENDENDO", VERDE)], rotulo_y="ROBÔS QUE CHEGAM POR GERAÇÃO",
          final=pct(float(serie[melhor_g])), log=[(f"GER {melhor_g + 1:03d} · {fin_s}/{n} CHEGAM", VERDE), (f"{milhar(quedas_ate)} QUEDAS NO TOTAL", VERMELHO)],
-         fala=f"Geração {melhor_g + 1}: {fin_s} de {n} cruzam a linha sozinhos. <short pause> "
-              f"Sem programação. Foram {milhar(quedas_ate)} quedas no total.")
+         fala=f"Geração {melhor_g + 1}: {fin_s} de {n} chegam sozinhos. <short pause> "
+              f"Foram {milhar(quedas_ate)} quedas.")
 
     # ---------------------------------------------------------------- A VIRADA: o gelo
     if tem_virada:
@@ -172,19 +169,19 @@ def monta(hist, A):
         sub = "o melhor robô · 400 tentativas · % que chega"
         cena(tipo="barras", grupo="gelo", ger=melhor_g, itens=itens, titulo="E SE O CHÃO FOR GELO?", sub=sub,
              log=[("TESTE: ATRITO DO CHÃO BAIXO", AMARELO)], pausa=0.25,
-             fala="Mas ele aprendeu a andar de verdade? <short pause> Troquei o chão por gelo.")
+             fala="Mas ele aprendeu de verdade? <short pause> Troquei o chão por gelo.")
         cena(tipo="barras", grupo="gelo", ger=melhor_g, itens=itens, titulo="E SE O CHÃO FOR GELO?", sub=sub,
              destaque=1, cor_destaque="vermelho", revela=0.0, rotulo_destaque=f"▼ -{(base - gelo) * 100:.0f} pts",
              log=[(f"CHEGA {pct(base)} → {pct(gelo)}", VERMELHO)],
-             fala=f"Chão normal: o melhor robô chegava {pct(base)} das vezes. <long pause> No gelo? "
-                  f"{'Nenhuma.' if gelo == 0 else 'Só ' + pct(gelo) + '.'} <short pause> Ele só sabe andar no chão que conhece.")
+             fala=f"Melhor robô, chão normal: {pct(base)} chegam. <long pause> No gelo? "
+                  f"{'Nenhuma.' if gelo == 0 else 'Só ' + pct(gelo) + '.'}")
 
     # ---------------------------------------------------------------- CHAMADA + LAÇO
     cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="fim", inicio=max(m_h - 1.4, 0),
          escolha={"pergunta": "O QUE DERRUBA ELE?", "opcoes": [("ESCADA", AMARELO), ("LADEIRA", CIANO)], "em": 0.2},
          destaques={"escada": AMARELO, "ladeira": CIANO, "votado": VERDE},
-         fala="Agora você decide. Escada ou ladeira: qual derruba ele primeiro? <short pause> "
-              "Comenta seu lado. O mais votado vira o próximo episódio. Segue para não perder.")
+         fala="Ele nunca andou… e só sabe andar no chão que conhece. <short pause> "
+              "Escada ou ladeira? Comenta. O mais votado vira o próximo episódio. Segue.")
 
     info = {"marca": "VÍDEO NEURAL", "serie": serie, "serie_rotulo": "% QUE CHEGA POR GERAÇÃO",
             "estilo_voz": ESTILO_VOZ, "marcos": marcos, "rotulo_vivo": f"{n} ROBÔS",
