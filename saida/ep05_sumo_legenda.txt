@@ -1,0 +1,4 @@
+Treinei duas IAs de sumô de três jeitos: só a azul, só a rosa e as duas juntas, em treinos curtos, médios e longos (186 gerações no total). Quem treina sozinho sobe, quem fica congelado cai, e juntas elas empatam. Simulação real, nenhum número inventado.
+Você treinaria só a azul, só a rosa ou as duas? 👇
+
+#ia #inteligenciaartificial #machinelearning #simulacao #sumo #redesneurais #tecnologia #curiosidades
