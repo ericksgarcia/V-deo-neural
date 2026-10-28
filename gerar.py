@@ -16,9 +16,9 @@ import numpy as np
 
 from neuralab.video import Video
 
-DESAFIOS = ("penalti", "foguete", "baliza")
-GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260}
-EPISODIO = {"foguete": 1, "baliza": 2, "penalti": 4}
+DESAFIOS = ("penalti", "foguete", "baliza", "policia")
+GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260, "policia": 250}
+EPISODIO = {"foguete": 1, "baliza": 2, "penalti": 4, "policia": 5}
 
 
 def treino_penalti(G, sementes):
@@ -36,6 +36,25 @@ def treino_penalti(G, sementes):
         ev = eventos(hist)
         nota = sum(ev[k] is not None for k in ("mira", "paciente", "leitura", "finta")) + 0.1 * ev["ciclos"]
         print(f"  semente {s}: acontecimentos detectados {nota:.1f}")
+        if melhor is None or nota > melhor[0]:
+            melhor = (nota, s, hist)
+    return melhor[1], melhor[2]
+
+
+def treino_policia(G, sementes):
+    from neuralab.coevolucao_policia import treina
+    from neuralab.roteiros.policia import nota_historia
+    melhor = None
+    for s in sementes:
+        arq = os.path.join(".cache", f"policia_{G}_{s}.npz")
+        if os.path.exists(arq):
+            hist = dict(np.load(arq))
+        else:
+            print(f"treinando polícia e ladrão (semente {s}, {G} gerações)…")
+            hist = treina(G, semente=s, log=None)
+            np.savez_compressed(arq, **hist)
+        nota = nota_historia(hist)
+        print(f"  semente {s}: nota da história {nota:.2f}")
         if melhor is None or nota > melhor[0]:
             melhor = (nota, s, hist)
     return melhor[1], melhor[2]
@@ -87,6 +106,13 @@ def main():
         sementes = [int(x) for x in (a.sementes or "3").split(",")]
         s, hist = treino_penalti(G, sementes)
         A = Penalti(hist)
+        cenas, info, post, _ = monta(hist, A)
+    elif a.desafio == "policia":
+        from neuralab.adaptadores.policia import Policia
+        from neuralab.roteiros.policia import monta
+        sementes = [int(x) for x in (a.sementes or "3,5,7").split(",")]
+        s, hist = treino_policia(G, sementes)
+        A = Policia(hist)
         cenas, info, post, _ = monta(hist, A)
     else:
         from neuralab.adaptadores.baliza import Baliza
