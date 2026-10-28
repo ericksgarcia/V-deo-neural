@@ -17,7 +17,7 @@ import numpy as np
 from neuralab.video import Video
 
 DESAFIOS = ("penalti", "foguete", "baliza")
-GERACOES = {"penalti": 300, "foguete": 160, "baliza": 220}
+GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260}
 EPISODIO = {"foguete": 1, "baliza": 2, "penalti": 4}
 
 

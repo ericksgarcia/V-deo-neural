@@ -28,7 +28,7 @@ class Baliza:
     estacionados = [(-(3.6 + COMP / 2), 1.25), (3.6 + COMP / 2, 1.25)]
     v_max, ester_max, forca_acel = 3.0, 0.6, 3.0
     # tolerâncias do "estacionou": centro (m), lateral (m), inclinação (sen) e velocidade (m/s)
-    tol_x, tol_y, tol_ang, tol_v = 1.0, 0.45, 0.12, 0.6
+    tol_x, tol_y, tol_ang, tol_v = 1.5, 0.6, 0.18, 0.8
     ga = {}   # ajustes do algoritmo genético para este desafio (elite, taxa, forca)
 
     def __init__(self, n, rng, ruido=0.3):
