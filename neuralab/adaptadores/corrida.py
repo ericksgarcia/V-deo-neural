@@ -26,15 +26,17 @@ class Corrida(AdaptadorPopulacao):
     som_falha = "batida"
 
     def camera(self, rod, t, modo, foco):
-        geral = Camera2D(centro=(0.0, 0.0), escala=21.5, t=t)
-        if modo != "replay" or foco is None:
-            return geral
+        """Câmera que segue a bateria em destaque (média suavizada das posições dos carros dela)."""
+        k0 = rod.lider if foco is None else foco
+        mates = rod.mates[k0]
         i = rod.i(t)
-        x, y = rod.reg["s"][foco, i, :2]
-        perto = Camera2D(centro=(float(x) * 0.8, float(y) * 0.8), escala=34, t=t)
-        k = min(t / 0.7, 1.0)
-        cam = geral.mistura(perto, k)
-        return cam
+        idx = [max(i - d, 0) for d in range(0, 24, 4)]
+        pts = rod.reg["s"][mates][:, idx, :2]                   # (4, 6, 2)
+        vivo = rod.reg["estado"][mates][:, idx] == 0
+        w = np.where(vivo, 1.0, 0.05)[..., None]
+        c = (pts * w).sum((0, 1)) / w.sum((0, 1))
+        esc = 24.0 if (modo == "replay" and foco is not None) else 16.0
+        return Camera2D(centro=(float(c[0]), float(c[1])), escala=esc, t=t)
 
     # ------------------------------------------------------------ cenário
     def cenario(self, h, t):
@@ -94,7 +96,7 @@ class Corrida(AdaptadorPopulacao):
             R.veiculo_topo(h, (float(x), float(y)), float(hd), COMP, LARG, cor, t, 1.0 if ehfoco else 0.85,
                            farois=est[k, i] == 0, freio=freio, esterco=float(e))
             if est[k, i] == 0:
-                h.texto(f"P{4 - int(ordem[j])}", (float(x), float(y) + 2.1), 22, cor, 0.95)
+                h.texto(f"P{1 + int(ordem[j])}", (float(x), float(y) + 2.1), 22, cor, 0.95)
             if m >= 0 and est[k, m] == FALHA and 0 <= (i - m) * rod.dt < 0.8:
                 idade = (i - m) * rod.dt
                 h.pulso((float(x), float(y)), idade, VERMELHO, 3.0, 0.7, 5)

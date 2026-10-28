@@ -16,9 +16,9 @@ import numpy as np
 
 from neuralab.video import Video
 
-DESAFIOS = ("penalti", "foguete", "baliza")
-GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260}
-EPISODIO = {"foguete": 1, "baliza": 2, "penalti": 4}
+DESAFIOS = ("penalti", "foguete", "baliza", "corrida")
+GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260, "corrida": 240}
+EPISODIO = {"foguete": 1, "baliza": 2, "corrida": 3, "penalti": 4}
 
 
 def treino_penalti(G, sementes):
@@ -45,19 +45,21 @@ def treino_simples(nome, G, sementes):
     from neuralab.desafios import DESAFIOS as D
     from neuralab.evolucao import treina
     from neuralab.roteiros.simples import nota_historia
-    if nome == "baliza":
-        from neuralab.roteiros.baliza import nota_historia
+    if nome in ("baliza", "corrida"):
+        import importlib
+        nota_historia = importlib.import_module(f"neuralab.roteiros.{nome}").nota_historia
+    pop = 160 if nome == "corrida" else 150
     melhor = None
     for s in sementes:
-        arq = os.path.join(".cache", f"treino_{nome}_{G}_150_{s}_v2.npz")
+        arq = os.path.join(".cache", f"treino_{nome}_{G}_{pop}_{s}_v2.npz")
         if os.path.exists(arq):
             hist = dict(np.load(arq))
         else:
             print(f"treinando {nome} (semente {s}, {G} gerações)…")
-            hist = treina(D[nome], G, 150, s, log=None)
+            hist = treina(D[nome], G, pop, s, log=None)
             np.savez_compressed(arq, **hist)
         nota = nota_historia(hist)
-        print(f"  semente {s}: final {hist['sucessos'].max()}/150, nota da história {nota:.2f}")
+        print(f"  semente {s}: final {hist["sucessos"].max()}/{len(hist["genes"][0])}, nota da história {nota:.2f}")
         if melhor is None or nota > melhor[0]:
             melhor = (nota, s, hist)
     return melhor[1], melhor[2]
@@ -90,12 +92,14 @@ def main():
         cenas, info, post, _ = monta(hist, A)
     else:
         from neuralab.adaptadores.baliza import Baliza
+        from neuralab.adaptadores.corrida import Corrida
         from neuralab.adaptadores.foguete import Foguete
         sementes = [int(x) for x in (a.sementes or "3,5,7,11").split(",")]
         s, hist = treino_simples(a.desafio, G, sementes)
-        A = {"foguete": Foguete, "baliza": Baliza}[a.desafio](hist)
-        if a.desafio == "baliza":
-            from neuralab.roteiros.baliza import monta
+        A = {"foguete": Foguete, "baliza": Baliza, "corrida": Corrida}[a.desafio](hist)
+        if a.desafio in ("baliza", "corrida"):
+            import importlib
+            monta = importlib.import_module(f"neuralab.roteiros.{a.desafio}").monta
             cenas, info, post, _ = monta(hist, A)
         else:
             from neuralab.roteiros.simples import monta
