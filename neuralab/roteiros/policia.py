@@ -103,32 +103,29 @@ def monta(hist, A):
     rod = A.rodada(gh)
     nd = int(rod.jogo.diamantes[kh])
     marcas_h = [{"tipo": "circulo", "em": max(f(rod, kh) - 1.0, 0.1), "alvo": "ladrao", "segue": True,
-                 "texto": f"{nd} DIAMANTES!", "rx": 80, "ry": 70}]
+                 "texto": f"MELHOR LADRÃO · {nd} DIAMANTES", "rx": 80, "ry": 70}]
     cena(tipo="replay", ger=gh, foco=kh, grupo="gancho", marcas=marcas_h, inicio=max(f(rod, kh) - 8, 0),
-         titulo_gancho=[("A IA APRENDEU", BRANCO), ("A ROUBAR", LAD)],
-         fala="Dois policiais atrás de um ladrão. <short pause> Ninguém ensinou ninguém a correr nem a perseguir.")
-    cena(tipo="replay", ger=gh, foco=kh, grupo="gancho", marcas=marcas_h, inicio=max(f(rod, kh) - 8, 0), pausa=0.2,
-         fala="Olha o que cada lado aprendeu sozinho.")
-
+         titulo_gancho=[("A IA APRENDEU", BRANCO), ("A ROUBAR E PRENDER", LAD)],
+         fala="Dois policiais atrás de um ladrão. <short pause> Ninguém ensinou ninguém a correr nem a perseguir. Olha o que aprenderam sozinhos.")
     # ---------------------------------------------------------------- PREMISSA + GERAÇÃO 1
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[("100 LADRÕES × 100 DUPLAS DE POLÍCIA", BRANCO),
                                                ("CÉREBROS VAZIOS", BRANCO)],
          fala="Cem ladrões. Cem duplas de polícia. Cérebros vazios. <short pause> O ladrão quer diamantes. "
               "A polícia quer prender.")
-    cena(tipo="ao_vivo", ger=0, grupo="g1",
-         log=[(f"GER 001 · PRESOS {pct(M['preso'][0])}", VERMELHO)],
-         carimbo={"texto": f"PRESOS {pct(M['preso'][0])}", "cor": "vermelho", "em": 0.6, "sub": "GERAÇÃO 1"},
-         fala=f"Geração um: só {em_dez(M['preso'][0])} são presos. <short pause> "
-              f"E os policiais ficam parados {pct(m0['parado'])} do tempo.")
     cena(tipo="ao_vivo", ger=min(5, G - 1), log=[("OS MELHORES TÊM FILHOS", VERDE), ("OS PIORES SAEM", VERMELHO)],
          carimbo={"texto": "OS MELHORES FICAM", "cor": "verde", "em": 0.4, "sub": "OS PIORES SAEM"},
-         fala="A regra é cruel. Quem rouba mais, ou prende mais, tem filhos. <short pause> Os outros? Eliminados.")
+         fala="Quem rouba mais, ou prende mais, tem filhos. <short pause> Os outros? Eliminados.")
 
     achados = []   # (geração, cena) de cada descoberta; entram em ordem cronológica e numeradas de 1 a n
 
     def achado(g, **kw):
         achados.append((g, kw))
 
+    cena(tipo="ao_vivo", ger=0, grupo="g1",
+         log=[(f"GER 001 · PRESOS {pct(M['preso'][0])}", VERMELHO)],
+         carimbo={"texto": f"PRESOS {pct(M['preso'][0])}", "cor": "vermelho", "em": 0.6, "sub": "GERAÇÃO 1"},
+         fala=f"Geração um: só {em_dez(M['preso'][0])} são presos. <short pause> "
+              f"E os policiais ficam parados {pct(m0['parado'])} do tempo.")
     # ---------------------------------------------------------------- DESCOBERTA: a polícia aprende a perseguir
     if gp is not None:
         g1, k1 = lance(A, range(gp, gp + 20), "preso")
@@ -139,7 +136,7 @@ def monta(hist, A):
              cartao={"numero": 0, "rotulo": "POLÍCIA", "nome": "A PERSEGUIÇÃO", "cor": POL,
                      "stat": f"PRESOS {pct(M['preso'][0])} → {pct(M['preso'][gp])} · PARADOS {pct(m0['parado'])} → {pct(mp['parado'])}"},
              log=[("NOVO PADRÃO: PERSEGUIR", POL)],
-             fala=f"Geração {gp + 1}. <short pause> Aí a polícia reage. Ela descobre que parado não prende. Ela corre atrás. "
+             fala=f"Geração {gp + 1}. <short pause> A polícia descobre que parado não prende. Ela corre atrás. "
                   f"E {em_dez(M['preso'][gp])} caem.")
         marcos.append((gp, "PERSEGUE", POL))
 
@@ -182,11 +179,10 @@ def monta(hist, A):
     gm = min(max((gp or 0) + 40, G // 2), G - 1)
     if M["preso"][gm:].max() - M["preso"][gm:].min() < 0.12 and df > M["diamantes"][gm] + 0.1:
         cena(tipo="ao_vivo", ger=gm,
-             carimbo={"texto": f"PRESOS ~{pct(M['preso'][gm:].mean())}", "cor": "texto", "em": 0.3,
-                      "sub": "PLACAR TRAVADO"},
+             carimbo={"texto": "PLACAR TRAVADO", "cor": "texto", "em": 0.3, "sub": "A POLÍCIA PAROU DE MELHORAR"},
              log=[(f"GER {gm + 1:03d}+ · PRESOS ~{pct(M['preso'][gm:].mean())}", BRANCO)],
-             fala=f"Aí o placar trava. Uns {em_dez(M['preso'][gm:].mean())} presos. <short pause> "
-                  "A polícia parou de melhorar… mas o ladrão não.")
+             fala=f"O placar trava. Uns {em_dez(M['preso'][gm:].mean())} presos. <short pause> "
+                  "A polícia parou… mas o ladrão não.")
 
     # ---------------------------------------------------------------- GRÁFICO
     eras = []
@@ -205,28 +201,25 @@ def monta(hist, A):
     taxas = [torneio(hist, g, G - 1, 1500) for g in gens]
     if taxas[0] - taxas[-1] >= 0.05:
         itens = [(f"G{g + 1:03d}", t, LAD) for g, t in zip(gens, taxas)]
-        sub = "% de ladrões presos pela polícia final · menor = ladrão melhor"
+        sub = "preso pela polícia final · 1500 partidas por barra"
         cena(tipo="barras", grupo="torneio", itens=itens, titulo="LADRÕES x POLÍCIA DE HOJE", sub=sub,
-             log=[("TORNEIO: LADRÕES DO PASSADO", BRANCO)], pausa=0.3,
-             fala="Aí eu pus ladrões do passado contra a polícia de hoje. Quem escapa mais?")
-        cena(tipo="barras", grupo="torneio", itens=itens, titulo="LADRÕES x POLÍCIA DE HOJE", sub=sub, revela=0.0,
-             destaque=len(itens) - 1, cor_destaque="verde", rotulo_destaque="◀ ESCAPA MAIS",
+             destaque=len(itens) - 1, cor_destaque="verde", rotulo_destaque="◀ ESCAPA MAIS", revela=2.2,
              log=[(f"PRESOS {pct(taxas[0])} → {pct(taxas[-1])}", VERDE)],
-             fala=f"O ladrão da geração um é preso {pct(taxas[0])} das vezes. O de hoje? Só {pct(taxas[-1])}. "
-                  "Contra a mesma polícia.")
+             fala=f"Ladrões do passado contra a polícia de hoje. O da geração um: preso {pct(taxas[0])}. "
+                  f"O de hoje? Só {pct(taxas[-1])}.")
 
     # ---------------------------------------------------------------- CHAMADA + LAÇO
     cena(tipo="replay", ger=gh, foco=kh, inicio=max(f(A.rodada(gh), kh) - 8, 0),
          escolha={"pergunta": "QUAL É O SEU TIME?", "opcoes": [("POLÍCIA", POL), ("LADRÃO", LAD)], "em": 0.2},
          destaques={"polícia": POL, "ladrão": LAD},
-         fala="Time polícia ou time ladrão? Comenta. Porque tudo começou quando eu…")
+         fala="Time polícia ou time ladrão? Comenta. Porque tudo começou com…")
 
     info = {"marca": "VÍDEO NEURAL", "serie": M["preso"], "serie_rotulo": "% DE LADRÕES PRESOS",
             "estilo_voz": ESTILO_VOZ, "marcos": marcos, "rotulo_vivo": "100 PERSEGUIÇÕES",
             "rodape": f"POP 100×100 · REDES 20-12-2 · {G} GERAÇÕES · NADA FOI PROGRAMADO, SÓ SELEÇÃO"}
-    post = (f"Coloquei 100 ladrões contra 100 duplas de polícia num labirinto por {G} gerações. "
-            f"A polícia saiu de {pct(M['preso'][0])} de prisões para {pct(final)}. O ladrão passou de "
-            f"{vir(d0)} para {vir(df)} diamantes por tentativa. Ninguém programou nada. 🚔💎\n"
-            f"Time polícia ou time ladrão? 👇\n\n#ia #inteligenciaartificial #aprendizadodemaquina "
-            f"#policiaeladrao #simulacao #curiosidades #tecnologia #machinelearning")
+    post = (f"Dois policiais, um ladrão e zero instrução. Em {G} gerações, as prisões foram de {pct(M['preso'][0])} "
+            f"para {pct(final)} e o ladrão foi de {vir(d0)} para {vir(df)} diamantes por tentativa. "
+            f"Simulação real, nenhum número inventado. 🚔💎\n"
+            f"Time polícia ou time ladrão? Comenta o seu 👇\n\n#ia #inteligenciaartificial "
+            f"#aprendizadodemaquina #simulacao #policiaeladrao #redesneurais")
     return cenas, info, post, {"gp": gp, "gr": gr, "gc": gc, "taxas": taxas}
