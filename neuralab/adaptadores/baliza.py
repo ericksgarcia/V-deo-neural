@@ -82,7 +82,7 @@ class Baliza(AdaptadorPopulacao):
         if modo == "replay" and foco is not None:
             ks = [foco]
         else:   # multidão: 1 em cada 3 (a soma de luz de 150 carros viraria uma mancha branca)
-            ks = sorted(set(range(0, rod.n, 3)) | {rod.lider})
+            ks = sorted(set(range(0, rod.n, 8)) | {rod.lider})
         for k in ks:
             m = rod.morte[k]
             fim = i if m < 0 else min(i, m)

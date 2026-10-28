@@ -23,7 +23,19 @@ def pct(x):
 
 
 def em_dez(x):
-    return f"{NOMES[int(round(x * 10))]} em cada dez"
+    """0.87 -> 'quase nove em cada dez'; 0.60 -> 'seis em cada dez'."""
+    n = int(round(x * 10))
+    quase = "quase " if x * 10 < n - 0.15 else ""
+    return f"{quase}{NOMES[n]} em cada dez"
+
+
+def erro_txt(e):
+    """Fração de erro em linguagem falada (só frações que a fala consegue dizer com fidelidade)."""
+    if 0.6 <= e < 0.72:
+        return "quase dois em cada três"
+    if 0.45 <= e < 0.55:
+        return "metade das vezes"
+    return f"{pct(e)} das vezes"
 
 
 def milhar(x):
@@ -92,13 +104,17 @@ def teste_estresse(hist, g, n=400, ruido=1.4, semente=11):
 def monta(hist, A):
     ev = eventos(hist)
     G, n = ev["G"], hist["genes"].shape[1]
-    gs, gf = ev["gs"], ev["final_g"]
+    gs = ev["gs"]
     if gs is None:
         raise RuntimeError("Nenhum carro estacionou: treine mais gerações ou troque a semente.")
     suc = hist["sucessos"]
     batidas = hist["m_bateu"] * n                      # carros que bateram de verdade (não conta tempo esgotado)
     falhas_ate = int(round(batidas.sum()))
-    final = int(suc[gf])
+    f_gs = int(round(batidas[:gs + 1].sum()))
+    melhor_g = int(np.argmax(suave(suc.astype(float))))
+    fin_s = int(suc[melhor_g])
+    base, duro = teste_estresse(hist, melhor_g)
+    tem_virada = base - duro >= 0.15
     cenas, marcos = [], []
     D = DESTAQUES
 
@@ -107,34 +123,49 @@ def monta(hist, A):
         cenas.append(kw)
         return kw
 
-    # ---------------------------------------------------------------- GANCHO: o carro perfeito, já no 1º quadro
-    g_h = int(np.argmax(suave(suc.astype(float))))
-    rod_h = A.rodada(g_h)
+    # ---------------------------------------------------------------- GANCHO: o carro perfeito + a virada plantada
+    rod_h = A.rodada(melhor_g)
     heroi = A.busca(rod_h, "primeiro")
-    marcas = [{"tipo": "circulo", "em": max(float(rod_h.morte[heroi]) * rod_h.dt - 0.6, 0), "alvo": "alvo",
-               "texto": "NA VAGA!", "rx": 90, "ry": 60, "desloca": (0, -80)}]
-    cena(tipo="replay", ger=g_h, foco=heroi, grupo="gancho", marcas=marcas,
+    m_h = float(rod_h.morte[heroi]) * rod_h.dt
+    marcas = [{"tipo": "circulo", "em": max(m_h - 0.6, 0), "alvo": "alvo", "texto": "NA VAGA!", "rx": 90, "ry": 60,
+               "desloca": (0, -80)}]
+    cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas,
          titulo_gancho=[("A IA APRENDEU", BRANCO), ("A FAZER BALIZA", VERDE)],
-         fala=f"Essa IA bateu {milhar(falhas_ate)} vezes… até aprender a fazer baliza.")
-    cena(tipo="replay", ger=g_h, foco=heroi, grupo="gancho", marcas=marcas, fala="Ninguém ensinou como.", pausa=0.25)
+         fala="Essa IA aprendeu a fazer baliza sozinha.")
+    if tem_virada:
+        cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas, pausa=0.2,
+             fala=f"Mas muda a posição inicial… e ela erra {erro_txt(1 - duro)}.")
+    else:
+        cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas, pausa=0.2,
+             fala="Ninguém ensinou como.")
 
-    # ---------------------------------------------------------------- PREMISSA + GERAÇÃO 1
+    # ---------------------------------------------------------------- PREMISSA + GERAÇÃO 1 (com batidas de verdade)
     b0 = float(hist["m_bateu"][0])
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"POPULAÇÃO: {n} CARROS", BRANCO), ("CÉREBROS ALEATÓRIOS", BRANCO)],
          fala=f"{n} carros. Cérebros aleatórios. Só os melhores têm filhos.")
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"GER 001 · BATERAM {pct(b0)}", VERMELHO)],
          carimbo={"texto": f"BATERAM {pct(b0)}", "cor": VERMELHO, "em": 0.5, "sub": "GERAÇÃO 1"},
-         fala=f"Geração um: {em_dez(b0)} batem em alguma coisa." if b0 < 0.95 else "Geração um: todo mundo bate.")
+         fala=f"Geração um: {em_dez(b0)} batem." if b0 < 0.97 else "Geração um: todo mundo bate.")
+    r0 = A.rodada(0)
+    est0 = r0.reg["estado"][:, -1]
+    caiu = [k for k in np.argsort(r0.morte) if r0.morte[k] >= 0 and est0[k] == 2]    # FALHA = 2
+    if len(caiu) >= 3:
+        pick = [caiu[int(i)] for i in np.linspace(len(caiu) * 0.15, len(caiu) * 0.85, 3)]
+        cena(tipo="montagem", clipes=[(0, int(k)) for k in pick], destaques=D,
+             log=[("BATEU. BATEU. BATEU.", VERMELHO)], fala="Bateu. Bateu. Bateu.")
 
-    # ---------------------------------------------------------------- CHEGA PERTO, MAS BATE
+    # ---------------------------------------------------------------- CHEGA PERTO, MAS NINGUÉM ESTACIONA
     if ev["chega"] is not None and gs - ev["chega"] > 3:
         g = ev["chega"]
+        pe = float(hist["m_perto"][g])
+        ninguem = int(suc[g]) == 0
         cena(tipo="ao_vivo", ger=g,
-             log=[(f"GER {g + 1:03d} · CHEGAM PERTO {pct(hist['m_perto'][g])}", AMARELO)],
-             carimbo={"texto": f"{pct(hist['m_perto'][g])} CHEGAM PERTO", "cor": AMARELO, "em": 0.4,
-                      "sub": f"MAS {int(suc[g])} ESTACIONAM"},
-             fala=f"Geração {g + 1}: metade já acha a vaga… mas ainda bate em tudo.")
-        marcos.append((g, "ACHA", AMARELO))
+             log=[(f"GER {g + 1:03d} · CHEGAM PERTO {pct(pe)}", AMARELO)],
+             carimbo={"texto": f"{pct(pe)} CHEGAM PERTO", "cor": AMARELO, "em": 0.4,
+                      "sub": "MAS NINGUÉM ESTACIONA" if ninguem else f"MAS {int(suc[g])} ESTACIONAM"},
+             fala=f"Geração {g + 1}: {em_dez(pe)} chegam perto da vaga… "
+                  + ("mas ninguém estaciona." if ninguem else f"mas só {int(suc[g])} estacionam."))
+        marcos.append((g, "PERTO", AMARELO))
 
     # ---------------------------------------------------------------- O PRIMEIRO SUCESSO
     r_s = A.rodada(gs)
@@ -142,63 +173,60 @@ def monta(hist, A):
     m_s = float(r_s.morte[k_s]) * r_s.dt
     marcas_s = [{"tipo": "circulo", "em": max(m_s - 0.9, 0), "alvo": "alvo", "texto": "PAROU!", "rx": 90, "ry": 60,
                  "desloca": (0, -80)}]
-    f_gs = int(round(batidas[:gs + 1].sum()))
     cena(tipo="replay", ger=gs, foco=k_s, marcas=marcas_s,
          cartao={"numero": 1, "rotulo": "PRIMEIRO SUCESSO", "nome": f"GERAÇÃO {gs + 1}", "cor": VERDE,
                  "stat": f"DEPOIS DE {milhar(f_gs)} BATIDAS"},
          log=[(f"GER {gs + 1:03d} · PRIMEIRO SUCESSO", VERDE)],
-         fala=f"Geração {gs + 1}: um único carro dá ré, endireita… e para.")
+         fala=f"Geração {gs + 1}. Depois de {milhar(f_gs)} batidas, o primeiro carro dá ré… alinha… e para.")
     marcos.append((gs, "1º", VERDE))
 
     # ---------------------------------------------------------------- COPIAR, MISTURAR, MELHORAR (montagem real)
-    marcas_g = sorted(set([gs] + list(np.linspace(gs, gf, 5).astype(int)[1:])))
+    gens = sorted(set([gs] + list(np.linspace(gs, melhor_g, 5).astype(int)[1:])))
     clipes = []
-    for g in marcas_g:
+    for g in gens:
         k = A.busca(A.rodada(g), "primeiro")
         if k is not None:
             clipes.append((g, k))
     if len(clipes) >= 3:
-        cena(tipo="montagem", clipes=clipes[:4], log=[("ESSE CÉREBRO É COPIADO E MELHORADO", BRANCO)],
-             fala="Esse cérebro é copiado, misturado e melhorado.")
+        cena(tipo="montagem", clipes=clipes[:4], log=[("OS MELHORES SÃO COPIADOS E MISTURADOS", BRANCO)],
+             fala="Os melhores são copiados e misturados. Os erros bons ficam.")
 
-    # ---------------------------------------------------------------- PLATÔ OU AVANÇO: o número final
-    melhor_g = int(np.argmax(suave(suc.astype(float))))
-    fin_s = int(suc[melhor_g])
+    # ---------------------------------------------------------------- O NÚMERO FINAL + O GRÁFICO
     cena(tipo="ao_vivo", ger=melhor_g, log=[(f"GER {melhor_g + 1:03d} · {fin_s}/{n} NA VAGA", VERDE)],
          carimbo={"texto": f"{fin_s} DE {n}", "cor": VERDE, "em": 0.5, "sub": "ESTACIONAM SOZINHOS"},
-         fala=f"Geração {melhor_g + 1}: {fin_s} de {n} estacionam sozinhos.")
-
-    # ---------------------------------------------------------------- GRÁFICO: a jornada
+         fala=f"Geração {melhor_g + 1}: {fin_s} de {n} estacionam sozinhos." + (" Mais da metade." if fin_s > n / 2 else ""))
     serie = suc / n
     cena(tipo="grafico", grupo="grafico", serie=serie, titulo="% QUE ESTACIONA",
          eras=[(gs, G - 1, "APRENDENDO", VERDE)], rotulo_y="CARROS NA VAGA POR GERAÇÃO",
-         final=pct(float(serie[melhor_g])),
-         log=[(f"{milhar(falhas_ate)} BATIDAS NO TOTAL", VERMELHO)],
-         fala=f"De zero a {pct(float(serie[melhor_g]))}. {milhar(falhas_ate)} batidas. Nenhuma aula.")
+         final=pct(float(serie[melhor_g])), log=[(f"{milhar(falhas_ate)} BATIDAS NO TOTAL", VERMELHO)],
+         fala=f"Do zero. Sem nenhuma aula. Só {milhar(falhas_ate)} batidas pelo caminho.")
 
-    # ---------------------------------------------------------------- A REVIRAVOLTA: o teste de estresse
-    base, duro = teste_estresse(hist, melhor_g)
-    if base - duro >= 0.15:
-        cena(tipo="barras", grupo="estresse", itens=[("COMO TREINOU", base, VERDE), ("POSIÇÃO NOVA", duro, VERMELHO)],
-             titulo="TESTE DE ESTRESSE", sub="o melhor carro · 400 partidas por teste · % que estaciona",
-             log=[("TESTE: MUDAR A POSIÇÃO INICIAL", AMARELO)], pausa=0.3,
-             fala="Aí eu mudei só um detalhe: a posição inicial do carro.")
-        cena(tipo="barras", grupo="estresse", itens=[("COMO TREINOU", base, VERDE), ("POSIÇÃO NOVA", duro, VERMELHO)],
-             titulo="TESTE DE ESTRESSE", sub="o melhor carro · 400 partidas por teste · % que estaciona",
-             destaque=1, cor_destaque="vermelho", revela=0.0,
+    # ---------------------------------------------------------------- A VIRADA: o teste de estresse
+    if tem_virada:
+        itens = [("COMO TREINOU", base, VERDE), ("POSIÇÃO NOVA", duro, VERMELHO)]
+        sub = "o melhor carro · 400 partidas por teste · % que estaciona"
+        cena(tipo="barras", grupo="estresse", ger=melhor_g, itens=itens, titulo="TESTE DE ESTRESSE", sub=sub,
+             log=[("TESTE: MUDAR A POSIÇÃO INICIAL", AMARELO)], pausa=0.25,
+             fala="Aí peguei o melhor carro e mudei só uma coisa: onde ele começa.")
+        cena(tipo="barras", grupo="estresse", ger=melhor_g, itens=itens, titulo="TESTE DE ESTRESSE", sub=sub,
+             destaque=1, cor_destaque="vermelho", revela=0.0, rotulo_destaque=f"▼ -{(base - duro) * 100:.0f} pts",
              log=[(f"ESTACIONA {pct(base)} → {pct(duro)}", VERMELHO)],
-             fala=f"Era {pct(base)}. Caiu pra {pct(duro)}. Ele aprendeu um caminho. Não aprendeu a dirigir.")
-    # ---------------------------------------------------------------- CHAMADA + LAÇO
-    cena(tipo="replay", ger=g_h, foco=heroi, grupo="fim", escolha={
-        "pergunta": "PRÓXIMO DESAFIO?", "opcoes": [("LADEIRA", AMARELO), ("CHUVA", CIANO)], "em": 0.2},
-         destaques={"ladeira": AMARELO, "chuva": CIANO},
-         fala="Baliza na ladeira, ou de ré na chuva? Você escolhe.")
+             fala=f"Era {pct(base)}. Caiu pra {pct(duro)}. Ele aprendeu o caminho do treino. "
+                  "Dirigir de verdade… ainda não.")
+
+    # ---------------------------------------------------------------- CHAMADA + LAÇO (volta ao replay do gancho)
+    cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="fim", inicio=max(m_h - 1.4, 0),
+         escolha={"pergunta": "O QUE DERRUBA ELE?", "opcoes": [("LADEIRA", AMARELO), ("CHUVA", CIANO)], "em": 0.2},
+         destaques={"ladeira": AMARELO, "chuva": CIANO, "votado": VERDE},
+         fala="Ladeira ou chuva: qual derruba ele primeiro? O mais votado vira o próximo vídeo.")
 
     info = {"marca": "VÍDEO NEURAL", "serie": serie, "serie_rotulo": "% QUE ESTACIONA POR GERAÇÃO",
             "marcos": marcos, "rotulo_vivo": f"{n} CARROS",
-            "rodape": f"POP {n} · REDE {'-'.join(map(str, A.Desafio.camadas))} · {G} GERAÇÕES · NADA FOI PROGRAMADO"}
-    post = (f"Essa IA bateu {milhar(falhas_ate)} vezes até aprender a fazer baliza. Na geração {melhor_g + 1}, "
-            f"{fin_s} de {n} estacionavam sozinhos. Simulação real, nenhum número inventado.\n"
-            f"Baliza na ladeira ou de ré na chuva? 👇\n\n#ia #baliza #autoescola #inteligenciaartificial "
-            f"#machinelearning #simulacao #carro #tecnologia")
+            "rodape": f"POP {n} · REDE {'-'.join(map(str, A.Desafio.camadas))} · {G} GERAÇÕES · "
+                      "NADA FOI PROGRAMADO: SÓ SELEÇÃO, CRUZAMENTO E MUTAÇÃO"}
+    virada = f" Aí mudei UM detalhe e ela caiu de {pct(base)} para {pct(duro)}. 🚗💥" if tem_virada else ""
+    post = (f"Esses carros bateram {milhar(falhas_ate)} vezes e aprenderam a estacionar sozinhos.{virada}\n"
+            f"Simulação real: {n} carros, {G} gerações, zero aula. Uma série em que a IA aprende sozinha.\n"
+            f"Qual derruba ela primeiro: LADEIRA ou CHUVA? O mais votado vira o próximo vídeo 👇\n\n"
+            f"#ia #inteligenciaartificial #aprendizadodemaquina #baliza #autoescola #curiosidades #tecnologia #carro")
     return cenas, info, post, ev

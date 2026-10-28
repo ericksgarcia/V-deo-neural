@@ -239,8 +239,8 @@ class Video:
                   next((d for a, b, w, d in self.blocos if a <= t < b), {}))
         # fileira de baixo
         cb = self.A.cerebro(rod, ts, foco)
-        K.console(ctx, 30, K.BAIXO[0], 570, K.BAIXO[1], self.linhas_log, t)
-        K.rede(ctx, 615, K.BAIXO[0], 435, K.BAIXO[1], cb["camadas"], cb["pesos"], cb["ativ"], t, cb["saidas"],
+        K.console(ctx, 30, K.BAIXO[0], 540, K.BAIXO[1], self.linhas_log, t)
+        K.rede(ctx, 585, K.BAIXO[0], 345, K.BAIXO[1], cb["camadas"], cb["pesos"], cb["ativ"], t, cb["saidas"],
                cb["titulo"], c=cb["cor"])
         K.rodape(ctx, info.get("rodape", ""))
         K.scanlines(ctx, t)
@@ -300,7 +300,8 @@ class Video:
             K.barras(ctx, K.CENA, c["itens"], c["titulo"], c.get("sub", ""), tg / 1.6,
                      c.get("destaque") if tl > c.get("revela", 0) else None,
                      atual=c.get("atual") if tl > c.get("revela", 0) else None,
-                     cor_destaque=c.get("cor_destaque", "vermelho"))
+                     cor_destaque=c.get("cor_destaque", "vermelho"),
+                     rotulo_destaque=c.get("rotulo_destaque", "◀ MELHOR"))
         elif c["tipo"] == "final":
             K.tela_final(ctx, K.CENA, tl, c["pergunta"], c["opcoes"])
 
