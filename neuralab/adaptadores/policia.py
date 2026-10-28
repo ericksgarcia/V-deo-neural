@@ -106,7 +106,8 @@ class Policia(Adaptador):
         a, b = rod.reg["l"][foco, i], rod.reg["p"][foco, i]
         m = rod.morte[foco] * rod.dt
         meio = ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
-        perto = Camera2D(centro=(float(meio[0]), float(meio[1])), escala=62, t=t)
+        # aproxima, mas sem perder o cofre: com esta escala, centro x <= 13,4 mostra o cofre inteiro
+        perto = Camera2D(centro=(float(np.clip(meio[0], 10.4, 13.4)), float(np.clip(meio[1], 5.5, 8.5))), escala=48, t=t)
         cam = geral.mistura(perto, min(t / 0.8, 1.0))
         if rod.jogo.estado[foco] == P.PEGO and 0 <= t - m < 0.3:
             cam.tremor = 8 * (1 - (t - m) / 0.3)
@@ -130,7 +131,7 @@ class Policia(Adaptador):
         h.linha([(cx + P.R_COFRE * math.cos(u), cy + P.R_COFRE * math.sin(u)) for u in np.linspace(0, 6.4, 40)],
                 AMARELO, 2.0, pulso, tracejado=[10, 8], halo=False)
         h.texto("COFRE", (cx, cy + 0.15), 20, AMARELO, 0.95)
-        h.ponto_luz((cx, cy), 60, AMARELO, 0.35)
+        h.ponto_luz((cx, cy), 60, AMARELO, 0.22)
         h.texto("LARGADA", (1.9, 12.9), 15, CIANO, 0.35)
 
     # ------------------------------------------------------------ fantasmas
@@ -151,7 +152,7 @@ class Policia(Adaptador):
             return CIANO, 0.16, 0.07, 0.13
         idade = (i - m) * rod.dt
         if e == P.ESCAPOU:
-            return VERDE, min(0.4 + idade * 1.5, 0.95), 0.4, max(0.13 * (1 - idade / 1.2), 0.0)
+            return VERDE, min(0.25 + idade, 0.5), 0.22, max(0.13 * (1 - idade / 1.2), 0.0)
         if idade > 1.1:
             return None
         s = 1 - idade / 1.1
@@ -224,6 +225,14 @@ class Policia(Adaptador):
         for k in ks:
             self._par(h, rod, k, i, t, False)
         self._par(h, rod, rod.lider, i, t, True, 1.0)
+        self._cofre_na_frente(h, t)
+
+    def _cofre_na_frente(self, h, t):
+        """Redesenha o aro e o nome do cofre por cima dos ladrões que chegaram (o objetivo nunca some na luz)."""
+        cx, cy = P.COFRE
+        h.linha([(cx + P.R_COFRE * math.cos(u), cy + P.R_COFRE * math.sin(u)) for u in np.linspace(0, 6.4, 40)],
+                AMARELO, 2.2, 0.9, halo=False)
+        h.texto("COFRE", (cx, cy + 0.15), 20, AMARELO, 0.95)
 
     def ponto(self, rod, foco, nome, t):
         i = rod.i(t)

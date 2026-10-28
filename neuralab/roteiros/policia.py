@@ -112,14 +112,12 @@ def monta(hist, A):
               "Os ladrões querem o cofre. Os policiais querem os ladrões.")
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"GER 001 · FUGIRAM {fuga(0)}/{n}", VERMELHO)],
          carimbo={"texto": f"FUGIRAM {fuga(0)}", "cor": VERMELHO, "em": 0.6, "sub": f"DE {n} · GERAÇÃO 1"},
-         fala=f"Chuta aí: quantos escapam? <long pause> Só {numero(fuga(0))}. "
-              + ("<short pause> E a maioria só anda sem rumo até o tempo acabar." if parado0 >= n * 0.5 else ""))
+         fala=f"Chuta aí: quantos escapam? <long pause> Só {numero(fuga(0))}.")
 
     # ------------------------------------------------------------ A REGRA (curta)
     cena(tipo="ao_vivo", ger=min(4, G - 1), log=[("QUEM VAI MELHOR VIRA PAI DA PRÓXIMA TURMA", VERDE),
                                                 ("QUEM ERRA SAI", VERMELHO), ("OS DOIS LADOS EVOLUEM JUNTOS", BRANCO)],
-         fala="A regra é simples. Quem vai melhor vira pai da próxima turma. <short pause> Quem erra, sai. "
-              "E os dois lados evoluem juntos.")
+         fala="Quem vai melhor vira pai da próxima turma. <short pause> Quem erra, sai.")
 
     # ------------------------------------------------------------ DESCOBERTA 1: o ladrão acha o caminho
     rg1 = A.rodada(g1)
@@ -152,7 +150,7 @@ def monta(hist, A):
     # ------------------------------------------------------------ CALMARIA ENGANOSA + DESCOBERTA 3: a troca de lado
     cena(tipo="ao_vivo", ger=g3, log=[(f"GER {g3 + 1:03d} · FUGIRAM {fuga(g3)}/{n}", AMARELO)],
          carimbo={"texto": f"SÓ {fuga(g3)} FOGEM", "cor": AMARELO, "em": 0.4, "sub": f"GERAÇÃO {g3 + 1}"},
-         fala=f"Geração {g3 + 1}. Só {numero(fuga(g3))} ladrões fogem. <short pause> Parece o fim dos ladrões.")
+         fala=f"Geração {g3 + 1}. <short pause> Só {numero(fuga(g3))} ladrões fogem. <short pause> Parece o fim.")
     rg4 = A.rodada(g4)
     k4 = A.busca(rg4, "cima" if hist["m_rota_cima"][g4] >= hist["m_rota_baixo"][g4] else "baixo") or A.busca(rg4, "escapa")
     lado_novo = "por cima" if hist["m_rota_cima"][g4] >= hist["m_rota_baixo"][g4] else "por baixo"
@@ -163,33 +161,27 @@ def monta(hist, A):
          cartao={"numero": 3, "rotulo": "LADRÃO", "nome": "A TROCA", "cor": CIANO,
                  "stat": f"FUGAS {fuga(g3)} → {fuga(g5)} DE {n}"},
          log=[(f"GER {g4 + 1:03d} · TROCA DE LADO", CIANO)],
-         fala=f"Até que um ladrão muda o jogo. <short pause> Troca de lado. <long pause> Vai {lado_novo}. "
-              + (f"E a polícia erra o lado: em {pct(1 - ml5)} das partidas." if falou_erro else
-                 f"E as fugas sobem para {numero(fuga(g5))}."))
+         fala=f"Até que um ladrão muda o jogo. <short pause> Vai {lado_novo}. <long pause> "
+              + (f"A polícia erra o lado em {pct(1 - ml5)} das partidas." if falou_erro else
+                 f"As fugas sobem para {numero(fuga(g5))}."))
     marcos.append((g4, "3", CIANO))
 
-    # ------------------------------------------------------------ O GRÁFICO
-    serie = hist["m_fuga"]
-    cena(tipo="grafico", grupo="grafico", serie=suave(serie, 5), titulo="% QUE FOGE",
-         eras=[(g1 - 6 if g1 > 6 else 0, g2, "LADRÃO ACHA O CAMINHO", CIANO), (g2, g4, "POLÍCIA REAGE", MAGENTA),
-               (g4, G - 1, "TROCA DE LADO", AMARELO)],
-         rotulo_y="LADRÕES QUE ESCAPAM POR GERAÇÃO", final=pct(float(suave(serie, 5)[-1])),
-         log=[(f"{G} GERAÇÕES · NENHUMA REGRA PROGRAMADA", BRANCO)],
-         fala=f"Dois cérebros. Zero regras. <short pause> Um perseguindo o outro por {numero(G)} gerações.")
-
     # ------------------------------------------------------------ FINAL + CHAMADA (volta ao gancho)
+    lado_fim = mlfim >= 0.85
     cena(tipo="ao_vivo", ger=G - 1, log=[(f"GER {G:03d} · FUGIRAM {fuga(G - 1)}/{n} · PRESOS {pego(G - 1)}/{n}", AMARELO)],
-         fala=(f"E a corrida não acaba. <short pause> Na geração {numero(G)}, a polícia já escolhe o mesmo lado de novo. "
-               f"<short pause> Em {pct(mlfim)} das partidas." if mlfim >= 0.85 else
-               f"E a corrida não acaba. <short pause> Na geração {numero(G)}, "
-               f"{numero(fuga(G - 1))} ladrões ainda fogem."))
+         carimbo=({"texto": f"{pct(mlfim)} MESMO LADO", "cor": MAGENTA, "em": 0.5, "sub": f"POLÍCIA · GERAÇÃO {G}"}
+                  if lado_fim else None),
+         fala=(f"E a corrida não acaba. <long pause> Geração {numero(G)}: a polícia acerta o lado de novo. "
+               f"<short pause> Em {pct(mlfim)} das partidas." if lado_fim else
+               f"E a corrida não acaba. <long pause> Na geração {numero(G)}, {numero(fuga(G - 1))} ladrões ainda fogem."))
     cena(tipo="replay", ger=g5, foco=heroi, grupo="fim", inicio=max(float(r5.jogo.t_fim[heroi]) * P.DT - 1.4, 0),
          escolha={"pergunta": "QUEM GANHA UM MOTOR MAIS RÁPIDO?", "opcoes": [("TIME LADRÃO", CIANO), ("TIME POLÍCIA", MAGENTA)],
                   "em": 0.2},
          destaques={"ladrão": CIANO, "polícia": MAGENTA, "votado": VERDE},
-         fala="Agora é com você. No próximo vídeo, um lado ganha um motor mais rápido. <short pause> "
-              "Time ladrão… ou time polícia? <long pause> Comenta o seu lado. O mais votado ganha.")
+         fala="Agora é com você. <long pause> No próximo vídeo, um lado ganha um motor mais rápido. "
+              "Time ladrão… ou time polícia? <short pause> Comenta o seu lado.")
 
+    serie = hist["m_fuga"]
     info = {"marca": "VÍDEO NEURAL", "serie": suave(serie, 5), "serie_rotulo": "% LADRÕES QUE FUGIRAM",
             "marcos": marcos, "rotulo_vivo": f"{n} LADRÕES x {n} POLICIAIS",
             "rodape": f"{n} x {n} · REDE {'-'.join(map(str, P.CAMADAS))} · {G} GERAÇÕES · NADA FOI PROGRAMADO: "
@@ -197,6 +189,6 @@ def monta(hist, A):
     post = (f"Coloquei {n} ladrões contra {n} policiais, todos com IA e cérebro vazio. Na geração 1, só {fuga(0)} fugiram. "
             f"Depois: o caminho, o cerco da polícia e uma troca de lado que virou o jogo. 🚔💨\n"
             f"Simulação real: {G} gerações, zero regras programadas. Uma série em que a IA aprende sozinha.\n"
-            f"Quem merece um motor mais rápido no próximo: TIME LADRÃO ou TIME POLÍCIA? Comenta 👇\n\n"
+            f"Quem ganha um motor mais rápido no próximo? Comenta uma palavra: LADRÃO ou POLÍCIA 👇\n\n"
             f"#ia #inteligenciaartificial #aprendizadodemaquina #policiaeladrao #curiosidades #tecnologia #simulacao")
     return cenas, info, post, ev
