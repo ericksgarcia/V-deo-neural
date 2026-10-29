@@ -168,8 +168,8 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "PRIMEIRO POUSO", "nome": f"GERAÇÃO {gs + 1}", "cor": VERDE,
                  "stat": f"DEPOIS DE {milhar(f_gs)} QUEDAS"},
          log=[(f"GER {gs + 1:03d} · PRIMEIRO POUSO", VERDE)],
-         fala=f"Geração {gs + 1}. Depois de {milhar(f_gs)} quedas… <long pause> um drone chega devagar, "
-              "<short pause> e pousa.")
+         fala=f"Geração {gs + 1}. Depois de {milhar(f_gs)} quedas… <long pause> um drone finalmente "
+              "<short pause> pousa.")
     marcos.append((gs, "1º", VERDE))
 
     # ---------------------------------------------------------------- DESCOBERTAS MEDIDAS (só se os dados mostram)
@@ -185,8 +185,8 @@ def monta(hist, A):
         cena(tipo="ao_vivo", ger=melhor_g, log=[(f"BATERIA QUE SOBRA {pct(bat0)} → {pct(bat1)}", AMARELO)],
              cartao={"numero": n_desc, "rotulo": "DESCOBERTA", "nome": "GASTAR MENOS", "cor": AMARELO,
                      "stat": f"BATERIA QUE SOBRA {pct(bat0)} → {pct(bat1)}"},
-             fala=f"E ficam mais econômicos. Ao pousar, sobra {pct(bat1)} da bateria. <short pause> "
-                  f"No primeiro pouso, eram só {pct(bat0)}.")
+             fala=f"E ficam mais econômicos. Nos primeiros pousos, sobravam só {pct(bat0)} da bateria. <short pause> "
+                  f"Na geração {melhor_g + 1}, sobram {pct(bat1)}.")
         n_desc += 1
 
     gens = sorted(set([gs] + list(np.linspace(gs, melhor_g, 5).astype(int)[1:])))
@@ -199,8 +199,8 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=melhor_g, log=[(f"GER {melhor_g + 1:03d} · {fin_s}/{n} POUSAM", VERDE)],
          carimbo={"texto": f"{fin_s} DE {n}", "cor": VERDE, "em": 0.5, "sub": "POUSAM SOZINHOS"},
          fala=f"Geração {melhor_g + 1}. <short pause> De {n} drones, {fin_s} pousam sozinhos."
-              + (" <short pause> Quase metade." if n * 0.4 < fin_s <= n / 2 else
-                 " <short pause> Mais da metade." if fin_s > n / 2 else ""))
+              + (" <short pause> Mais da metade." if fin_s > n / 2 else
+                 f" <short pause> {em_dez(fin_s / n).capitalize()}." if fin_s / n >= 0.15 else ""))
     serie = suc / n
     cena(tipo="grafico", grupo="grafico", serie=serie, titulo="% QUE POUSA",
          eras=[(gs, G - 1, "APRENDENDO", VERDE)], rotulo_y="DRONES QUE POUSAM POR GERAÇÃO",
@@ -219,7 +219,7 @@ def monta(hist, A):
              destaque=1, cor_destaque="vermelho", revela=0.0, rotulo_destaque=f"▼ -{(base - duro) * 100:.0f} pts",
              log=[(f"POUSA {pct(base)} → {pct(duro)}", VERMELHO)],
              fala=f"Na tempestade do treino, ele pousava {pct(base)}. <long pause> Com mais vento? Só {pct(duro)}. "
-                  "<short pause> Fora do que treinou, ele se perde.")
+                  "<short pause> Fora do que treinou, ele erra quase metade.")
 
     # ---------------------------------------------------------------- CHAMADA + LAÇO
     cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="fim", inicio=max(m_h - 1.4, 0),
@@ -232,7 +232,7 @@ def monta(hist, A):
             "estilo_voz": ESTILO_VOZ, "marcos": marcos, "rotulo_vivo": f"{n} DRONES",
             "rodape": f"POP {n} · REDE {'-'.join(map(str, A.Desafio.camadas))} · {G} GERAÇÕES · "
                       "NADA FOI PROGRAMADO: SÓ SELEÇÃO, CRUZAMENTO E MUTAÇÃO"}
-    virada = f" Aí aumentei o vento e ela caiu de {pct(base)} para {pct(duro)}. 🌪️" if tem_virada else ""
+    virada = f" Aí aumentei o vento e o melhor drone caiu de {pct(base)} para {pct(duro)}. 🌪️" if tem_virada else ""
     post = (f"Esses drones caíram {milhar(falhas_ate)} vezes e aprenderam a pousar na tempestade sozinhos.{virada}\n"
             f"Simulação real: {n} drones, {G} gerações, zero aula. Uma série em que a IA aprende sozinha.\n"
             f"Sumô de IAs ou polícia e ladrão? O mais votado vira o próximo vídeo 👇\n\n"
