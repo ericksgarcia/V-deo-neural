@@ -5,11 +5,13 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
 
 ## Quando o usuário pedir "um novo vídeo" (ou algo parecido)
 
-1. **Não gere nada ainda.** Leia `docs/EPISODIOS.md` e `docs/IDEIAS.md`.
-2. **Analise e proponha 3 a 5 temas NOVOS**, diferentes de todos os já gerados (tabela de episódios).
-   Para cada um: gancho em uma frase, vista 2D, se tem dois lados, a "descoberta" que pode surgir,
-   esforço (reaproveita adaptador existente ou exige simulação nova). Dê uma recomendação.
-3. Use `AskUserQuestion` para o usuário escolher. Só então implemente (receita no README) e gere.
+1. Leia `docs/EPISODIOS.md` e `docs/IDEIAS.md`.
+2. **A lista de `docs/IDEIAS.md` tem prioridade.** Pegue o PRÓXIMO item da lista que ainda não foi
+   feito (na ordem; ignore os marcados "feito" e os que o dono mandou deixar de lado) e **implemente
+   direto, sem perguntar**. Avise em uma linha qual tema foi escolhido.
+3. **Só se a lista estiver esgotada**: analise e proponha 3 a 5 temas NOVOS (gancho, vista 2D, dois
+   lados?, descoberta, esforço, recomendação) e use `AskUserQuestion`. Depois implemente (receita no
+   README) e gere.
 4. Depois de gerar, rode os analistas (`diretor`) e corrija antes de entregar.
 
 ## Ao entregar QUALQUER vídeo
