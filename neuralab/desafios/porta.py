@@ -133,7 +133,7 @@ class Porta:
             dy = p[:, :, None, 1] - p[:, None, :, 1]
             dd = np.sqrt(dx ** 2 + dy ** 2) + np.eye(N)[None] * 99
             pa = np.clip(2 * R_AG - dd, 0, None) * ativa[:, :, None] * ativa[:, None, :]
-            fa = K_AG * pa / dd
+            fa = K_AG * pa / (dd + 1e-6)
             F = F + np.stack([(fa * dx).sum(2), (fa * dy).sum(2)], -1)
             # paredes: a divisória x=0 (fora do cilindro) e o cilindro (só fecha em cima e embaixo)
             x, y = p[..., 0], p[..., 1]
