@@ -15,6 +15,7 @@ class RodadaPop(Rodada):
         genes = hist["genes"][g]
         amb, self.reg = simula(D, genes, int(hist["semente"][g]), gravar=True)
         self.apt = amb.aptidao()
+        self.fase = getattr(amb, "fase", None)
         self.lider = int(np.argmax(self.apt))
         est = self.reg["estado"]
         self.T = est.shape[1]
