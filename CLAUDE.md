@@ -5,14 +5,22 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
 
 ## Quando o usuário pedir "um novo vídeo" (ou algo parecido)
 
-1. Leia `docs/EPISODIOS.md` e `docs/IDEIAS.md`.
-2. **A lista de `docs/IDEIAS.md` tem prioridade.** Pegue o PRÓXIMO item da lista que ainda não foi
-   feito (na ordem; ignore os marcados "feito" e os que o dono mandou deixar de lado) e **implemente
-   direto, sem perguntar**. Avise em uma linha qual tema foi escolhido.
-3. **Só se a lista estiver esgotada**: analise e proponha 3 a 5 temas NOVOS (gancho, vista 2D, dois
-   lados?, descoberta, esforço, recomendação) e use `AskUserQuestion`. Depois implemente (receita no
-   README) e gere.
-4. Depois de gerar, rode os analistas (`diretor`) e corrija antes de entregar.
+1. **Não gere nada ainda.** Leia `docs/EPISODIOS.md` e `docs/IDEIAS.md`.
+2. **Analise e proponha 3 a 5 temas NOVOS**, diferentes de todos os já gerados (tabela de episódios).
+   Para cada um: gancho em uma frase, vista 2D, se tem dois lados, a "descoberta" que pode surgir,
+   esforço (reaproveita adaptador existente ou exige simulação nova). Dê uma recomendação.
+3. Use `AskUserQuestion` para o usuário escolher. Só então implemente (receita no README) e gere.
+4. **Ordem obrigatória (analisar ANTES de renderizar):** `--so-roteiro` -> analistas de roteiro e engajamento
+   (texto, gancho, retenção, CTA) -> ajustar -> **uma** voz (`--so-voz`) -> rascunho `--rascunho --sem-voz` só
+   para conferir o visual -> corrigir -> render final. Nunca renderize o final antes de aprovar o roteiro.
+
+## Economia de tokens (sem perder qualidade)
+
+- Passe aos analistas só o roteiro (texto + fatos reais), não o código; peça resposta curta e objetiva.
+- Rode só os analistas que o estágio precisa (roteiro/engajamento antes; visual/retenção no rascunho);
+  `diretor` completo só no fim, uma vez.
+- Não releia arquivos já lidos nem imprima logs longos (`tail`); treino e TTS ficam em `.cache/` (reuse).
+- Renders longos em segundo plano, sem polling; um único rascunho por rodada de correções.
 
 ## Ao entregar QUALQUER vídeo
 
@@ -31,3 +39,5 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
 - Do Gemini só o TTS (a menos que seja gratuito). Transcrição = Whisper local.
 - Língua: português do Brasil, frases curtas, linguagem simples, gancho forte, pergunta ao espectador.
 - Não copiar vídeos de referência (@circuito_cero.1): entender a ideia e fazer melhor.
+- **Efeitos sonoros baixos**: nunca competem com a voz. Cada efeito é limitado a pico ≈ -14 dBFS
+  (`SFX_PICO` em `neuralab/audio.py`) e é abaixado enquanto a voz fala. Pico geral do mix bem abaixo de 0 dB.

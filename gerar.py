@@ -16,9 +16,22 @@ import numpy as np
 
 from neuralab.video import Video
 
-DESAFIOS = ("penalti", "foguete", "baliza", "drone")
-GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260, "drone": 160}
-EPISODIO = {"foguete": 1, "baliza": 2, "drone": 3, "penalti": 4}
+# Para um desafio novo: uma linha aqui + adaptador + desafio + roteiro (ver README).
+# gera = gerações; pop = tamanho da população; ep = número do arquivo; nota/monta = módulo de roteiro
+CFG = {
+    "penalti": dict(gera=300, ep=4),
+    "foguete": dict(gera=160, ep=1, roteiro="simples"),
+    "baliza": dict(gera=260, ep=2, roteiro="baliza"),
+    "andador": dict(gera=70, ep=3, roteiro="andador", nota="baliza"),
+    "drone": dict(gera=340, ep=3, roteiro="drone", sementes="5,11,17"),
+    "corrida": dict(gera=240, ep=3, roteiro="corrida", pop=160),
+    "sumo": dict(gera=186, ep=5),
+    "policia": dict(gera=250, ep=5),
+    "cabo": dict(gera=150, ep=9),
+}
+DESAFIOS = tuple(CFG)
+GERACOES = {k: v["gera"] for k, v in CFG.items()}
+EPISODIO = {k: v["ep"] for k, v in CFG.items()}
 
 
 def treino_penalti(G, sementes):
@@ -41,25 +54,83 @@ def treino_penalti(G, sementes):
     return melhor[1], melhor[2]
 
 
+def treino_sumo(sementes):
+    from neuralab.coevolucao_sumo import FASES, treina
+    from neuralab.roteiros.sumo import nota_historia
+    melhor = None
+    for s in sementes:
+        arq = os.path.join(".cache", f"sumo_{s}.npz")
+        if os.path.exists(arq):
+            hist = dict(np.load(arq))
+        else:
+            print(f"treinando sumô (semente {s}, {sum(f[2] for f in FASES)} gerações em fases)…")
+            hist = treina(semente=s, log=None)
+            np.savez_compressed(arq, **hist)
+        nota = nota_historia(hist)
+        print(f"  semente {s}: nota da história {nota:.1f}")
+        if melhor is None or nota > melhor[0]:
+            melhor = (nota, s, hist)
+    return melhor[1], melhor[2]
+
+
+def treino_cabo(sementes):
+    from neuralab.coevolucao_cabo import FASES, treina
+    from neuralab.roteiros.cabo import nota_historia
+    melhor = None
+    for s in sementes:
+        arq = os.path.join(".cache", f"cabo_{s}.npz")
+        if os.path.exists(arq):
+            hist = dict(np.load(arq))
+        else:
+            print(f"treinando cabo de guerra (semente {s}, {sum(f[2] for f in FASES)} gerações em fases)…")
+            hist = treina(semente=s, log=print)
+            np.savez_compressed(arq, **hist)
+        nota = nota_historia(hist)
+        print(f"  semente {s}: nota da história {nota:.1f}")
+        if melhor is None or nota > melhor[0]:
+            melhor = (nota, s, hist)
+    return melhor[1], melhor[2]
+
+
+def treino_policia(G, sementes):
+    from neuralab.coevolucao_policia import treina
+    from neuralab.roteiros.policia import nota_historia
+    melhor = None
+    for s in sementes:
+        arq = os.path.join(".cache", f"policia_{G}_{s}.npz")
+        if os.path.exists(arq):
+            hist = dict(np.load(arq))
+        else:
+            print(f"treinando polícia e ladrão (semente {s}, {G} gerações)…")
+            hist = treina(G, semente=s, log=None)
+            np.savez_compressed(arq, **hist)
+        nota = nota_historia(hist)
+        print(f"  semente {s}: nota da história {nota:.2f}")
+        if melhor is None or nota > melhor[0]:
+            melhor = (nota, s, hist)
+    return melhor[1], melhor[2]
+
+
 def treino_simples(nome, G, sementes):
     from neuralab.desafios import DESAFIOS as D
     from neuralab.evolucao import treina
     from neuralab.roteiros.simples import nota_historia
-    if nome == "baliza":
-        from neuralab.roteiros.baliza import nota_historia
-    elif nome == "drone":
-        from neuralab.roteiros.drone import nota_historia
+    cfg = CFG[nome]
+    if cfg["roteiro"] != "simples":
+        import importlib
+        nota_historia = importlib.import_module(f"neuralab.roteiros.{cfg.get('nota', cfg['roteiro'])}").nota_historia
+    pop = cfg.get("pop", 150)
     melhor = None
     for s in sementes:
-        arq = os.path.join(".cache", f"treino_{nome}_{G}_150_{s}_v2.npz")
+        arq = os.path.join(".cache", f"treino_{nome}_{G}_{pop}_{s}_v3.npz")
         if os.path.exists(arq):
             hist = dict(np.load(arq))
         else:
             print(f"treinando {nome} (semente {s}, {G} gerações)…")
-            hist = treina(D[nome], G, 150, s, log=None)
+            hist = treina(D[nome], G, pop, s, log=None)
             np.savez_compressed(arq, **hist)
         nota = nota_historia(hist)
-        print(f"  semente {s}: final {hist['sucessos'].max()}/150, nota da história {nota:.2f}")
+        print(f"  semente {s}: final {hist["sucessos"].max()}/{len(hist["genes"][0])}, nota da história {nota:.2f}")
         if melhor is None or nota > melhor[0]:
             melhor = (nota, s, hist)
     return melhor[1], melhor[2]
@@ -70,42 +141,58 @@ def main():
     ap.add_argument("desafio", choices=DESAFIOS)
     ap.add_argument("--geracoes", type=int)
     ap.add_argument("--sementes", default=None, help="ex.: 3,5,7 — testa várias e fica com a melhor história")
-    ap.add_argument("--voz", default="Charon", help="voz do Gemini TTS (Charon, Fenrir, Orus, Kore...)")
+    ap.add_argument("--voz", default="Charon", help="voz do Gemini TTS (Charon, Achird, Fenrir, Orus, Kore...)")
     ap.add_argument("--sem-voz", action="store_true")
     ap.add_argument("--rascunho", action="store_true", help="metade da resolução, para revisar rápido")
     ap.add_argument("--so-roteiro", action="store_true")
     ap.add_argument("--so-voz", action="store_true",
                     help="gera/carrega só a narração (1 requisição, depois cache) e mostra o relatório de ritmo")
-    ap.add_argument("--ritmo", type=float, default=4.0, help="teto de palavras/s enquanto fala, sem contar pausas (ajuste local, sem API)")
+    ap.add_argument("--ritmo", type=float, default=3.4, help="teto de palavras/s enquanto fala, sem contar pausas (ajuste local, sem API)")
     ap.add_argument("--saida", default="saida")
     a = ap.parse_args()
     os.makedirs(".cache", exist_ok=True)
     os.makedirs(a.saida, exist_ok=True)
     G = a.geracoes or GERACOES[a.desafio]
 
-    if a.desafio == "penalti":
+    if a.desafio == "sumo":
+        from neuralab.adaptadores.sumo import Sumo
+        from neuralab.roteiros.sumo import monta
+        s, hist = treino_sumo([int(x) for x in (a.sementes or "10").split(",")])
+        A = Sumo(hist)
+        cenas, info, post, _ = monta(hist, A)
+    elif a.desafio == "cabo":
+        from neuralab.adaptadores.cabo import Cabo
+        from neuralab.roteiros.cabo import monta
+        s, hist = treino_cabo([int(x) for x in (a.sementes or "3").split(",")])
+        A = Cabo(hist)
+        cenas, info, post, _ = monta(hist, A)
+    elif a.desafio == "penalti":
         from neuralab.adaptadores.penalti import Penalti
         from neuralab.roteiros.penalti import monta
         sementes = [int(x) for x in (a.sementes or "3").split(",")]
         s, hist = treino_penalti(G, sementes)
         A = Penalti(hist)
         cenas, info, post, _ = monta(hist, A)
+    elif a.desafio == "policia":
+        from neuralab.adaptadores.policia import Policia
+        from neuralab.roteiros.policia import monta
+        sementes = [int(x) for x in (a.sementes or "3,5,7").split(",")]
+        s, hist = treino_policia(G, sementes)
+        A = Policia(hist)
+        cenas, info, post, _ = monta(hist, A)
     else:
-        from neuralab.adaptadores.baliza import Baliza
-        from neuralab.adaptadores.drone import Drone
-        from neuralab.adaptadores.foguete import Foguete
-        sementes = [int(x) for x in (a.sementes or "3,5,7,11").split(",")]
+        import importlib
+        cfg = CFG[a.desafio]
+        classe = {"foguete": "Foguete", "baliza": "Baliza", "andador": "Andador", "drone": "Drone", "corrida": "Corrida"}[a.desafio]
+        Adap = getattr(importlib.import_module(f"neuralab.adaptadores.{a.desafio}"), classe)
+        sementes = [int(x) for x in (a.sementes or cfg.get("sementes", "3,5,7,11")).split(",")]
         s, hist = treino_simples(a.desafio, G, sementes)
-        A = {"foguete": Foguete, "baliza": Baliza, "drone": Drone}[a.desafio](hist)
-        if a.desafio == "baliza":
-            from neuralab.roteiros.baliza import monta
-            cenas, info, post, _ = monta(hist, A)
-        elif a.desafio == "drone":
-            from neuralab.roteiros.drone import monta
-            cenas, info, post, _ = monta(hist, A)
-        else:
-            from neuralab.roteiros.simples import monta
+        A = Adap(hist)
+        monta = importlib.import_module(f"neuralab.roteiros.{cfg['roteiro']}").monta
+        if cfg["roteiro"] == "simples":
             cenas, info, post, _ = monta(a.desafio, hist, A)
+        else:
+            cenas, info, post, _ = monta(hist, A)
     print(f"usando semente {s}\nroteiro:")
     for k, c in enumerate(cenas):
         print(f"  {k:2d} {c['tipo']:<8} {c['fala']}")

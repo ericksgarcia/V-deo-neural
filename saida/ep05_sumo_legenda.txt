@@ -1,0 +1,4 @@
+Treinei só UM lado de duas IAs de sumô. O outro lado nunca perdoou. Treinos curtos, médios e longos, só a azul, só a rosa e as duas juntas (186 gerações no total). Quem treina sozinho sobe, quem fica congelado cai, e juntas elas empatam. Simulação real, nenhum número inventado.
+Você treinaria só a azul, só a rosa ou as duas? Comenta A, B ou AB 👇
+
+#ia #inteligenciaartificial #aprendizadodemaquina #simulacao #sumo #redesneurais #evolucao #tecnologia

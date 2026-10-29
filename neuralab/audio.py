@@ -81,7 +81,7 @@ class CotaEsgotada(RuntimeError):
 
 
 LIMITE_REQUISICOES = 10          # por voz, a cada 24 h (cota da conta)
-VOZES_RESERVA = ["Orus", "Fenrir", "Puck", "Iapetus", "Algenib", "Enceladus"]
+VOZES_RESERVA = ["Charon", "Orus", "Fenrir", "Puck", "Iapetus", "Algenib", "Enceladus"]   # só com reserva=True
 
 
 def _uso_arq(cache):
@@ -159,16 +159,19 @@ def _silencios(x, minimo=0.25, limiar=0.02):
 
 
 ESTILO_PADRAO = (
-    "You are a gripping, charismatic Brazilian Portuguese (pt-BR) storyteller narrating a short vertical video, "
-    "talking to one person like a friend who just discovered something amazing. Natural spoken Brazilian rhythm, "
-    "warm and confident. Pace: brisk and conversational, about three words per second; never rushed, never "
-    "dragging; slightly slower on key numbers. Open urgent and intriguing, as if sharing a secret; explain the "
-    "rules clearly and calmly with a hint of humor; build suspense before reveals; deliver surprises with real "
-    "surprise; end playful and direct, inviting the viewer to vote.")
+    "Voice: Achird. You are a curious, warm Brazilian (pt-BR) friend watching an experiment with the listener, "
+    "on the phone, not an announcer and not a YouTuber. Speak softly and close to the microphone, like telling "
+    "something you can't believe you just saw. Natural spoken Brazilian Portuguese, relaxed, with small human "
+    "reactions: a short breath, a half-smile, a quiet laugh at the funny failures. Never shout, never use a "
+    "'trailer' voice, never rush. Pace: calm and clear, about 2.6 words per second, with real silences. "
+    "Emotional shape: open intrigued and a little incredulous; explain the rules plainly, like to a smart "
+    "friend, with dry humor; go quiet and slow before a reveal, then say the number simply, letting it land; "
+    "when something finally works, sound genuinely moved and relieved, not hyped; end light, playful and "
+    "direct, truly curious about the listener's answer.")
 
 
-def narra_lote(falas, cache, voz="Charon", modelo="gemini-3.8-flash-tts", estilo=None, antes=None,
-               tts_textos=None, ritmo=4.0, faixa=(0.84, 1.1), reserva=True, forcar=False):
+def narra_lote(falas, cache, voz="Achird", modelo="gemini-3.8-flash-tts", estilo=None, antes=None,
+               tts_textos=None, ritmo=4.0, faixa=(0.84, 1.1), reserva=False, forcar=False):
     """Narra todas as falas com UMA ÚNICA requisição (mesmo timbre do início ao fim) e molda tudo localmente.
 
     falas  : textos visíveis de cada cena (sem tags).
@@ -394,6 +397,18 @@ def boom(intensidade=1.0, semente=0):
     return (0.5 * ruido + 0.6 * grave) * 0.5 * intensidade
 
 
+def raio(intensidade=1.0, semente=0):
+    """Raio: estalo agudo seguido de trovão grave rolando."""
+    m = int(1.4 * SR)
+    rng = np.random.default_rng(semente)
+    tt = np.arange(m) / SR
+    r = rng.normal(0, 1, m)
+    estalo = (r - _lp(r, 2500)) * np.exp(-tt * 38)
+    trovao = _lp(r, 380) * np.exp(-tt * 2.6) * (0.6 + 0.4 * np.sin(2 * np.pi * 9 * tt))
+    grave = np.sin(2 * np.pi * (42 + 30 * np.exp(-tt * 9)) * tt) * np.exp(-tt * 3.5)
+    return (0.55 * estalo + 1.3 * trovao + 0.5 * grave) * 0.45 * intensidade
+
+
 def batida(intensidade=1.0, semente=0):
     """Colisão de carro: estalo de ruído + lata ressoando."""
     m = int(0.5 * SR)
@@ -491,9 +506,14 @@ def torcida(dur, semente=0):
     return (banda * onda * 0.09).astype(np.float32)
 
 
-SONS = {"boom": boom, "batida": batida, "chute": chute, "rede": rede, "defesa": defesa, "fora": fora,
+SONS = {"boom": boom, "raio": raio, "batida": batida, "chute": chute, "rede": rede, "defesa": defesa, "fora": fora,
         "glitch": lambda i, k: glitch(k), "tique": lambda i, k: tique(k), "whoosh": lambda i, k: whoosh(k),
         "ding": lambda i, k: ding(i > 1)}
+
+
+# Regra do canal: efeitos NUNCA competem com a voz. Cada efeito é limitado a este pico (≈ -14 dBFS)
+# e ainda é abaixado enquanto a voz fala.
+SFX_PICO = 0.2
 
 
 def mixa(dur, falas, eventos, semente=0, ambiente=None, musica=0.55):
@@ -507,6 +527,9 @@ def mixa(dur, falas, eventos, semente=0, ambiente=None, musica=0.55):
     for k, (t, tipo, inten) in enumerate(eventos):
         f = SONS[tipo]
         s = f(inten, k)
+        pico = float(np.abs(s).max()) if len(s) else 0.0
+        if pico > SFX_PICO:
+            s = s * (SFX_PICO / pico)
         i = int(max(t, 0) * SR)
         sfx[i:i + len(s)] += s[: len(sfx) - i]
     mus = np.zeros_like(voz)
@@ -516,7 +539,7 @@ def mixa(dur, falas, eventos, semente=0, ambiente=None, musica=0.55):
         amb[: min(n, len(ambiente))] = ambiente[:n]
     env = np.convolve(np.abs(voz), np.ones(4800) / 4800, "same")
     duck = 1 - 0.6 * np.clip(env / 0.05, 0, 1)
-    mix = voz * 1.0 + sfx * 1.1 + mus * duck * musica + amb * (0.6 + 0.4 * duck)
+    mix = voz * 1.0 + sfx * (1.0 - 0.5 * np.clip(env / 0.05, 0, 1)) + mus * duck * musica + amb * (0.6 + 0.4 * duck)
     mix = mix[:n]
     fade = int(0.25 * SR)
     mix[-fade:] *= np.linspace(1, 0, fade)

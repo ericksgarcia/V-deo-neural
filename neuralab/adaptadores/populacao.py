@@ -14,8 +14,9 @@ class RodadaPop(Rodada):
         self.g, self.dt = g, D.dt
         genes = hist["genes"][g]
         amb, self.reg = simula(D, genes, int(hist["semente"][g]), gravar=True)
+        self.amb = amb   # o ambiente re-simulado (clima, raios...) para o adaptador desenhar
         self.apt = amb.aptidao()
-        self.fase = getattr(amb, "fase", None)
+        self.mates = getattr(amb, "mates", None)
         self.lider = int(np.argmax(self.apt))
         est = self.reg["estado"]
         self.T = est.shape[1]
@@ -77,6 +78,38 @@ class AdaptadorPopulacao(Adaptador):
                 return int(fal[np.argmax(rod.apt[fal])])
             return int(fal[0])
         return None
+
+    # ------------------------------------------------------------ multidão de "fantasmas"
+    def fantasmas(self, rod, maxn=90):
+        """Índices dos indivíduos desenhados na multidão: TODOS os que acertaram (o público tem que ver os
+        poucos que dão certo) e uma amostra uniforme dos demais, até `maxn` no total."""
+        chave = ("fantasmas", maxn)
+        if chave not in rod.__dict__:
+            ok = np.where(rod.reg["estado"][:, -1] == SUCESSO)[0][: maxn // 2]
+            resto = np.setdiff1d(np.arange(rod.n), ok)
+            passo = max(1, int(np.ceil(len(resto) / max(maxn - len(ok), 1))))
+            rod.__dict__[chave] = sorted(set(ok.tolist()) | set(resto[::passo].tolist()) | {rod.lider})
+        return rod.__dict__[chave]
+
+    def aparencia(self, rod, k, i, lider=False):
+        """(cor, alfa_corpo, alfa_rastro) de um fantasma no passo i; None = já sumiu da tela.
+
+        Ainda tentando: azul quase transparente (muitos juntos viram uma névoa de luz, que mostra por onde a
+        turma passa). Errou: pisca vermelho e se dissolve em ~1 s (a tela não acumula destroços). Acertou:
+        verde nítido e permanente, que ganha destaque justamente por ser raro."""
+        m = rod.morte[k]
+        e = rod.reg["estado"][k, i]
+        if lider:
+            return (VERDE if e == SUCESSO else VERMELHO if e == FALHA else AMARELO, 1.0, 0.85)
+        if e == 0 or m < 0 or i < m:
+            return (CIANO, 0.10, 0.06)
+        idade = (i - m) * rod.dt
+        if e == SUCESSO:
+            return (VERDE, min(0.35 + idade * 1.5, 0.9), 0.45)
+        if idade > 1.1:
+            return None
+        sobra = 1 - idade / 1.1
+        return (VERMELHO, 0.5 * sobra ** 1.5 + (0.25 if idade < 0.12 else 0.0), 0.18 * sobra)
 
     def medidores(self, rod, t, foco):
         if foco is not None:   # replay de 1 lance: o HUD mostra o saldo da geração inteira
