@@ -28,7 +28,10 @@ class Porta(AdaptadorPopulacao):
         geral = Camera2D(centro=(-0.8, 0.0), escala=ESCALA, t=t)
         if modo != "replay" or foco is None:
             return geral
-        perto = Camera2D(centro=(-1.2, 0.0), escala=ESCALA * 1.55, t=t)
+        sk = rod.reg["s"][foco, rod.i(t)]
+        c = self.heroi(rod, foco)
+        hx, hy = float(np.clip(sk[c, 0], -6, 4)), float(np.clip(sk[c, 1], -3, 3))
+        perto = Camera2D(centro=(-0.6 + 0.45 * hx, 0.45 * hy), escala=ESCALA * 1.55, t=t)
         return geral.mistura(perto, min(t / 0.8, 1.0))
 
     # ------------------------------------------------------------ cenário
@@ -105,13 +108,14 @@ class Porta(AdaptadorPopulacao):
                     h.linha([(float(x), float(y)), (float(x + vx * 0.25), float(y + vy * 0.25))], cor, 2, 0.6, halo=False)
         hx, hy = float(s[hero, 0]), float(s[hero, 1])
         if s[hero, 0] <= X_PASSOU:
-            h.circulo((hx, hy), R_AG * 1.9, AMARELO, 0.5, 1.5, 0.0)
-        h.texto("CAMPEÃO", (hx, hy + 0.95), 15, AMARELO, 0.9)
+            h.circulo((hx, hy), R_AG * (2.2 + 0.3 * math.sin(t * 6)), AMARELO, 0.75, 2.2, 0.0)
+            h.ponto_luz((hx, hy), 26, AMARELO, 0.6)
+        h.texto("CAMPEÃO", (hx, hy + 1.25), 28, AMARELO, 1.0)
         passou = int((s[:, 0] > X_PASSOU).sum())
         if rod.reg["estado"][k, i] == SUCESSO:
             idade = max((i - rod.morte[k]) * rod.dt, 0.0)
             h.pulso((3.0, 0.0), idade, VERDE, 4.0, 0.9, 5)
-            h.texto(f"✓ TODAS PASSARAM", (3.5, 0.0), 22, VERDE, min(idade * 3, 1))
+            h.texto(f"✓ TODAS PASSARAM", (4.6, 3.6), 24, VERDE, min(idade * 3, 1))
         elif passou:
             h.texto(f"{passou}/{N}", (S_TEXTO, SALA_Y - 1.6), 26, VERDE, 0.9)
 

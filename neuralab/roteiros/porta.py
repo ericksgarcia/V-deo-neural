@@ -161,8 +161,8 @@ def monta(hist, A):
     k2 = A.busca(rm, "primeiro")
     cena(tipo="replay", ger=mesmo, foco=k2,
          cartao={"numero": 2, "rotulo": "DESCOBERTA", "nome": "O MESMO LADO", "cor": MAGENTA,
-                 "stat": f"PORTA NO MESMO SENTIDO {pct(h_a)} → {pct(h_b)} DAS SALAS"},
-         log=[(f"GER {mesmo + 1:03d} · SENTIDO ÚNICO {pct(h_a)} → {pct(h_b)}", MAGENTA)],
+                 "stat": f"PORTA NO MESMO SENTIDO {round(h_a * 10)} EM 10 → {round(h_b * 10)} EM 10 SALAS"},
+         log=[(f"GER {mesmo + 1:03d} · SENTIDO ÚNICO {round(h_a * 10)} EM 10 → {round(h_b * 10)} EM 10", MAGENTA)],
          fala=f"Geração {mesmo + 1}. A porta gira sempre para o mesmo lado. <long pause> "
               f"De {em_dez(h_a)} salas para {em_dez(h_b)}.")
     marcos.append((mesmo, "MESMO LADO", MAGENTA))
@@ -194,8 +194,7 @@ def monta(hist, A):
     cena(tipo="barras", grupo="duelo", ger=G - 1, itens=itens, titulo="E EM SALAS NOVAS?",
          sub="600 salas novas · melhor de cada geração", destaque=1, cor_destaque="amarelo", revela=4.0,
          rotulo_destaque=f"▼ {(s_a - s_f) * 100:.0f} pts" if s_a - s_f >= 0.1 else "◀ MELHOR",
-         log=[("TESTE: 600 SALAS NOVAS", AMARELO), (f"TODAS PASSAM {pct(s_a)} → {pct(s_f)}", AMARELO),
-              (f"TEMPO {seg(ta)} s → {seg(tf)} s", CIANO)],
+         log=[("TESTE: 600 SALAS NOVAS", AMARELO), (f"SALAS NOVAS COMPLETAS {pct(s_a)} → {pct(s_f)}", AMARELO)],
          fala=f"Teste: salas novas. <short pause> O campeão da {g_ref + 1} acerta {pct(s_a)}. "
               f"O da {G}, só {pct(s_f)}, mas chega mais rápido.")
     # ---------------------------------------------------------------- CTA + LAÇO
