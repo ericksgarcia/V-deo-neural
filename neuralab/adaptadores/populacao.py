@@ -16,6 +16,7 @@ class RodadaPop(Rodada):
         amb, self.reg = simula(D, genes, int(hist["semente"][g]), gravar=True)
         self.amb = amb   # o ambiente re-simulado (clima, raios...) para o adaptador desenhar
         self.apt = amb.aptidao()
+        self.mates = getattr(amb, "mates", None)
         self.lider = int(np.argmax(self.apt))
         est = self.reg["estado"]
         self.T = est.shape[1]

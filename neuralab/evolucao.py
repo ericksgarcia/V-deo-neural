@@ -18,6 +18,8 @@ def simula(Desafio, genes, semente, gravar=False):
             reg["estado"].append(amb.estado.copy())
             reg["acel"].append(amb.acel.copy())
             reg["ativ"].append(np.concatenate(ativ, 1))
+            if hasattr(amb, "extra"):
+                reg.setdefault("extra", []).append(amb.extra())
         if (amb.estado != 0).all():
             break
     amb.finaliza(t)

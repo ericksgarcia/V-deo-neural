@@ -1,7 +1,8 @@
+from .andador import Andador
 from .baliza import Baliza
+from .corrida import Corrida
 from .drone import Drone
 from .foguete import Foguete
 from .penalti import Penalti
-from .andador import Andador
 
-DESAFIOS = {"foguete": Foguete, "baliza": Baliza, "penalti": Penalti, "andador": Andador, "drone": Drone}
+DESAFIOS = {"foguete": Foguete, "baliza": Baliza, "penalti": Penalti, "andador": Andador, "drone": Drone, "corrida": Corrida}
