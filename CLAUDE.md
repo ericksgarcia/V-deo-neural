@@ -6,14 +6,17 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
 ## Quando o usuário pedir "um novo vídeo" (ou algo parecido)
 
 1. **Não gere nada ainda.** Leia `docs/EPISODIOS.md` (tabela de episódios **e** a seção "Temas já feitos fora do
-   repositório") e `docs/IDEIAS.md`. Essas duas listas juntas são a fonte única de "tema já usado".
-2. **Analise e proponha 3 a 5 temas NOVOS**, que não estejam em NENHUMA dessas listas (nem como episódio, nem como
-   "já feito fora do repo", nem como ideia marcada como feita). Não reaproveite ideias do `IDEIAS.md`: o dono do canal
-   já fez vídeo de todas. Se tiver dúvida de que um tema é inédito, pesquise na web antes de propor.
-   Para cada um: gancho em uma frase, vista 2D, se tem dois lados, a "descoberta" que pode surgir,
+   repositório") e `docs/IDEIAS.md` (inclui a **fila de próximos temas aprovados**, no fim do arquivo).
+2. **Primeiro olhe a fila** (`docs/IDEIAS.md`, seções "Fila de próximos temas" e "Segunda leva"). Se houver temas
+   nela que ainda não viraram episódio, **proponha esses** (até 5, os mais promissores), confirmando na web que
+   continuam inéditos.
+3. **Só se a fila estiver vazia (ou o usuário pedir outras opções):** confira o que já foi feito (tabela de episódios,
+   "já feitos fora do repo" e as 10 ideias antigas do `IDEIAS.md`, todas já gravadas) e **proponha 3 a 5 temas NOVOS**
+   fora de todas essas listas. Se tiver dúvida de que um tema é inédito, pesquise na web antes de propor.
+   Para cada tema proposto: gancho em uma frase, vista 2D, se tem dois lados, a "descoberta" que pode surgir,
    esforço (reaproveita adaptador existente ou exige simulação nova). Dê uma recomendação.
-3. Use `AskUserQuestion` para o usuário escolher. Só então implemente (receita no README) e gere.
-4. Depois de gerar, rode os analistas (`diretor`) e corrija antes de entregar.
+4. Use `AskUserQuestion` para o usuário escolher. Só então implemente (receita no README) e gere.
+5. Depois de gerar, rode os analistas (`diretor`) e corrija antes de entregar.
 
 ## Ao entregar QUALQUER vídeo
 
@@ -27,7 +30,8 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
 - **Nunca mostrar o resultado final no início.** O vídeo começa na geração 1 (caos) e mostra a melhora aos poucos,
   na ordem em que aconteceu, uma descoberta por vez. O gancho é uma pergunta/tensão, não o resultado. O número
   final só aparece perto do fim (ex.: teste em situação nova).
-- Depois de entregar um vídeo, **registre o tema** em `docs/EPISODIOS.md` (é o que impede repetir).
+- Depois de entregar um vídeo, **registre o tema** em `docs/EPISODIOS.md` (é o que impede repetir) e **tire-o da fila**
+  em `docs/IDEIAS.md`.
 
 - Tudo **2D**, estilo **neon/holograma**, HUD tecnológico; nada de 3D.
 - Honestidade: todo número falado vem do treino real (checagens em `roteiros/`). Nada inventado.
