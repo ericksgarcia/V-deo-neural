@@ -6,12 +6,14 @@ infectados usam o MESMO cérebro infectado (quem se contagia troca de cérebro).
 nem "fugir", nem "manter distância", nem "perseguir". O saudável é nota pelo tempo que a cidade segue saudável;
 o vírus, pelo contrário.
 """
+import os
+
 import numpy as np
 
 LARG, ALT = 22.0, 18.0
-A = 80                                     # agentes por cidade (1 paciente zero + 79 saudáveis)
+A = int(os.environ.get("PAC_A", 80))                                     # agentes por cidade (1 paciente zero + 79 saudáveis)
 RAIO, CONTAGIO = 0.25, 0.8
-V_SAU, V_INF, ACEL = 3.0, 3.3, 12.0
+V_SAU, V_INF, ACEL = 3.0, float(os.environ.get("PAC_VINF", 3.3)), 12.0
 DT, PASSOS = 1 / 15, 450                   # 30 s de cidade
 R_VIZ, R_LOCAL = 8.0, 5.0
 CAMADAS = (18, 12, 2)
