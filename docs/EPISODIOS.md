@@ -18,5 +18,6 @@ Atualize esta tabela a cada vídeo entregue. Ao propor temas novos, **não repit
 
 ## Ideias ainda não feitas
 
-Ver `docs/IDEIAS.md` (itens 4 a 10: robô andando, drone na tempestade, sumô de IAs, 1x1 goleiro x atacante,
-polícia e ladrão, basquete, corrida de carrinhos).
+Ver `docs/IDEIAS.md`: itens 1 a 10 são as propostas novas (próximo da fila: **1. Paciente Zero**); depois vêm
+sumô de IAs (16), 1x1 goleiro x atacante (17), polícia e ladrão (18), basquete (19) e corrida de carrinhos (20).
+Robô (14) e drone (15) já foram feitos.
