@@ -43,7 +43,7 @@ class RodadaCabo(Rodada):
 
 
 class Cabo(Adaptador):
-    titulo = "CABO DE GUERRA DE ENXAMES"
+    titulo = "CABO DE GUERRA"
     experimento = "006"
     cores = {"a": COR_A, "b": COR_B, "verde": VERDE, "vermelho": VERMELHO}
 

@@ -118,7 +118,7 @@ def monta(hist, A):
     gd2 = primeira(M["pico_a"], lambda v: v > 3.5, fim[1])
     q0, q1 = M["pico_a"][0], M["pico_a"][gd2]
     kd2 = luta(gd2, "junto_a", "vitoria_a", "vitoria")
-    marcas2 = [{"tipo": "circulo", "em": 1.0, "alvo": "a", "segue": True, "texto": "TODOS JUNTOS", "rx": 90, "ry": 90}]
+    marcas2 = [{"tipo": "circulo", "em": 1.0, "alvo": "caixa", "segue": True, "texto": "TODOS JUNTOS", "rx": 100, "ry": 100}]
     cena(tipo="replay", ger=gd2, foco=kd2, grupo="d2", marcas=marcas2, inicio=0.0,
          cartao={"numero": 2, "rotulo": "ENXAME A", "nome": "EMPURRAR JUNTOS", "cor": VERDE,
                  "stat": f"ROBÔS AO MESMO TEMPO {n1(q0)} → {n1(q1)}"},
