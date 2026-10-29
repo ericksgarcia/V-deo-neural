@@ -1,0 +1,5 @@
+Uma ambulância, 10 segundos e 24 carros no caminho. 🚑 Na geração 1, ela chegava a tempo em só 83 de 150 avenidas, e em 77% delas os carros batiam uns nos outros. Depois eles descobriram que dava para acelerar e sair da frente… e só mais tarde a se desviar sem se bater.
+Simulação real: 150 avenidas, 120 gerações. A ambulância é programada; quem aprende é o cérebro dos 24 carros, só por seleção e mutação. Uma série em que a IA aprende sozinha.
+Com a sirene atrás de você: ENCOSTO ou FICO NA FAIXA? Comenta 👇 e marca quem nunca dá passagem.
+
+#ia #inteligenciaartificial #simulacao #ambulancia #transito #curiosidades #tecnologia

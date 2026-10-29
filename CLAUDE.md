@@ -31,12 +31,27 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
    Nunca renderize o final antes de aprovar o roteiro.
 6. Receita técnica de um tema novo: ver `README.md` (simulação, adaptador, roteiro e uma linha em `CFG` no `gerar.py`).
 
-## Trabalho em sessões paralelas (leia)
+## Trabalho em sessões paralelas / branches (OBRIGATÓRIO, leia)
 
-- O repositório tem UM tronco. Antes de começar, faça `git fetch` e confirme que está no branch mais recente
-  (o de maior histórico); não parta de um branch antigo. Se o dono pedir um branch específico, use-o e, ao
-  terminar, garanta que o trabalho esteja integrado ao tronco (merge), para a próxima conversa enxergar tudo.
-- Os prefixos `epNN` dos arquivos podem repetir; o que vale é o NOME do tema em `docs/EPISODIOS.md`.
+A plataforma cria um branch novo `claude/<nome>` para cada conversa; não dá para impedir isso. Por isso existe UM
+**TRONCO: `claude/cool-gauss-mg0fhk`** (é o branch padrão do GitHub). Todo o trabalho tem que terminar nele.
+
+**No começo de toda conversa (antes de qualquer coisa):**
+```bash
+git fetch origin
+git merge origin/claude/cool-gauss-mg0fhk      # traz o guia v2, a fila e os vídeos feitos para o seu branch
+```
+Se o branch da conversa estiver vazio/antigo, esse merge basta. Confira que `docs/ROTEIRO.md` existe; se não existir, pare e avise.
+
+**No fim de todo vídeo/mudança (depois do commit e do push no branch da conversa):**
+```bash
+git fetch origin
+git merge origin/claude/cool-gauss-mg0fhk       # resolva conflitos (em docs/EPISODIOS.md e docs/IDEIAS.md mantenha as DUAS partes)
+git push origin HEAD                              # branch da conversa
+git push origin HEAD:claude/cool-gauss-mg0fhk     # atualiza o tronco; se for recusado, repita o fetch+merge e tente de novo
+```
+Nunca deixe um vídeo só no branch da conversa. Não crie outros branches de propósito. Se o dono pedir um branch específico, use-o e
+integre ao tronco do mesmo jeito. Os prefixos `epNN` dos arquivos podem repetir; vale o NOME do tema em `docs/EPISODIOS.md`.
 
 ## Economia de tokens (sem perder qualidade)
 
@@ -51,7 +66,7 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
 - Envie **juntos**, na mesma resposta: o `.mp4` e a legenda do TikTok (`saida/<ep>_legenda.txt`),
   e cole o texto da legenda também no chat, pronto para copiar.
 - Atualize `docs/EPISODIOS.md` (nova linha na tabela, duração, semente, comando, pergunta do CTA e a linha 1 da legenda), **marque o tema
-  como feito (EPxx) na fila de `docs/IDEIAS.md`** e faça commit + push no branch designado. Tudo que precisa
+  como feito (EPxx) na fila de `docs/IDEIAS.md`** e faça commit + push no branch da conversa **e integre ao tronco** (seção acima). Tudo que precisa
   persistir fica no repositório.
 
 ## Regras que o dono do canal já decidiu
