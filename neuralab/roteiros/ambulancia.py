@@ -221,7 +221,7 @@ def monta(hist, A):
     serie = suc / n
     bat_tot = int(round((hist["m_carros_bateram"] * n).sum()))
     cena(tipo="grafico", grupo="grafico", serie=serie, titulo="% QUE A AMBULÂNCIA CHEGA A TEMPO",
-         eras=[(d1, d2, "DÁ PASSAGEM", VERDE), (d2, d3, "SEM SE BATER", CIANO), (d3, G - 1, "ESTÁVEL", AMARELO)],
+         eras=[(d1, d2, "ACELERA", VERDE), (d2, G - 1, "SEM BATER", CIANO)],
          rotulo_y="AVENIDAS EM QUE ELA CHEGA, POR GERAÇÃO", final=pct(float(serie[-1])),
          log=[(f"{bat_tot} AVENIDAS COM BATIDA NO CAMINHO", VERMELHO)],
          fala=f"Geração {numero(G)}. Ninguém ensinou nada a eles. <short pause> E {ext(fora_fim)} dos carros à frente "

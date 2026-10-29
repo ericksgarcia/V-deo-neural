@@ -43,10 +43,10 @@ class Ambulancia(AdaptadorPopulacao):
         k = self.mundo(rod, foco)
         i = rod.i(t)
         ax = float(rod.reg["extra"][k, i, 3 * C])
-        geral = Camera2D(centro=(ax + 8.0, M.LARG_VIA / 2), escala=28, t=t)
+        geral = Camera2D(centro=(ax + 8.0, M.LARG_VIA / 2), escala=34, t=t)
         if modo != "replay" or foco is None:
             return geral
-        perto = Camera2D(centro=(ax + 6.0, M.LARG_VIA / 2), escala=38, t=t)
+        perto = Camera2D(centro=(ax + 6.0, M.LARG_VIA / 2), escala=44, t=t)
         cam = geral.mistura(perto, min(t / 0.8, 1.0))
         if rod.morte[foco] >= 0 and rod.reg["estado"][foco, rod.morte[foco]] == FALHA and 0 <= t - rod.morte[foco] * rod.dt < 0.35:
             cam.tremor = 9 * (1 - (t - rod.morte[foco] * rod.dt) / 0.35)
@@ -76,7 +76,7 @@ class Ambulancia(AdaptadorPopulacao):
                 cor = BRANCO if j % 2 == 0 else (0.2, 0.25, 0.35)
                 h.forma([(M.FIM, j * W / n), (M.FIM + 1.2, j * W / n), (M.FIM + 1.2, (j + 1) * W / n), (M.FIM, (j + 1) * W / n)],
                         cor, 0.7, 1.0, 0.5, gradiente=False)
-            h.texto("CHEGADA", (M.FIM + 0.6, W + 1.2), 20, VERDE, 0.9)
+            h.texto("CHEGADA", (M.FIM + 0.6, -1.7), 20, VERDE, 0.9)
 
     # ------------------------------------------------------------ desenho
     def desenha(self, h, rod, t, modo, foco):
@@ -89,7 +89,7 @@ class Ambulancia(AdaptadorPopulacao):
         for c in range(C):
             if xs[c] < ax - 24 or xs[c] > ax + 40:
                 continue
-            cor = VERMELHO if bat[c] else (CIANO if c % 2 == 0 else MAGENTA)
+            cor = VERMELHO if bat[c] else (CIANO if c % 2 == 0 else AZUL)
             freio = bool(rod.reg["acel"][k, i, c] < -0.25) and not bat[c]
             R.veiculo_topo(h, (float(xs[c]), float(ys[c])), 0.0, M.COMP, M.LARG, cor, t, 1.0,
                            farois=not bat[c], freio=freio)
