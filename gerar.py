@@ -16,9 +16,9 @@ import numpy as np
 
 from neuralab.video import Video
 
-DESAFIOS = ("penalti", "foguete", "baliza")
-GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260}
-EPISODIO = {"foguete": 1, "baliza": 2, "penalti": 4}
+DESAFIOS = ("penalti", "foguete", "baliza", "cruzamento")
+GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260, "cruzamento": 300}
+EPISODIO = {"foguete": 1, "baliza": 2, "penalti": 4, "cruzamento": 5}
 
 
 def treino_penalti(G, sementes):
@@ -47,6 +47,8 @@ def treino_simples(nome, G, sementes):
     from neuralab.roteiros.simples import nota_historia
     if nome == "baliza":
         from neuralab.roteiros.baliza import nota_historia
+    if nome == "cruzamento":
+        from neuralab.roteiros.cruzamento import nota_historia
     melhor = None
     for s in sementes:
         arq = os.path.join(".cache", f"treino_{nome}_{G}_150_{s}_v2.npz")
@@ -57,7 +59,7 @@ def treino_simples(nome, G, sementes):
             hist = treina(D[nome], G, 150, s, log=None)
             np.savez_compressed(arq, **hist)
         nota = nota_historia(hist)
-        print(f"  semente {s}: final {hist['sucessos'].max()}/150, nota da história {nota:.2f}")
+        print(f"  semente {s}: melhor {hist['sucessos'].max()}/150, nota da história {nota:.2f}")
         if melhor is None or nota > melhor[0]:
             melhor = (nota, s, hist)
     return melhor[1], melhor[2]
@@ -90,12 +92,16 @@ def main():
         cenas, info, post, _ = monta(hist, A)
     else:
         from neuralab.adaptadores.baliza import Baliza
+        from neuralab.adaptadores.cruzamento import Cruzamento
         from neuralab.adaptadores.foguete import Foguete
         sementes = [int(x) for x in (a.sementes or "3,5,7,11").split(",")]
         s, hist = treino_simples(a.desafio, G, sementes)
-        A = {"foguete": Foguete, "baliza": Baliza}[a.desafio](hist)
+        A = {"foguete": Foguete, "baliza": Baliza, "cruzamento": Cruzamento}[a.desafio](hist)
         if a.desafio == "baliza":
             from neuralab.roteiros.baliza import monta
+            cenas, info, post, _ = monta(hist, A)
+        elif a.desafio == "cruzamento":
+            from neuralab.roteiros.cruzamento import monta
             cenas, info, post, _ = monta(hist, A)
         else:
             from neuralab.roteiros.simples import monta

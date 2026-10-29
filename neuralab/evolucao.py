@@ -5,10 +5,10 @@ from .rede import Arquitetura
 from .desafios.foguete import SUCESSO
 
 
-def simula(Desafio, genes, semente, gravar=False):
+def simula(Desafio, genes, semente, gravar=False, **kw):
     arq = Arquitetura(Desafio.camadas)
     params = arq.desempacota(genes)
-    amb = Desafio(len(genes), np.random.default_rng(semente))
+    amb = Desafio(len(genes), np.random.default_rng(semente), **kw)
     reg = {"s": [], "estado": [], "acel": [], "ativ": []}
     for t in range(Desafio.passos):
         saida, ativ = arq.avalia(params, amb.observa())
@@ -17,7 +17,7 @@ def simula(Desafio, genes, semente, gravar=False):
             reg["s"].append(amb.s.copy())
             reg["estado"].append(amb.estado.copy())
             reg["acel"].append(amb.acel.copy())
-            reg["ativ"].append(np.concatenate(ativ, 1))
+            reg["ativ"].append(np.concatenate(ativ, -1))
         if (amb.estado != 0).all():
             break
     amb.finaliza(t)
@@ -51,6 +51,10 @@ def treina(Desafio, geracoes=150, populacao=150, semente=7, log=print):
         sem = semente * 100_000 + g
         amb, _ = simula(Desafio, genes, sem)
         apt = amb.aptidao()
+        K = getattr(Desafio, "cenarios", 1)
+        if K > 1:   # nota de seleção = média em K trânsitos diferentes (evita decorar um único cenário)
+            ambs, _ = simula(Desafio, np.tile(genes, (K, 1)), sem + 1, por_mundo=True)
+            apt = ambs.aptidao().reshape(K, -1).mean(0)
         suc = int((amb.estado == SUCESSO).sum())
         hist["genes"].append(genes.copy())
         hist["sucessos"].append(suc)
