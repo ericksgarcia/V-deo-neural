@@ -196,7 +196,10 @@ def main():
             cenas, info, post, _ = monta(hist, A)
     print(f"usando semente {s}\nroteiro:")
     for k, c in enumerate(cenas):
-        print(f"  {k:2d} {c['tipo']:<8} {c['fala']}")
+        cartao = f"  [CARTÃO {c['cartao']['numero']}]" if c.get("cartao") else ""
+        print(f"  {k:2d} {c['tipo']:<8} {c['fala']}{cartao}")
+    print("legenda:")
+    print(post)
     if a.so_roteiro:
         return
     nome = f"ep{EPISODIO[a.desafio]:02d}_{a.desafio}{'_rascunho' if a.rascunho else ''}"

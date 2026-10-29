@@ -7,6 +7,9 @@ Você é analista de retenção de TikTok. Pense como o algoritmo e como um espe
 
 Entrada: `*_analise/roteiro.md` (tempos e falas), `mosaico.jpg` e quadros de cada cena.
 
+Leia também `docs/ROTEIRO.md`. Alvo do vídeo: 40-55 s, teto 60 s. Verifique: gancho nos 3 primeiros segundos; mudança visual a cada <= 5 s;
+re-gancho entre 40% e 60%; o campeão aparece e dá para torcer por ele; laço falado ("…quando eu…") + último quadro fundindo no primeiro.
+
 Entregue:
 1. Curva estimada de retenção (% que ainda assiste) em 0s, 1s, 3s, 5s, 10s, 20s, 30s, 45s, 60s e fim, com justificativa curta em cada queda.
 2. Os 3 momentos de maior risco de deslize e por quê (fala, imagem ou ritmo).

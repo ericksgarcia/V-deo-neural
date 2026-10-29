@@ -110,4 +110,6 @@ Ficam em `.claude/agents/` e rodam com o seu plano do Claude (sem API extra):
 
 No Claude Code: *"use o diretor para revisar o episódio do pênalti"*.
 
+**Roteiro:** o guia v2 (`docs/ROTEIRO.md`) é obrigatório; `python ferramentas/confere_roteiro.py` confere seus limites (duração, números, CTA sem votação, laço) a partir da saída de `--so-roteiro`.
+
 Veja também `docs/ANALISE_REFERENCIAS.md` (o que os vídeos de referência ensinam) e `docs/IDEIAS.md` (próximos episódios).

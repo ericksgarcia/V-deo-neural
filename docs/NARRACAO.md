@@ -10,12 +10,17 @@ anunciado). Agora é **um amigo curioso assistindo ao experimento junto com voc�
 
 ## Regras do texto
 1. **Frases curtas** (até ~9 palavras), uma ideia por frase. Contraste em vez de adjetivo.
-2. **Um número por frase, no fim dela**, depois de uma pausa (`<long pause>`): o número aterrissa sozinho.
+2. **Um número por frase, no fim dela**, depois de uma pausa (`<long pause>`): o número aterrissa sozinho. No vídeo
+   inteiro, no máximo 6 dados falados (guia v2, `docs/ROTEIRO.md`); o resto vai para o visual.
 3. **Nada de palavras de hype** ("incrível", "chocante", "você não vai acreditar"). A surpresa vem do fato.
 4. **Pergunta de verdade ao espectador** com silêncio antes da resposta ("Chuta aí… <long pause> sete em cada dez").
 5. Regras do jogo explicadas como para um amigo esperto: "Quem vai melhor vira pai da próxima turma. Quem bate sai do jogo."
 6. Quando finalmente dá certo, o tom é de **alívio emocionado**, não de comemoração.
-7. Final leve e provocador, com escolha de lado (nunca só "comenta aí").
+7. Final leve e provocador: **UMA pergunta sobre o que se passou** (sem votação, sem prometer próximo vídeo; nunca só
+   "comenta aí"), seguida de `<short pause>` e da frase cortada que fecha o laço: **"Porque tudo começou quando eu…"**
+   (sem ponto final; completa o gancho, que começa com verbo "-ei").
+8. Gancho: primeira frase em 1ª pessoa do passado ("Tirei…", "Treinei…"), com o número da geração 1; ≤ 16 palavras.
+9. Fale do **campeão** ("o campeão da geração 47"): a linhagem é real, o corpo muda a cada geração.
 
 ## Direção de voz (vai em `speechMetadata.style`, nunca no texto)
 Fica em `neuralab/audio.py` (`ESTILO_PADRAO`): voz Achird, suave, perto do microfone, ~2,6 palavras/s,

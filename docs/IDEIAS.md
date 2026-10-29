@@ -1,6 +1,6 @@
 # Fila de temas (fonte única — o PRIMEIRO "pendente" é o próximo vídeo)
 
-**Como usar (para qualquer sessão):** ao pedir "um novo vídeo", pegue o primeiro item com estado **pendente** na
+**Como usar (para qualquer sessão; leia também `docs/ROTEIRO.md`):** ao pedir "um novo vídeo", pegue o primeiro item com estado **pendente** na
 ordem da tabela e implemente direto. Só proponha temas novos se a fila acabar. Ao entregar, troque o estado para
 **feito (EPxx)** aqui e registre em `docs/EPISODIOS.md`. Ordem da tabela = prioridade definida pelo dono do canal
 (1 a 10 primeiro, depois A a J).
@@ -37,7 +37,9 @@ Inéditos que ainda não entraram na fila: blefe (truco), formigas (trilha e gue
 
 ## Fichas dos temas 1 a 10
 
-Formato: gancho · cérebro · descobertas · virada · pergunta · esforço · risco.
+Formato: gancho · cérebro · descobertas · virada · pergunta · esforço · risco. Atenção: o "gancho" e a "pergunta" das fichas
+são só sementes. No vídeo, o gancho segue o `docs/ROTEIRO.md` (verbo "-ei" + número real da geração 1) e a pergunta final
+é sobre o que aconteceu no treino, sem votação.
 
 **1. Paciente Zero.** Gancho: "Soltei um 'vírus' numa cidade de IAs para ver se elas aprenderiam a fazer quarentena sozinhas." 100 pontos azuis e 1 verde-tóxico; encostar contagia. Infectados (ganham infectando) x saudáveis (ganham sobrevivendo). Entradas: distância/ângulo ao infectado mais próximo, distância às paredes; saídas: andar e girar. Descobertas: O Pânico (correm para o canto e morrem juntos); O Distanciamento (raio de espaço pessoal); Prisão Humana (cercam o infectado). Virada: a muralha funciona até um guarda ser infectado e ela virar bomba-relógio. Pergunta: "A muralha humana foi corajosa ou a ideia mais burra possível?" Esforço: baixo. Risco: centro da tela vazio, todos nas bordas.
 
@@ -109,19 +111,18 @@ Pênalti (rascunho), foguete (rascunho), baliza, robô andador, drone na tempest
 polícia e ladrão, cabo de guerra de enxames, cruzamento sem semáforo. Gravados pelo dono fora do repositório:
 goleiro x atacante 1 contra 1, arremesso de basquete. Detalhes e arquivos em `docs/EPISODIOS.md`.
 
-## Fórmula de roteiro (vale para todos)
+## Fórmula de roteiro (vale para todos) — resumo; o guia completo é `docs/ROTEIRO.md` (obrigatório)
 
-1. **0–3 s:** uma pergunta ou tensão sobre a geração 1, nunca o resultado final. "Coloquei X… quantos conseguem?"
-2. **3–10 s:** quem são os lados e a regra (seleção + mutação) em duas frases.
-3. **Geração 1:** o caos, com um número ("quatro em cada dez...").
-4. **Uma virada a cada 8–12 s**, cada uma com um cartão "DESCOBERTA #n" e o número antes → depois.
-5. **Calmaria enganosa** ("o placar trava… mas…") antes da maior virada.
-6. **Final irônico tirado dos dados** (torneio entre gerações, ou o pior vence o melhor).
-7. **Chamada com escolha de lado** ("time X ou time Y?"), nunca só "comenta aí".
-8. **Laço:** o último quadro funde no primeiro.
+1. **0–3 s, gancho:** verbo "-ei" + premissa + número REAL da geração 1 (≤ 16 palavras). Nunca o resultado final.
+2. **3–9 s:** premissa e regra numa cena só (seleção + mutação em 2 frases).
+3. **Geração 1:** o caos, com um número; o campeão da geração 1 falha.
+4. **Até 3 descobertas**, ~7 s cada, com cartão "DESCOBERTA #n" (antes → depois) e o campeão em foco.
+5. **Re-gancho** entre 40% e 60% do tempo (calmaria enganosa / pegadinha) e resposta antes do fim.
+6. **Final irônico tirado dos dados** (torneio entre gerações, situação nova ou o pior vence o melhor).
+7. **CTA = UMA pergunta sobre o que se passou** (sem voto, sem prometer próximo vídeo) + **laço falado** ("Porque
+   tudo começou quando eu…") + último quadro fundindo no primeiro.
+8. Vídeo de **40–55 s (teto 60 s)**, 100–140 palavras, ≤ 6 dados falados.
 
-**Regra nova:** o gancho NÃO mostra o resultado final; abra na geração 1 e mostre a melhora aos poucos.
+**Regra mantida:** o gancho NÃO mostra o resultado final; abra na geração 1 e mostre a melhora aos poucos.
 
-Use `--so-roteiro` e rode o `analista-roteiro` antes de renderizar.
-
-
+Use `--so-roteiro`, `python ferramentas/confere_roteiro.py` e os analistas antes de renderizar (ver `CLAUDE.md`).

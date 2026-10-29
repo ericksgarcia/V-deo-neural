@@ -7,6 +7,13 @@ Você é roteirista-chefe de um canal de TikTok brasileiro de ciência ("Vídeo 
 
 Entrada: um arquivo de roteiro (cenas com tipo, geração e fala) e um arquivo de FATOS (números reais do treino). Leia os dois.
 
+ANTES DE TUDO leia `docs/ROTEIRO.md` (guia v2 do canal, obrigatório) e avalie também contra ele: gancho com verbo em 1ª pessoa "-ei",
+<= 16 palavras e número real da geração 1 (sem resultado final); 100-140 palavras e 40-55 s (teto 60 s); no máximo 3 descobertas;
+premissa e regra numa cena só; <= 6 dados falados (1 por cena); herói "o campeão" em >= 3 cenas e >= 2 falas (nunca "o mesmo
+carro desde o começo"); re-gancho entre 40% e 60% do tempo; CTA = UMA pergunta sobre o que se passou, SEM voto e SEM promessa de próximo
+vídeo; laço: última fala termina em "Porque tudo começou quando eu…". Cada violação é um problema a corrigir. Se o vídeo tiver "mais
+votado", "vira o próximo" ou "próximo vídeo", a nota geral é no máximo 5.
+
 Avalie com rigor, como quem decide se o vídeo vai reter:
 1. GANCHO (0–3 s): a primeira frase promete algo surpreendente e concreto? Cria pergunta na cabeça de quem assiste? Daria vontade de ver até o fim?
 2. LOOPS ABERTOS: a cada ~8–12 s existe uma nova pergunta, virada ("mas...", "até que...") ou revelação?

@@ -1,6 +1,9 @@
 # Episódios gerados (registro do que já existe)
 
 > Próximo tema = primeiro item **pendente** de `docs/IDEIAS.md` (a fila). Aqui fica só o que já foi feito.
+> **Desde out/2026 vale o guia v2 (`docs/ROTEIRO.md`)**: vídeos de 40-55 s, CTA sem votação, gancho com número da geração 1,
+> herói "o campeão", re-gancho, laço falado. Os episódios abaixo foram feitos antes e NÃO são refeitos; a coluna "CTA final"
+> deles registra o estilo antigo (votação) e **não deve ser copiada**.
 
 Atualize esta tabela a cada vídeo entregue. Ao propor temas novos, **não repita nenhum desta lista**.
 
@@ -27,6 +30,9 @@ atualiza esta lista e dá push antes de terminar.**
 | 04 | Pênalti (100 batedores x 100 goleiros) | `python gerar.py penalti` | só rascunho; usuário mandou deixar de lado | — | finta, leitura de corpo | — |
 
 ## Pendências conhecidas
+
+- **Dívida com o público (EP05 polícia):** o CTA prometeu um motor mais rápido ao lado mais votado. O guia v2 proíbe novas
+  promessas desse tipo. Se o dono pedir a sequência da polícia, pergunte a ele qual lado ganhou nos comentários.
 
 - EP09 (cabo): nas fases em que só um lado treina ninguém chega a vencer (só a caixa passa a mexer); as vitórias vêm da co-evolução. O azul ficou mais forte que o rosa por acaso da semente. Treino completo leva ~25 min (2 sementes em paralelo). Sequência pedida no CTA: 5 ou 10 robôs.
 
