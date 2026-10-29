@@ -44,7 +44,7 @@ class RodadaCabo(Rodada):
 
 class Cabo(Adaptador):
     titulo = "CABO DE GUERRA"
-    experimento = "006"
+    experimento = "009"
     cores = {"a": COR_A, "b": COR_B, "verde": VERDE, "vermelho": VERMELHO}
 
     def __init__(self, hist):
@@ -82,6 +82,7 @@ class Cabo(Adaptador):
             "vitoria_a": (va, -fim),
             "vitoria_b": (vb, -fim),
             "vitoria": (va | vb, -fim),
+            "empurra_a": (j.t_mexeu >= 0, j.enc_pico[0] - j.enc_pico[1]),
             "junto_a": (va, j.enc_pico[0]),
             "junto_b": (vb, j.enc_pico[1]),
             "mexeu": (j.t_mexeu >= 0, -j.t_mexeu),
