@@ -115,7 +115,7 @@ def monta(hist, A):
          titulo_gancho=[("A IA APRENDEU", BRANCO), ("A VOAR NA TEMPESTADE", CIANO)],
          fala="Esse drone não sabia voar. <short pause> Ninguém ensinou nada. Olha ele cruzando a tempestade.")
     if tem_virada:
-        cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas, pausa=0.2,
+        cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=[], pausa=0.2,
              fala=f"Mas tem uma pegadinha. <short pause> Com o vento mais forte, ele cai {erro_txt(1 - duro)}.")
     else:
         cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas, pausa=0.2,
@@ -209,7 +209,7 @@ def monta(hist, A):
 
     # ---------------------------------------------------------------- A VIRADA: tempestade mais forte
     if tem_virada:
-        itens = [("TEMPESTADE DO TREINO", base, VERDE), ("VENTO 40% MAIS FORTE", duro, VERMELHO)]
+        itens = [("TREINO", base, VERDE), ("VENTO +40%", duro, VERMELHO)]
         sub = "o melhor drone · 400 tentativas · % que pousa"
         cena(tipo="barras", grupo="estresse", ger=melhor_g, itens=itens, titulo="E SE O VENTO AUMENTAR?", sub=sub,
              log=[("TESTE: VENTO 40% MAIS FORTE", AMARELO)], pausa=0.25,
@@ -235,6 +235,6 @@ def monta(hist, A):
     virada = f" Aí aumentei o vento e o melhor drone caiu de {pct(base)} para {pct(duro)}. 🌪️" if tem_virada else ""
     post = (f"Esses drones caíram {milhar(falhas_ate)} vezes e aprenderam a pousar na tempestade sozinhos.{virada}\n"
             f"Simulação real: {n} drones, {G} gerações, zero aula. Uma série em que a IA aprende sozinha.\n"
-            f"Sumô de IAs ou polícia e ladrão? O mais votado vira o próximo vídeo 👇\n\n"
-            f"#ia #inteligenciaartificial #aprendizadodemaquina #drone #tempestade #curiosidades #tecnologia")
+            f"Comenta SUMÔ ou POLÍCIA: o mais votado vira o próximo vídeo 👇\n\n"
+            f"#ia #inteligenciaartificial #aprendizadodemaquina #drone #tempestade #simulacao #algoritmogenetico #tecnologia")
     return cenas, info, post, ev

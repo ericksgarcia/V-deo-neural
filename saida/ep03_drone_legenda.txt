@@ -1,5 +1,5 @@
 Esses drones caíram 17.837 vezes e aprenderam a pousar na tempestade sozinhos. Aí aumentei o vento e o melhor drone caiu de 100% para 52%. 🌪️
 Simulação real: 150 drones, 160 gerações, zero aula. Uma série em que a IA aprende sozinha.
-Sumô de IAs ou polícia e ladrão? O mais votado vira o próximo vídeo 👇
+Comenta SUMÔ ou POLÍCIA: o mais votado vira o próximo vídeo 👇
 
-#ia #inteligenciaartificial #aprendizadodemaquina #drone #tempestade #curiosidades #tecnologia
+#ia #inteligenciaartificial #aprendizadodemaquina #drone #tempestade #simulacao #algoritmogenetico #tecnologia
