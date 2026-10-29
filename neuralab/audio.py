@@ -81,7 +81,7 @@ class CotaEsgotada(RuntimeError):
 
 
 LIMITE_REQUISICOES = 10          # por voz, a cada 24 h (cota da conta)
-VOZES_RESERVA = ["Orus", "Fenrir", "Puck", "Iapetus", "Algenib", "Enceladus"]
+VOZES_RESERVA = ["Charon", "Orus", "Fenrir", "Puck", "Iapetus", "Algenib", "Enceladus"]   # só com reserva=True
 
 
 def _uso_arq(cache):
@@ -159,16 +159,19 @@ def _silencios(x, minimo=0.25, limiar=0.02):
 
 
 ESTILO_PADRAO = (
-    "You are a gripping, charismatic Brazilian Portuguese (pt-BR) storyteller narrating a short vertical video, "
-    "talking to one person like a friend who just discovered something amazing. Natural spoken Brazilian rhythm, "
-    "warm and confident. Pace: brisk and conversational, about three words per second; never rushed, never "
-    "dragging; slightly slower on key numbers. Open urgent and intriguing, as if sharing a secret; explain the "
-    "rules clearly and calmly with a hint of humor; build suspense before reveals; deliver surprises with real "
-    "surprise; end playful and direct, inviting the viewer to vote.")
+    "Voice: Achird. You are a curious, warm Brazilian (pt-BR) friend watching an experiment with the listener, "
+    "on the phone, not an announcer and not a YouTuber. Speak softly and close to the microphone, like telling "
+    "something you can't believe you just saw. Natural spoken Brazilian Portuguese, relaxed, with small human "
+    "reactions: a short breath, a half-smile, a quiet laugh at the funny failures. Never shout, never use a "
+    "'trailer' voice, never rush. Pace: calm and clear, about 2.6 words per second, with real silences. "
+    "Emotional shape: open intrigued and a little incredulous; explain the rules plainly, like to a smart "
+    "friend, with dry humor; go quiet and slow before a reveal, then say the number simply, letting it land; "
+    "when something finally works, sound genuinely moved and relieved, not hyped; end light, playful and "
+    "direct, truly curious about the listener's answer.")
 
 
-def narra_lote(falas, cache, voz="Charon", modelo="gemini-3.8-flash-tts", estilo=None, antes=None,
-               tts_textos=None, ritmo=4.0, faixa=(0.84, 1.1), reserva=True, forcar=False):
+def narra_lote(falas, cache, voz="Achird", modelo="gemini-3.8-flash-tts", estilo=None, antes=None,
+               tts_textos=None, ritmo=4.0, faixa=(0.84, 1.1), reserva=False, forcar=False):
     """Narra todas as falas com UMA ÚNICA requisição (mesmo timbre do início ao fim) e molda tudo localmente.
 
     falas  : textos visíveis de cada cena (sem tags).

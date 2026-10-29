@@ -26,6 +26,7 @@ CFG = {
     "drone": dict(gera=340, ep=3, roteiro="drone", sementes="5,11,17"),
     "corrida": dict(gera=240, ep=3, roteiro="corrida", pop=160),
     "sumo": dict(gera=186, ep=5),
+    "policia": dict(gera=250, ep=5),
 }
 DESAFIOS = tuple(CFG)
 GERACOES = {k: v["gera"] for k, v in CFG.items()}
@@ -71,6 +72,25 @@ def treino_sumo(sementes):
     return melhor[1], melhor[2]
 
 
+def treino_policia(G, sementes):
+    from neuralab.coevolucao_policia import treina
+    from neuralab.roteiros.policia import nota_historia
+    melhor = None
+    for s in sementes:
+        arq = os.path.join(".cache", f"policia_{G}_{s}.npz")
+        if os.path.exists(arq):
+            hist = dict(np.load(arq))
+        else:
+            print(f"treinando polícia e ladrão (semente {s}, {G} gerações)…")
+            hist = treina(G, semente=s, log=None)
+            np.savez_compressed(arq, **hist)
+        nota = nota_historia(hist)
+        print(f"  semente {s}: nota da história {nota:.2f}")
+        if melhor is None or nota > melhor[0]:
+            melhor = (nota, s, hist)
+    return melhor[1], melhor[2]
+
+
 def treino_simples(nome, G, sementes):
     from neuralab.desafios import DESAFIOS as D
     from neuralab.evolucao import treina
@@ -82,7 +102,7 @@ def treino_simples(nome, G, sementes):
     pop = cfg.get("pop", 150)
     melhor = None
     for s in sementes:
-        arq = os.path.join(".cache", f"treino_{nome}_{G}_{pop}_{s}_v2.npz")
+        arq = os.path.join(".cache", f"treino_{nome}_{G}_{pop}_{s}_v3.npz")
         if os.path.exists(arq):
             hist = dict(np.load(arq))
         else:
@@ -101,13 +121,13 @@ def main():
     ap.add_argument("desafio", choices=DESAFIOS)
     ap.add_argument("--geracoes", type=int)
     ap.add_argument("--sementes", default=None, help="ex.: 3,5,7 — testa várias e fica com a melhor história")
-    ap.add_argument("--voz", default="Charon", help="voz do Gemini TTS (Charon, Fenrir, Orus, Kore...)")
+    ap.add_argument("--voz", default="Charon", help="voz do Gemini TTS (Charon, Achird, Fenrir, Orus, Kore...)")
     ap.add_argument("--sem-voz", action="store_true")
     ap.add_argument("--rascunho", action="store_true", help="metade da resolução, para revisar rápido")
     ap.add_argument("--so-roteiro", action="store_true")
     ap.add_argument("--so-voz", action="store_true",
                     help="gera/carrega só a narração (1 requisição, depois cache) e mostra o relatório de ritmo")
-    ap.add_argument("--ritmo", type=float, default=4.0, help="teto de palavras/s enquanto fala, sem contar pausas (ajuste local, sem API)")
+    ap.add_argument("--ritmo", type=float, default=3.4, help="teto de palavras/s enquanto fala, sem contar pausas (ajuste local, sem API)")
     ap.add_argument("--saida", default="saida")
     a = ap.parse_args()
     os.makedirs(".cache", exist_ok=True)
@@ -126,6 +146,13 @@ def main():
         sementes = [int(x) for x in (a.sementes or "3").split(",")]
         s, hist = treino_penalti(G, sementes)
         A = Penalti(hist)
+        cenas, info, post, _ = monta(hist, A)
+    elif a.desafio == "policia":
+        from neuralab.adaptadores.policia import Policia
+        from neuralab.roteiros.policia import monta
+        sementes = [int(x) for x in (a.sementes or "3,5,7").split(",")]
+        s, hist = treino_policia(G, sementes)
+        A = Policia(hist)
         cenas, info, post, _ = monta(hist, A)
     else:
         import importlib

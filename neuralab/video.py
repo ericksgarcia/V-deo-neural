@@ -34,7 +34,7 @@ MIN_DUR = {"ao_vivo": 1.6, "replay": 2.0, "montagem": 2.4, "grafico": 2.4, "barr
 
 
 class Video:
-    def __init__(self, adaptador, cenas, info, voz="Charon", escala=1.0, narrar=True, cache=".cache/tts",
+    def __init__(self, adaptador, cenas, info, voz="Achird", escala=1.0, narrar=True, cache=".cache/tts",
                  log=print, estilo=None, ritmo=4.0):
         self.A, self.cenas, self.info = adaptador, cenas, info
         self.voz, self.escala, self.narrar, self.cache, self.log = voz, escala, narrar, cache, log
