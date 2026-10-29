@@ -5,8 +5,11 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
 
 ## Quando o usuário pedir "um novo vídeo" (ou algo parecido)
 
-1. **Não gere nada ainda.** Leia `docs/EPISODIOS.md` e `docs/IDEIAS.md`.
-2. **Analise e proponha 3 a 5 temas NOVOS**, diferentes de todos os já gerados (tabela de episódios).
+1. **Não gere nada ainda.** Leia `docs/EPISODIOS.md` (tabela de episódios **e** a seção "Temas já feitos fora do
+   repositório") e `docs/IDEIAS.md`. Essas duas listas juntas são a fonte única de "tema já usado".
+2. **Analise e proponha 3 a 5 temas NOVOS**, que não estejam em NENHUMA dessas listas (nem como episódio, nem como
+   "já feito fora do repo", nem como ideia marcada como feita). Não reaproveite ideias do `IDEIAS.md`: o dono do canal
+   já fez vídeo de todas. Se tiver dúvida de que um tema é inédito, pesquise na web antes de propor.
    Para cada um: gancho em uma frase, vista 2D, se tem dois lados, a "descoberta" que pode surgir,
    esforço (reaproveita adaptador existente ou exige simulação nova). Dê uma recomendação.
 3. Use `AskUserQuestion` para o usuário escolher. Só então implemente (receita no README) e gere.
@@ -20,6 +23,11 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
   faça commit + push no branch designado. Tudo que precisa persistir fica no repositório.
 
 ## Regras que o dono do canal já decidiu
+
+- **Nunca mostrar o resultado final no início.** O vídeo começa na geração 1 (caos) e mostra a melhora aos poucos,
+  na ordem em que aconteceu, uma descoberta por vez. O gancho é uma pergunta/tensão, não o resultado. O número
+  final só aparece perto do fim (ex.: teste em situação nova).
+- Depois de entregar um vídeo, **registre o tema** em `docs/EPISODIOS.md` (é o que impede repetir).
 
 - Tudo **2D**, estilo **neon/holograma**, HUD tecnológico; nada de 3D.
 - Honestidade: todo número falado vem do treino real (checagens em `roteiros/`). Nada inventado.
