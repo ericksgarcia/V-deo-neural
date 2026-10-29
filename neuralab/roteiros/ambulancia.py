@@ -30,6 +30,11 @@ def pct(x):
     return f"{100 * x:.0f}%"
 
 
+def ext(x):
+    """0.77 -> 'setenta e sete por cento' (a voz lê melhor por extenso)."""
+    return f"{numero(round(100 * x))} por cento"
+
+
 def seg(x):
     return f"{x:.1f}".replace(".", ",")
 
@@ -153,11 +158,12 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.0,
          titulo_gancho=[("UMA AMBULÂNCIA, 10 SEGUNDOS", BRANCO), ("E 24 CARROS NO CAMINHO", AMARELO)],
          log=[(f"{n} AVENIDAS AO MESMO TEMPO", BRANCO), ("24 CARROS · 3 FAIXAS · 10 SEGUNDOS", AMARELO)],
-         fala="Uma ambulância, dez segundos e vinte e quatro carros no caminho. <short pause> "
-              "Será que eles aprendem a dar passagem?")
+         fala="Vinte e quatro carros. Uma ambulância com dez segundos para chegar. <short pause> "
+              "E nenhum carro sabe o que é uma sirene.")
     cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.0,
          log=[("A AMBULÂNCIA SÓ SABE DIRIGIR", BRANCO), ("OS CARROS: CÉREBRO VAZIO", CIANO)],
-         fala="A ambulância é programada. Os carros não sabem nada. <short pause> Todos usam o mesmo cérebro, vazio.")
+         fala="A ambulância só sabe dirigir. Os carros não sabem nada. <short pause> Todos têm o mesmo cérebro, em branco. "
+              "Cada avenida é um teste novo.")
     r0 = A.rodada(0)
     kf = A.busca(r0, "quase")
     cena(tipo="replay", ger=0, foco=kf, grupo="g1b",
@@ -165,14 +171,14 @@ def monta(hist, A):
                   "ry": 70, "desloca": (0, -100)}],
          log=[(f"GER 001 · CHEGOU {s0}/{n}", VERMELHO)],
          carimbo={"texto": f"CHEGA EM {s0} DE {n}", "cor": VERMELHO, "em": 0.5, "sub": "GERAÇÃO 1"},
-         fala=f"Geração um. A ambulância chega a tempo em só {numero(s0)} de {numero(n)}. <short pause> "
-              f"E em {pct(cb0)} das avenidas, os carros batem uns nos outros.")
+         fala=f"Geração um. Em {numero(n)} avenidas, a ambulância chega a tempo em só {numero(s0)}. <short pause> "
+              f"E em {ext(cb0)} delas, os carros batem uns nos outros.")
 
     # ---------------------------------------------------------------- A REGRA
     cena(tipo="ao_vivo", ger=min(5, G - 1), log=[("OS MELHORES SÃO COPIADOS", VERDE), ("OS PIORES SAEM", VERMELHO),
                                                   ("CADA RODADA = 1 GERAÇÃO", BRANCO)],
          carimbo={"texto": "OS MELHORES FICAM", "cor": VERDE, "em": 0.4, "sub": "OS PIORES SAEM"},
-         fala="A regra é cruel. Os melhores são copiados, com pequenas mudanças. Os piores? <short pause> Eliminados.")
+         fala="A regra é cruel. Os melhores são copiados, com pequenas mudanças. Os piores? <short pause> Eliminados. Será que isso basta?")
 
     # ---------------------------------------------------------------- DESCOBERTA 1: DAR PASSAGEM
     r1 = A.rodada(d1)
@@ -184,9 +190,9 @@ def monta(hist, A):
                  "stat": f"CARROS {v0:.0f} → {v1:.0f} m/s · AMBULÂNCIA PRESA {seg(l0)} → {seg(l1)} s"},
          log=[(f"GER {d1 + 1:03d} · CARROS {v0:.0f} → {v1:.0f} m/s", VERDE),
               (f"PRESA {seg(l0)} s → {seg(l1)} s · CHEGOU {s0} → {sd1}/{n}", VERDE)],
-         fala=f"Geração {d1 + 1}. Os carros descobrem que podem acelerar. <short pause> "
-              f"A velocidade média sobe de {numero(round(v0))} para {numero(round(v1))} metros por segundo. "
-              f"A ambulância chega em {numero(sd1)} de {numero(n)}.")
+         fala=f"Geração {numero(d1 + 1)}. Os carros descobrem que podem acelerar. <short pause> "
+              f"A velocidade média dobra: de {numero(round(v0))} para {numero(round(v1))} metros por segundo. "
+              f"E a ambulância chega em {numero(sd1)} de {numero(n)}.")
     marcos.append((d1, "ACELERAR", VERDE))
 
     # ---------------------------------------------------------------- CALMARIA ENGANOSA
@@ -195,8 +201,8 @@ def monta(hist, A):
          log=[(f"GER {d1 + 1}→{d2 + 1} · CHEGOU {sd1}→{sd2}/{n}", AMARELO),
               (f"AVENIDAS COM BATIDA: {pct(cb1)}", VERMELHO)],
          carimbo={"texto": "O PLACAR TRAVA", "cor": AMARELO, "em": 0.4, "sub": f"GERAÇÃO {g_calma + 1}"},
-         fala=f"Aí o placar trava. <short pause> Da geração {d1 + 1} à {d2 + 1}, quase não sobe. "
-              f"E em {pct(cb1)} das avenidas… os carros ainda batem.")
+         fala=f"Mas aí, trava. <short pause> Da geração {numero(d1 + 1)} à {numero(d2 + 1)}, quase nada muda. "
+              f"E em {ext(cb1)} das avenidas… os carros ainda batem. Por que não melhoram?")
 
     # ---------------------------------------------------------------- DESCOBERTA 2: PARAR DE SE BATER
     r2 = A.rodada(d2)
@@ -207,8 +213,8 @@ def monta(hist, A):
          cartao={"numero": 2, "rotulo": "DESCOBERTA", "nome": "SEM SE BATER", "cor": CIANO,
                  "stat": f"AVENIDAS COM BATIDA {pct(cb1)} → {pct(cb2)}"},
          log=[(f"GER {d2 + 1:03d} · BATIDAS {pct(cb1)} → {pct(cb2)}", CIANO)],
-         fala=f"Geração {d2 + 1}. Eles aprendem a se desviar sem se bater. <short pause> "
-              f"Avenidas com batida: de {pct(cb1)} para {pct(cb2)}.")
+         fala=f"Geração {numero(d2 + 1)}. De repente, eles aprendem a se desviar sem bater. <short pause> "
+              f"As avenidas com batida caem de {ext(cb1)} para {ext(cb2)}.")
     marcos.append((d2, "SEM BATER", CIANO))
 
     # ---------------------------------------------------------------- GRÁFICO
@@ -218,8 +224,8 @@ def monta(hist, A):
          eras=[(d1, d2, "DÁ PASSAGEM", VERDE), (d2, d3, "SEM SE BATER", CIANO), (d3, G - 1, "ESTÁVEL", AMARELO)],
          rotulo_y="AVENIDAS EM QUE ELA CHEGA, POR GERAÇÃO", final=pct(float(serie[-1])),
          log=[(f"{bat_tot} AVENIDAS COM BATIDA NO CAMINHO", VERMELHO)],
-         fala=f"{G} gerações. Nenhuma aula de trânsito. No fim, {pct(fora_fim)} dos carros à frente da ambulância "
-              "já estão fora da faixa dela.")
+         fala=f"Geração {numero(G)}. Ninguém ensinou nada a eles. <short pause> E {ext(fora_fim)} dos carros à frente "
+              "da ambulância já estão fora da faixa dela.")
 
     # ---------------------------------------------------------------- O TESTE: avenidas novas
     c1, b1, k1b, t1 = duelo(hist, 0)
@@ -227,11 +233,11 @@ def monta(hist, A):
     c3, b3, k3b, t3 = duelo(hist, G - 1)
     virada = (k2b - k3b) >= 0.3 and c2 >= c1
     itens = [("GER 1", c1, CIANO), (f"GER {d1 + 1}", c2, AMARELO), (f"GER {G}", c3, VERDE)]
-    fala_t = (f"Teste em seiscentas avenidas novas. A geração um deixa a ambulância chegar em {pct(c1)}. "
-              f"A geração {d1 + 1}, em {pct(c2)}… <short pause> mas os carros batem uns nos outros em {pct(k2b)}. "
-              f"A {G} chega em {pct(c3)}, e só {pct(k3b)} batem." if virada else
-              f"Teste em seiscentas avenidas novas. A geração um deixa a ambulância chegar em {pct(c1)}. "
-              f"A geração {G}, em {pct(c3)}.")
+    fala_t = (f"Agora, seiscentas avenidas novas. Geração um: a ambulância chega em {ext(c1)}. "
+              f"Geração {numero(d1 + 1)}: {ext(c2)}. <short pause> Mas em {ext(k2b)}, os carros batem uns nos outros. "
+              f"Geração {numero(G)}: {ext(c3)} chegam. E só {ext(k3b)} têm batida." if virada else
+              f"Agora, seiscentas avenidas novas. Geração um: a ambulância chega em {ext(c1)}. "
+              f"Geração {numero(G)}: {ext(c3)}.")
     cena(tipo="barras", grupo="duelo", ger=G - 1, itens=itens, titulo="E EM AVENIDAS NOVAS?",
          sub="600 avenidas inéditas · melhor cérebro de cada geração", destaque=2, cor_destaque="verde", revela=4.0,
          rotulo_destaque=f"▲ +{(c3 - c1) * 100:.0f} pts" if c3 - c1 >= 0.1 else "◀ MELHOR",
@@ -243,22 +249,23 @@ def monta(hist, A):
     rf = A.rodada(G - 1)
     kf2 = _limpa(A, rf)
     cena(tipo="replay", ger=G - 1, foco=kf2, grupo="fim",
-         escolha={"pergunta": "NA VIDA REAL, VOCÊ...", "opcoes": [("ENCOSTA", CIANO), ("FICA NA FAIXA", AMARELO)],
+         escolha={"pergunta": "SIRENE ATRÁS DE VOCÊ...", "opcoes": [("ENCOSTO", CIANO), ("FICO NA FAIXA", AMARELO)],
                   "em": 0.2},
-         destaques={"encosta": CIANO, "faixa": AMARELO, "votado": VERDE},
-         fala="Esses carros aprenderam a abrir caminho sozinhos. <short pause> E você, quando ouve a sirene? "
-              "Encosta… ou fica na faixa? Comenta o seu lado.")
+         destaques={"encosto": CIANO, "fico": AMARELO, "votado": VERDE},
+         fala="Eles aprenderam a abrir caminho sozinhos. <short pause> E você, com a sirene atrás? "
+              "Comenta ENCOSTO ou FICO. E marca quem nunca dá passagem.")
 
     info = {"marca": "VÍDEO NEURAL", "serie": serie, "serie_rotulo": "% EM QUE A AMBULÂNCIA CHEGA",
             "estilo_voz": ESTILO_VOZ, "marcos": marcos, "rotulo_vivo": f"{n} AVENIDAS",
             "rodape": f"POP {n} · REDE {'-'.join(map(str, Desafio.camadas))} · {G} GERAÇÕES · "
                       "NADA FOI PROGRAMADO NOS CARROS: SÓ SELEÇÃO, CRUZAMENTO E MUTAÇÃO"}
-    post = (f"Coloquei uma ambulância numa avenida com 24 carros e deixei uma IA aprender a dar passagem. "
-            f"Na geração 1, ela chegava em só {s0} de {n} avenidas. Depois, os carros descobriram a passagem… "
-            f"e só mais tarde a fazer isso sem bater uns nos outros. 🚑\n"
-            f"Simulação real: {n} avenidas, {G} gerações, zero regra de trânsito nos carros. Uma série em que a IA aprende sozinha.\n"
-            f"E você, quando ouve a sirene: ENCOSTA ou FICA NA FAIXA? Comenta 👇\n\n"
-            f"#ia #inteligenciaartificial #aprendizadodemaquina #ambulancia #transito #curiosidades #tecnologia #simulacao")
+    post = (f"Uma ambulância, 10 segundos e 24 carros no caminho. 🚑 Na geração 1, ela chegava a tempo em só {s0} de {n} "
+            f"avenidas, e em {pct(cb0)} delas os carros batiam uns nos outros. Depois eles descobriram a passagem… e só "
+            f"mais tarde a fazer isso sem se bater.\n"
+            f"Simulação real: {n} avenidas, {G} gerações. A ambulância é programada; quem aprende é o cérebro dos 24 carros, "
+            f"só por seleção e mutação. Uma série em que a IA aprende sozinha.\n"
+            f"Com a sirene atrás de você: ENCOSTO ou FICO NA FAIXA? Comenta 👇 e marca quem nunca dá passagem.\n\n"
+            f"#ia #inteligenciaartificial #simulacao #ambulancia #transito #curiosidades #tecnologia")
     ev["vel"], ev["fora_fim"] = (v0, v1), fora_fim
     ev["duelo"] = {"g1": (c1, b1, k1b, t1), "d1": (c2, b2, k2b, t2), "fim": (c3, b3, k3b, t3)}
     return cenas, info, post, ev
