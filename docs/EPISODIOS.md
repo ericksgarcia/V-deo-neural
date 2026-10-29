@@ -28,6 +28,8 @@ atualiza esta lista e dá push antes de terminar.**
 
 ## Pendências conhecidas
 
+- **Paciente Zero (fila #1) NÃO entregue.** Simulação, co-evolução e adaptador prontos (`python -m neuralab.coevolucao_paciente GER SEMENTE`; parâmetros de teste `PAC_A`, `PAC_VINF`). Em 9 configurações testadas (velocidade do vírus 2,5 a 3,3 m/s; 40 ou 80 agentes; com e sem corpos sólidos; 60 a 120 gerações) os saudáveis NÃO aprendem a se defender: ficam de 2% a 70% saudáveis no fim, sem tendência, grudados nas paredes, e o "distanciamento" não aparece nas métricas. Sem descoberta real não há roteiro honesto. Próximo passo possível: redesenhar (ex.: cérebro com memória/ruído, nota por indivíduo em vez de cérebro único por cidade, ou trocar de tema).
+
 - EP09 (cabo): nas fases em que só um lado treina ninguém chega a vencer (só a caixa passa a mexer); as vitórias vêm da co-evolução. O azul ficou mais forte que o rosa por acaso da semente. Treino completo leva ~25 min (2 sementes em paralelo). Sequência pedida no CTA: 5 ou 10 robôs.
 
 - EP03: voz leu "Caiu" como "Caio" (cena 4) e "sumô" como "sumou" (CTA); corrigir exige nova requisição TTS (pedir licença). Visual: gráfico com espaço vazio, botões do CTA pequenos, barra do estresse sem animação. 72 s (meta 60 s).
