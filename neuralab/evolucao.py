@@ -17,7 +17,7 @@ def simula(Desafio, genes, semente, gravar=False, **kw):
             reg["s"].append(amb.s.copy())
             reg["estado"].append(amb.estado.copy())
             reg["acel"].append(amb.acel.copy())
-            reg["ativ"].append(np.concatenate(ativ, 1))
+            reg["ativ"].append(np.concatenate(ativ, -1))
             if hasattr(amb, "extra"):
                 reg.setdefault("extra", []).append(amb.extra())
         if (amb.estado != 0).all():
@@ -92,6 +92,10 @@ def treina(Desafio, geracoes=150, populacao=150, semente=7, log=print, robusto=T
         else:
             amb, _ = simula(Desafio, genes, sem)
             apt = amb.aptidao()
+            K = getattr(Desafio, "cenarios", 1)
+            if K > 1:   # nota de seleção = média em K trânsitos diferentes (evita decorar um único cenário)
+                ambs, _ = simula(Desafio, np.tile(genes, (K, 1)), sem + 1, por_mundo=True)
+                apt = ambs.aptidao().reshape(K, -1).mean(0)
         suc = int((amb.estado == SUCESSO).sum())
         melhor_nota = float(np.sort(apt)[-5:].mean())
         if not adaptativa:

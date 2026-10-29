@@ -22,11 +22,14 @@ class Arquitetura:
         return out
 
     def avalia(self, params, x):
-        """x (P, entradas) -> (saida (P, saidas), ativacoes por camada)."""
+        """x (P, entradas) ou (P, agentes, entradas) -> (saida (P, saidas), ativacoes por camada)."""
         ativ = [x]
         h = x
         for k, (W, b) in enumerate(params):
-            h = np.einsum("pa,pab->pb", h, W) + b
+            if h.ndim == 3:   # vários agentes por indivíduo, mesmo cérebro: x (P, agentes, entradas)
+                h = np.einsum("pca,pab->pcb", h, W) + b[:, None, :]
+            else:
+                h = np.einsum("pa,pab->pb", h, W) + b
             h = np.tanh(h)
             ativ.append(h)
         return h, ativ

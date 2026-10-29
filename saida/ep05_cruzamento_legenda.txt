@@ -1,0 +1,5 @@
+Tirei o semáforo e deixei uma IA resolver o cruzamento. Foram 12.646 batidas até ela aprender a esperar e a revezar as ruas. Em trânsito novo, a geração 15 passava sem bater 33%; a 300, 82%. 🚦
+Simulação real: 150 cruzamentos, 300 gerações, zero regra de trânsito. Uma série em que a IA aprende sozinha.
+O que atrapalha mais essa IA: AMBULÂNCIA ou PEDESTRE? O mais votado vira o próximo vídeo 👇
+
+#ia #inteligenciaartificial #aprendizadodemaquina #transito #semaforo #curiosidades #tecnologia #simulacao
