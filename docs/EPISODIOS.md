@@ -2,6 +2,14 @@
 
 Atualize esta tabela a cada vídeo entregue. Ao propor temas novos, **não repita nenhum desta lista**.
 
+## Lista rápida (fonte única — consulte antes de propor tema)
+
+Feitos e entregues (arquivo em `saida/`): **baliza** (ep02), **robô andador** (ep03_andador), **drone na tempestade** (ep03_drone),
+**corrida de carrinhos** (ep03_corrida), **sumô de IAs** (ep05_sumo), **polícia e ladrão** (ep05_policia; há uma 2ª versão
+`ep05_policia_v2_alternativa`). Só rascunho: foguete, pênalti.
+Os prefixos `epNN` repetem (sessões paralelas); o que vale é o NOME do tema. **Regra: toda sessão trabalha neste branch,
+atualiza esta lista e dá push antes de terminar.**
+
 | EP | Tema | Comando | Estado | Duração | Resultado-chave | CTA final |
 |---|---|---|---|---|---|---|
 | 01 | Foguete (pouso) | `python gerar.py foguete` | só rascunho; roteiro simples antigo, precisa portar ao estilo novo | — | de 0 a 84 de 150 pousos | — |
