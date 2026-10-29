@@ -1,0 +1,5 @@
+Coloquei 16 IAs numa porta giratória e nenhuma sala passou inteira. O que mudou? 🚪
+IA aprendendo sozinha por seleção natural (algoritmo genético). Simulação real: 150 salas de 16 IAs, 100 gerações, nenhum número inventado.
+Manda pra quem empurra a porta do lado errado e atrasa a fila 👇
+
+#inteligenciaartificial #ia #algoritmogenetico #curiosidades #tecnologia
