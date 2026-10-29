@@ -6,9 +6,12 @@ Atualize esta tabela a cada vídeo entregue. Ao propor temas novos, **não repit
 |---|---|---|---|---|---|---|
 | 01 | Foguete (pouso) | `python gerar.py foguete` | só rascunho; roteiro simples antigo, precisa portar ao estilo novo | — | de 0 a 84 de 150 pousos | — |
 | 02 | **Baliza** (estacionar entre dois carros) | `python gerar.py baliza` | **entregue**, 1080x1920, voz Charon 3.8 | 83,8 s | 16.068 batidas até aprender; 86% -> 35% no teste de estresse | LADEIRA ou CHUVA? (o mais votado vira o próximo) |
+| 03 | **Drone na tempestade** (vento em rajadas + raios, pouso na plataforma) | `python gerar.py drone` (semente 17, 340 gerações; sementes testadas 5,11,17) | **entregue**, 1080x1920, voz Charon 3.8 | 72,4 s | 32.857 quedas; 138/150 pousam na ger. 340; teste de estresse (40 tempestades novas): 65% -> 21% com vento +80% | SUMÔ DE IAs ou POLÍCIA E LADRÃO? (comentar SUMÔ ou POLÍCIA) |
 | 04 | Pênalti (100 batedores x 100 goleiros) | `python gerar.py penalti` | só rascunho; usuário mandou deixar de lado | — | finta, leitura de corpo | — |
 
 ## Pendências conhecidas
+
+- EP03: voz leu "Caiu" como "Caio" (cena 4) e "sumô" como "sumou" (CTA); corrigir exige nova requisição TTS (pedir licença). Visual: gráfico com espaço vazio, botões do CTA pequenos, barra do estresse sem animação. 72 s (meta 60 s).
 
 - EP02: 84 s (analistas recomendavam ~40 s); pico de volume 0 dB nos efeitos.
 - Portar o foguete ao roteiro/estilo da baliza; pênalti sem render final.
