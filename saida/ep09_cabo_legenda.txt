@@ -1,0 +1,4 @@
+Cinco robôs, uma caixa pesada. Na geração 1, em 92% dos jogos a caixa nem se mexe. Treinei dois enxames por seleção natural (150 gerações) e eles descobriram sozinhos como chegar na caixa e empurrar juntos. Simulação real, nenhum número inventado.
+Próximo cabo de guerra: 5 ROBÔS ou 10 ROBÔS? Comenta 5 ou 10 👇
+
+#ia #inteligenciaartificial #aprendizadodemaquina #simulacao #enxame #redesneurais #evolucao #tecnologia
