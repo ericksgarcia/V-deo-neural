@@ -79,7 +79,7 @@ def monta(hist, A):
     marcas = [{"tipo": "circulo", "em": 1.0, "alvo": "caixa", "segue": True, "texto": "CAIXA", "rx": 70, "ry": 70}]
     cena(tipo="replay", ger=gh, foco=kh, grupo="gancho", marcas=marcas, inicio=0.0,
          titulo_gancho=[("5 ROBÔS", BRANCO), ("1 CAIXA", AMARELO)],
-         fala="Cinco robôs. Uma caixa pesada. Sozinho, nenhum consegue mover.")
+         fala="Cinco robôs. Uma caixa pesada. Ninguém ensinou trabalho em equipe.")
 
     # ---------------------------------------------------------------- PREMISSA + GERAÇÃO 1
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[("CABO DE GUERRA · ENXAME A × ENXAME B", BRANCO), ("LEVE A CAIXA ATÉ O GOL DO OUTRO", BRANCO)],
@@ -95,13 +95,13 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=fim[f], grupo="f1",
          carimbo={"texto": QUEM["A"][0], "cor": QUEM["A"][1], "em": 0.2, "sub": f"{FASES[f][2]} GERAÇÕES"},
          log=[(f"SÓ O A TREINA · {FASES[f][2]} GER", COR_A)],
-         fala=f"Primeiro treino só o azul. Em {FASES[f][2]} gerações ele vence {pct(M['venc_a'][fim[f]])}.")
+         fala=f"Primeiro treino só o azul. A caixa mexe em {em_dez(M['mexeu'][fim[f]])} jogos. Antes, {em_dez(M['mexeu'][0])}.")
     # ---------------------------------------------------------------- FASE 2: SÓ O B TREINA
     f = 1
     cena(tipo="ao_vivo", ger=fim[f], grupo="f2",
          carimbo={"texto": QUEM["B"][0], "cor": QUEM["B"][1], "em": 0.2, "sub": f"{FASES[f][2]} GERAÇÕES"},
          log=[(f"SÓ O B TREINA · {FASES[f][2]} GER", COR_B)],
-         fala=f"Agora só o rosa. Ele vai de {pct(M['venc_b'][fim[f - 1]])} para {pct(M['venc_b'][fim[f]])}.")
+         fala=f"Agora só o rosa. Ele chega a {n1(M['pico_b'][fim[f]])} robôs empurrando ao mesmo tempo.")
 
     # ---------------------------------------------------------------- DESCOBERTAS (os dois treinam)
     g2 = fim[1]
@@ -113,7 +113,7 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "ENXAME A", "nome": "CHEGAR NA CAIXA", "cor": VERDE,
                  "stat": f"ROBÔS NA CAIXA {n1(e0)} → {n1(e1)} DE 5"},
          log=[("NOVO PADRÃO: ENCOSTAR", VERDE)],
-         fala=f"Descoberta um: chegar na caixa. Eram {n1(e0)} robôs encostados. Agora, {n1(e1)}.")
+         fala=f"Descoberta um: chegar na caixa. Em média, {n1(e0)} robô encostado. Agora, {n1(e1)}.")
     # 2 · EMPURRAR JUNTOS: pico de robôs encostados ao mesmo tempo
     gd2 = primeira(M["pico_a"], lambda v: v > 3.5, fim[1])
     q0, q1 = M["pico_a"][0], M["pico_a"][gd2]
@@ -123,7 +123,7 @@ def monta(hist, A):
          cartao={"numero": 2, "rotulo": "ENXAME A", "nome": "EMPURRAR JUNTOS", "cor": VERDE,
                  "stat": f"ROBÔS AO MESMO TEMPO {n1(q0)} → {n1(q1)}"},
          log=[("NOVO PADRÃO: EMPURRAR_EM_GRUPO", VERDE)],
-         fala=f"Descoberta dois: empurrar juntos. Cinco empurram o que um não move. O pico foi de {n1(q0)} para {n1(q1)}.")
+         fala=f"Descoberta dois: empurrar juntos. O pico foi de {n1(q0)} para {n1(q1)} robôs ao mesmo tempo.")
     # 3 · FICAR ATRÁS DA CAIXA
     gd3 = G - 1
     t0, t1 = M["atras_a"][0], M["atras_a"][gd3]
@@ -144,12 +144,12 @@ def monta(hist, A):
          fala=f"E {pct(M['empate'][gf])} dos jogos ficam empatados.")
 
     # ---------------------------------------------------------------- GRÁFICO
-    ponto = M["venc_a"] + 0.5 * M["empate"]
+    ponto = M["enc_a"] / 5.0
     eras = [(L[f][0], L[f][1] + 1, {"A": "SÓ A", "B": "SÓ B", "AB": "OS DOIS"}[FASES[f][1]],
              {"A": COR_A, "B": COR_B, "AB": AMARELO}[FASES[f][1]]) for f in range(len(FASES))]
-    cena(tipo="grafico", grupo="grafico", serie=ponto, eras=eras, titulo="PONTOS DO ENXAME AZUL (50% = EQUILÍBRIO)",
-         rotulo_y="FAIXAS: QUEM ESTAVA TREINANDO", final=pct(ponto[-1]), log=[(f"GER {G:03d} · A {pct(ponto[-1])}", BRANCO)],
-         fala="No gráfico: só o azul treina, sobe. Só o rosa, desce. Juntos, brigam pelo meio.")
+    cena(tipo="grafico", grupo="grafico", serie=ponto, eras=eras, titulo="ENXAME AZUL: % DOS ROBÔS NA CAIXA",
+         rotulo_y="FAIXAS: QUEM ESTAVA TREINANDO", final=pct(ponto[-1]), log=[(f"GER {G:03d} · NA CAIXA {pct(ponto[-1])}", BRANCO)],
+         fala=f"No gráfico: robôs do azul na caixa. De {pct(ponto[0])} para {pct(ponto[-1])}.")
 
     # ---------------------------------------------------------------- TORNEIO
     gA = G - 1
@@ -160,7 +160,7 @@ def monta(hist, A):
     cena(tipo="barras", grupo="torneio", itens=itens, titulo="O AZUL FINAL × ROSAS DO PASSADO", sub=sub, revela=0.0,
          destaque=len(ep) - 1, cor_destaque="vermelho", rotulo_destaque="◀ O MAIS NOVO",
          log=[(f"CONTRA O B FINAL: {pct(res[ep[-1]][0])}", VERMELHO)],
-         fala=f"O azul final contra rosas do passado: vence {pct(res[ep[0]][0])} da primeira, só {pct(res[ep[-1]][0])} da última.")
+         fala=f"O azul final contra rosas do passado: chega a vencer {pct(max(res[g][0] for g in ep[:-1]))}. Contra a rosa final, só {pct(res[ep[-1]][0])}.")
     cena(tipo="barras", grupo="torneio", itens=itens, titulo="O AZUL FINAL × ROSAS DO PASSADO", sub=sub, revela=0.0,
          destaque=len(ep) - 1, cor_destaque="vermelho", rotulo_destaque="◀ O MAIS NOVO",
          fala="Aprender ajuda. Mas o outro lado também aprende.")
@@ -174,7 +174,7 @@ def monta(hist, A):
     info = {
         "marca": "VÍDEO NEURAL",
         "serie": ponto,
-        "serie_rotulo": "PONTOS DO AZUL POR GERAÇÃO",
+        "serie_rotulo": "ROBÔS DO AZUL NA CAIXA",
         "marcos": [(L[f][0], {"A": "SÓ A", "B": "SÓ B", "AB": "OS DOIS"}[FASES[f][1]],
                     {"A": COR_A, "B": COR_B, "AB": AMARELO}[FASES[f][1]]) for f in (0, 1, 2)],
         "rotulo_vivo": "100 JOGOS",
