@@ -83,3 +83,24 @@ Só afirmar "empurrão" se o treino mostrar de fato (medir contatos). Pergunta: 
 - **Honestidade:** medir (preço médio x custo, lucro, correlação entre preços). Só chamar de "cartel" se os números
   mostrarem preços sincronizados acima do custo; nunca afirmar que apps reais fazem isso. Dizer "parece um cartel".
 - **Risco:** visual abstrato se os clientes não ficarem claros; calibrar para a geração 1 não ter lucro zero para todos.
+
+## Segunda leva (aprovada; avaliada entre 50 ideias de outra IA; NÃO geradas ainda)
+
+Mesmas regras da fila acima (descobertas são hipóteses; abrir na geração 1; conferir na web que ainda é inédita).
+
+| # | Tema | Gancho (sem revelar o final) | Vista / lados | Esforço |
+|---|---|---|---|---|
+| F | **Cão pastor e ovelhas** | "Um cão IA precisa guiar 50 ovelhas medrosas para dentro do cercado." | de cima, um lado (ovelhas seguem regra de bando) | médio |
+| G | **Duelo de canhões com vento** | "Dois tanques IAs atirando por cima de uma montanha sem ver o oponente." | de lado, dois lados | baixo/médio |
+| H | **Guerra de pintura (Paint War)** | "Duas populações de IAs pintando o chão para dominar a tela." | de cima, dois lados | médio/baixo (grade) |
+| I | **Bolinha no labirinto inclinado** | "A IA inclina o chão para guiar a bolinha ao buraco certo, sem cair nos falsos." | de cima, um lado | baixo/médio |
+| J | **Queimada 3x3** | "Desviar ou pegar a bola no ar? Queimada entre IAs." | de cima, dois lados | médio (começar com 2x2 ou 3x3) |
+
+Notas rápidas:
+- **F:** descobertas prováveis: contornar por trás, cercar. Métrica: ovelhas no cercado. Risco: levar muitas gerações para achar o "contornar".
+- **G:** entradas: ângulo, força, vento, onde caiu o tiro anterior. O vento precisa variar para a virada "usou o vento a favor".
+- **H:** métrica: % do chão pintado. Precisa de regra que gere estratégia (pintar por cima do rival, bordas).
+- **I:** descoberta provável: usar a parede para frear. Apelo mais visual (um lado só).
+- **J:** tema bem brasileiro. Descobertas prováveis: finta e mirar à frente. Não fazer 6x6 (complica demais).
+
+Descartadas da lista de 50 (não propor): vôlei 2x2, tag team, ponte humana, pinball, enxame construtor, espelhos com laser, jogo da velha, Tetris, pistas falsas, Snake multiplayer, equilíbrio de monociclo; e as repetidas: polícia (já feito), estádio (= evacuação A), pedestres (= cruzamento EP05), basquete (já feito).
