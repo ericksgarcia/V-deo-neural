@@ -115,22 +115,21 @@ def monta(hist, A):
                "desloca": (0, -80)}]
     cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas,
          titulo_gancho=[("A IA APRENDEU", BRANCO), ("A VOAR NA TEMPESTADE", VERDE)],
-         fala="Esse drone nunca voou na vida. <short pause> Ninguém ensinou nada. Olha ele atravessar a tempestade.")
+         fala=f"Esses drones caíram {milhar(quedas_ate)} vezes. <short pause> E mesmo assim, um deles aprendeu a atravessar uma tempestade.")
     if tem_virada:
         cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas, pausa=0.2,
-             fala=f"Mas tem uma pegadinha. <short pause> Com mais vento, ele erra {pct(1 - duro)} das vezes.")
+             fala="Mas tem uma pegadinha. <short pause> Eu conto no final.")
     else:
         cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="gancho", marcas=marcas, pausa=0.2,
              fala="Mas tem uma pegadinha. <short pause> Ninguém ensinou como.")
 
     # ---------------------------------------------------------------- PREMISSA + GERAÇÃO 1
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"{n} DRONES", BRANCO), ("CADA UM COM UMA IA QUE NÃO SABE NADA", BRANCO)],
-         fala=f"Tudo começou assim: {n} drones. Cada um com um cérebro de computador vazio. <short pause> "
-              "Vento em rajadas. E raios caindo.")
+         fala=f"Tudo começou assim: {n} drones, cérebro vazio, vento em rajadas e raios caindo.")
     s0 = int(suc[0])
     cena(tipo="ao_vivo", ger=0, grupo="g1", log=[(f"GER 001 · POUSARAM {s0}", VERMELHO)],
          carimbo={"texto": f"POUSARAM {s0}", "cor": VERMELHO, "em": 0.5, "sub": "GERAÇÃO 1"},
-         fala="E aí? Quantos você acha que pousaram? <long pause> " + ("Nenhum." if s0 == 0 else f"Só {s0}."))
+         fala="Quantos pousaram? <long pause> " + ("Nenhum." if s0 == 0 else f"Só {s0}."))
     r0 = A.rodada(0)
     est0 = r0.reg["estado"][:, -1]
     caiu = [k for k in np.argsort(r0.morte) if r0.morte[k] >= 0 and est0[k] == 2]
@@ -144,7 +143,7 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=g_sel, log=[("OS MELHORES SÃO COPIADOS", VERDE), ("OS PIORES SAEM", VERMELHO),
                                          ("CADA RODADA = 1 GERAÇÃO", BRANCO)],
          carimbo={"texto": "OS MELHORES FICAM", "cor": VERDE, "em": 0.4, "sub": "OS PIORES SAEM"},
-         fala="Aí entra a regra cruel. Os melhores são copiados e misturados, com pequenas mudanças. "
+         fala="Aí entra a regra cruel. Os melhores são copiados, com pequenas mudanças. "
               "Os piores? <short pause> Eliminados. Cada rodada é uma geração.")
 
     # ---------------------------------------------------------------- CHEGA PERTO, MAS NINGUÉM POUSA
@@ -170,8 +169,7 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "PRIMEIRO POUSO", "nome": f"GERAÇÃO {gs + 1}", "cor": VERDE,
                  "stat": f"DEPOIS DE {milhar(f_gs)} QUEDAS"},
          log=[(f"GER {gs + 1:03d} · PRIMEIRO POUSO", VERDE)],
-         fala=f"Geração {gs + 1}. Depois de {milhar(f_gs)} quedas… <long pause> um drone enfrenta o vento, "
-              "<short pause> segura a inclinação… e pousa.")
+         fala=f"Geração {gs + 1}. Depois de {milhar(f_gs)} quedas… <long pause> um drone enfrenta o vento… e pousa.")
     marcos.append((gs, "1º", VERDE))
 
     # ---------------------------------------------------------------- COPIAR, MISTURAR, MELHORAR
@@ -183,7 +181,7 @@ def monta(hist, A):
             clipes.append((g, k))
     if len(clipes) >= 3:
         cena(tipo="montagem", clipes=clipes[:4], log=[("OS PRÓXIMOS COPIAM ESSE JEITO", BRANCO)],
-             fala="Os drones seguintes herdam esse jeito. <short pause> E vão melhorando, rodada após rodada.")
+             fala="Os filhos herdam o jeito, e vão melhorando.")
 
     # ---------------------------------------------------------------- A TEMPESTADE FRITA (dado real)
     g = ev["g_raio"]
@@ -191,7 +189,7 @@ def monta(hist, A):
     if fr >= 0.4:
         cena(tipo="ao_vivo", ger=g, log=[(f"GER {g + 1:03d} · FRITADOS {pct(fr)}", AMARELO)],
              carimbo={"texto": f"{pct(fr)} FRITADOS", "cor": AMARELO, "em": 0.4, "sub": "POR RAIO"},
-             fala=f"Mas o raio continua. Ele avisa um segundo antes. <short pause> Na geração {g + 1}, {em_dez(fr)} foram fritados.")
+             fala=f"Mas o raio continua. <short pause> Na geração {g + 1}, {em_dez(fr)} foram fritados.")
 
     # ---------------------------------------------------------------- O NÚMERO FINAL + O GRÁFICO
     cena(tipo="ao_vivo", ger=melhor_g, log=[(f"GER {melhor_g + 1:03d} · {fin_s}/{n} POUSAM", VERDE)],
@@ -202,8 +200,7 @@ def monta(hist, A):
     cena(tipo="grafico", grupo="grafico", serie=serie, titulo="% QUE POUSA",
          eras=[(gs, G - 1, "APRENDENDO", VERDE)], rotulo_y="DRONES NA PLATAFORMA POR GERAÇÃO",
          final=pct(float(serie[melhor_g])), log=[(f"{milhar(quedas_ate)} QUEDAS NO TOTAL", VERMELHO)],
-         fala=f"Começou do zero. Sem aula, sem professor. Só tentativa e erro… <short pause> e {milhar(quedas_ate)} quedas. "
-              "A linha sobe e desce porque a tempestade muda a cada geração.")
+         fala="Sem aula, sem professor. Só tentativa e erro.")
 
     # ---------------------------------------------------------------- A VIRADA: o teste de estresse
     if tem_virada:
@@ -212,20 +209,20 @@ def monta(hist, A):
         cena(tipo="barras", grupo="estresse", ger=melhor_g, itens=itens, titulo="E SE O VENTO FICAR MAIS FORTE?", sub=sub,
              log=[("TESTE: VENTO 80% MAIS FORTE", AMARELO)], pausa=0.25,
              fala="Mas será que ele aprendeu a voar de verdade? <short pause> "
-                  "Peguei o melhor drone… e aumentei o vento em oitenta por cento.")
+                  "Peguei o melhor drone e aumentei o vento em oitenta por cento.")
         cena(tipo="barras", grupo="estresse", ger=melhor_g, itens=itens, titulo="E SE O VENTO FICAR MAIS FORTE?", sub=sub,
              destaque=1, cor_destaque="vermelho", revela=0.0, rotulo_destaque=f"▼ -{(base - duro) * 100:.0f} pts",
              log=[(f"POUSA {pct(base)} → {pct(duro)}", VERMELHO)],
              fala=f"Em quarenta tempestades novas, ele pousava {pct(base)}. <long pause> Com vento forte? Só {pct(duro)}. "
-                  "<short pause> Fora do que treinou, ele se perde.")
+                  "<short pause> Ele aprendeu aquela tempestade. Não qualquer uma.")
 
     # ---------------------------------------------------------------- CHAMADA + LAÇO
     cena(tipo="replay", ger=melhor_g, foco=heroi, grupo="fim", inicio=max(m_h - 1.4, 0),
          escolha={"pergunta": "O PRÓXIMO VÍDEO?", "opcoes": [("SUMÔ DE IAs", AMARELO), ("POLÍCIA E LADRÃO", CIANO)],
                   "em": 0.2},
          destaques={"sumô": AMARELO, "polícia": CIANO, "ladrão": CIANO, "votado": VERDE},
-         fala="Agora você decide. Duas IAs, uma contra a outra. Sumô ou polícia e ladrão? <short pause> "
-              "Comenta seu lado. O mais votado vira o próximo vídeo.")
+         fala="Próximo vídeo: duas IAs, uma contra a outra. Sumô ou polícia e ladrão? <short pause> "
+              "Comenta SUMÔ ou POLÍCIA. O mais votado vira o próximo.")
 
     info = {"marca": "VÍDEO NEURAL", "serie": serie, "serie_rotulo": "% QUE POUSA POR GERAÇÃO",
             "estilo_voz": ESTILO_VOZ, "marcos": marcos, "rotulo_vivo": f"{n} DRONES",
