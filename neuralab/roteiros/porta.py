@@ -130,11 +130,13 @@ def monta(hist, A):
          titulo_gancho=[("COLOQUEI 16 IAs", BRANCO), ("DIANTE DE UMA PORTA GIRATÓRIA", MAGENTA)],
          log=[(f"{n} SALAS AO MESMO TEMPO", BRANCO), (f"{N} IAs · 1 PORTA · 0 REGRAS", MAGENTA)],
          carimbo={"texto": f"{seg(p0)} DE {N}", "cor": VERMELHO, "em": 1.6, "sub": "PASSAM EM MÉDIA"},
-         fala=f"Coloquei {N} IAs diante de uma porta giratória. <short pause> Em média, {menos} passou.")
+         fala=(f"Coloquei {N} IAs diante de uma porta giratória. <short pause> Em {n} salas, nenhuma passou inteira."
+               if int(suc[0]) == 0 else
+               f"Coloquei {N} IAs diante de uma porta giratória. <short pause> Em cada sala, {menos} passou."))
     # ---------------------------------------------------------------- PREMISSA + REGRA
     cena(tipo="ao_vivo", ger=min(3, G - 1), grupo="g1b",
          log=[("MESMO CÉREBRO EM TODAS AS IAs", BRANCO), ("AS SALAS QUE PASSAM MAIS GENTE VIRAM PAIS", VERDE)],
-         fala="Todas têm o mesmo cérebro, vazio. <short pause> As melhores salas viram pais da próxima turma.")
+         fala="Mesmo cérebro em todas. A porta só gira se empurrarem. <short pause> As melhores salas viram pais.")
     # ---------------------------------------------------------------- GERAÇÃO 1: o campeão falha
     r0 = A.rodada(0)
     k0 = r0.lider
@@ -150,8 +152,8 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "DESCOBERTA", "nome": "EMPURRAR A PORTA", "cor": CIANO,
                  "stat": f"PASSAM POR SALA {seg(pm_a)} → {pm_b:.0f} DE {N}"},
          log=[(f"GER {sobe + 1:03d} · {pm_b:.0f} DE {N} PASSAM POR SALA", CIANO)],
-         fala=f"Geração {sobe + 1}. O campeão aprende a empurrar a porta. <long pause> "
-              f"De {menos.replace('só ', '')} para {NOMES[int(round(pm_b))]}.")
+         fala=f"Geração {sobe + 1}. O campeão aprende a empurrar. <long pause> "
+              f"De {menos.replace('só ', '')} para {NOMES[int(round(pm_b))]} por sala.")
     marcos.append((sobe, "EMPURRA", CIANO))
     # ---------------------------------------------------------------- DESCOBERTA 2: O MESMO LADO
     h_a, h_b = float(hist["m_horario"][0]), float(hist["m_horario"][mesmo])
@@ -161,7 +163,7 @@ def monta(hist, A):
          cartao={"numero": 2, "rotulo": "DESCOBERTA", "nome": "O MESMO LADO", "cor": MAGENTA,
                  "stat": f"PORTA NO MESMO SENTIDO {pct(h_a)} → {pct(h_b)} DAS SALAS"},
          log=[(f"GER {mesmo + 1:03d} · SENTIDO ÚNICO {pct(h_a)} → {pct(h_b)}", MAGENTA)],
-         fala=f"Geração {mesmo + 1}. Todos empurram a porta para o mesmo lado. <long pause> "
+         fala=f"Geração {mesmo + 1}. A porta gira sempre para o mesmo lado. <long pause> "
               f"De {em_dez(h_a)} salas para {em_dez(h_b)}.")
     marcos.append((mesmo, "MESMO LADO", MAGENTA))
     # ---------------------------------------------------------------- RE-GANCHO: o placar trava
@@ -172,7 +174,7 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=g_calma,
          log=[(f"GER {plat + 1}→{rap + 1} · MÉDIA {int(round(s_m))}→{int(round(s_r))}/{n}", AMARELO), ("O PLACAR TRAVA", AMARELO)],
          carimbo={"texto": "O PLACAR TRAVA", "cor": AMARELO, "em": 0.4, "sub": f"GERAÇÃO {g_calma + 1}"},
-         fala=f"Aí o placar trava na geração {plat + 1}. <short pause> Será que acabou?")
+         fala=f"Aí o placar trava. <short pause> Será que acabou? <long pause>")
     # ---------------------------------------------------------------- DESCOBERTA 3: MENOS PORTA TRAVADA
     t_a, t_b = float(ev["tem"][plat]), float(ev["tem"][rap])
     rr = A.rodada(rap)
@@ -181,7 +183,7 @@ def monta(hist, A):
          cartao={"numero": 3, "rotulo": "DESCOBERTA", "nome": "SEM TEMPO PERDIDO", "cor": AMARELO,
                  "stat": f"TEMPO PARA TODAS PASSAREM {t_a:.0f} s → {t_b:.0f} s"},
          log=[(f"GER {rap + 1:03d} · TEMPO {t_a:.0f} s → {t_b:.0f} s", AMARELO)],
-         fala=f"Geração {rap + 1}. O campeão acha como perder menos tempo. <long pause> "
+         fala=f"Geração {rap + 1}. Não acabou: o campeão perde menos tempo. <long pause> "
               f"De {NOMES[int(round(t_a))]} para {NOMES[int(round(t_b))]} segundos.")
     marcos.append((rap, "MAIS RÁPIDO", AMARELO))
     # ---------------------------------------------------------------- O TESTE: salas novas
@@ -194,26 +196,27 @@ def monta(hist, A):
          rotulo_destaque=f"▼ {(s_a - s_f) * 100:.0f} pts" if s_a - s_f >= 0.1 else "◀ MELHOR",
          log=[("TESTE: 600 SALAS NOVAS", AMARELO), (f"TODAS PASSAM {pct(s_a)} → {pct(s_f)}", AMARELO),
               (f"TEMPO {seg(ta)} s → {seg(tf)} s", CIANO)],
-         fala=f"Teste: seiscentas salas novas. <short pause> O campeão da geração {g_ref + 1} passa todas em {pct(s_a)}. "
-              f"O da {G}, em {pct(s_f)}. Só que é mais rápido.")
+         fala=f"Teste: salas novas. <short pause> O campeão da {g_ref + 1} acerta {pct(s_a)}. "
+              f"O da {G}, só {pct(s_f)}, mas chega mais rápido.")
     # ---------------------------------------------------------------- CTA + LAÇO
     rf = A.rodada(G - 1)
     kf = A.busca(rf, "primeiro")
+    nf = round((1 - s_f) * 10)
+    falha = f"{'quase ' if (1 - s_f) * 10 < nf - 0.15 else ''}{NOMES[nf]} de cada dez salas"
     cena(tipo="replay", ger=G - 1, foco=kf, grupo="fim",
-         escolha={"pergunta": "O RÁPIDO É MELHOR?", "opcoes": [("MELHOR", VERDE), ("ARRISCADO", VERMELHO)], "em": 0.2},
-         destaques={"melhor": VERDE, "arriscado": VERMELHO},
-         fala="O campeão mais rápido é melhor ou só mais arriscado? <short pause> Porque tudo começou quando eu…")
+         escolha={"pergunta": "EVOLUIU OU PIOROU?", "opcoes": [("EVOLUIU", VERDE), ("PIOROU", VERMELHO)], "em": 0.2},
+         destaques={"evoluiu": VERDE, "piorou": VERMELHO},
+         fala=f"O campeão da {G} falha em {falha}. Evoluiu ou piorou? <short pause> Porque tudo começou quando eu…")
 
     serie = suc / n
     info = {"marca": "VÍDEO NEURAL", "serie": serie, "serie_rotulo": "% SALAS COM TODAS AS IAs PASSANDO",
             "estilo_voz": ESTILO_VOZ, "marcos": marcos, "rotulo_vivo": f"{n} SALAS",
             "rodape": f"POP {n} · REDE {'-'.join(map(str, Desafio.camadas))} · {G} GERAÇÕES · "
                       "NADA FOI PROGRAMADO: SÓ SELEÇÃO, CRUZAMENTO E MUTAÇÃO"}
-    post = (f"De {N} IAs, {'menos de 1' if p0 < 1 else 'só ' + str(int(round(p0)))} passou pela porta giratória. "
-            f"Depois de {G} gerações… 🚪\n"
-            f"IA aprendendo sozinha por seleção natural. Simulação real: {n} salas de {N} IAs, {G} gerações, "
-            "nenhum número inventado.\n"
-            "Manda pra quem ainda acha que fila é só questão de educação 👇\n\n"
-            "#inteligenciaartificial #ia #aprendizadodemaquina #simulacao #portagiratoria")
+    post = (f"Coloquei {N} IAs numa porta giratória e nenhuma sala passou inteira. O que mudou? 🚪\n"
+            f"IA aprendendo sozinha por seleção natural (algoritmo genético). Simulação real: {n} salas de {N} IAs, "
+            f"{G} gerações, nenhum número inventado.\n"
+            "Manda pra quem empurra a porta do lado errado e atrasa a fila 👇\n\n"
+            "#inteligenciaartificial #ia #algoritmogenetico #curiosidades #tecnologia")
     ev["duelo"] = {"ref": (g_ref, s_a, ta), "fin": (G - 1, s_f, tf)}
     return cenas, info, post, ev
