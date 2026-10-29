@@ -394,6 +394,18 @@ def boom(intensidade=1.0, semente=0):
     return (0.5 * ruido + 0.6 * grave) * 0.5 * intensidade
 
 
+def raio(intensidade=1.0, semente=0):
+    """Raio: estalo agudo seguido de trovão grave rolando."""
+    m = int(1.4 * SR)
+    rng = np.random.default_rng(semente)
+    tt = np.arange(m) / SR
+    r = rng.normal(0, 1, m)
+    estalo = (r - _lp(r, 2500)) * np.exp(-tt * 38)
+    trovao = _lp(r, 380) * np.exp(-tt * 2.6) * (0.6 + 0.4 * np.sin(2 * np.pi * 9 * tt))
+    grave = np.sin(2 * np.pi * (42 + 30 * np.exp(-tt * 9)) * tt) * np.exp(-tt * 3.5)
+    return (0.55 * estalo + 1.3 * trovao + 0.5 * grave) * 0.45 * intensidade
+
+
 def batida(intensidade=1.0, semente=0):
     """Colisão de carro: estalo de ruído + lata ressoando."""
     m = int(0.5 * SR)
@@ -491,7 +503,7 @@ def torcida(dur, semente=0):
     return (banda * onda * 0.09).astype(np.float32)
 
 
-SONS = {"boom": boom, "batida": batida, "chute": chute, "rede": rede, "defesa": defesa, "fora": fora,
+SONS = {"boom": boom, "raio": raio, "batida": batida, "chute": chute, "rede": rede, "defesa": defesa, "fora": fora,
         "glitch": lambda i, k: glitch(k), "tique": lambda i, k: tique(k), "whoosh": lambda i, k: whoosh(k),
         "ding": lambda i, k: ding(i > 1)}
 
