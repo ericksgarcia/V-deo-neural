@@ -31,6 +31,7 @@ CFG = {
     "cruzamento": dict(gera=300, ep=5, roteiro="cruzamento"),
     "paciente": dict(gera=120, ep=10),
     "ambulancia": dict(gera=120, ep=11, roteiro="ambulancia", pop=150, sementes="3,5,7"),
+    "sofa": dict(gera=200, ep=12, roteiro="sofa", pop=150, sementes="3,7"),
 }
 DESAFIOS = tuple(CFG)
 GERACOES = {k: v["gera"] for k, v in CFG.items()}
@@ -211,7 +212,7 @@ def main():
     else:
         import importlib
         cfg = CFG[a.desafio]
-        classe = {"foguete": "Foguete", "baliza": "Baliza", "andador": "Andador", "drone": "Drone", "corrida": "Corrida", "cruzamento": "Cruzamento", "ambulancia": "Ambulancia"}[a.desafio]
+        classe = {"foguete": "Foguete", "baliza": "Baliza", "andador": "Andador", "drone": "Drone", "corrida": "Corrida", "cruzamento": "Cruzamento", "ambulancia": "Ambulancia", "sofa": "Sofa"}[a.desafio]
         Adap = getattr(importlib.import_module(f"neuralab.adaptadores.{a.desafio}"), classe)
         sementes = [int(x) for x in (a.sementes or cfg.get("sementes", "3,5,7,11")).split(",")]
         s, hist = treino_simples(a.desafio, G, sementes)
