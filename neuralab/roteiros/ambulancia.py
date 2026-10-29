@@ -260,8 +260,8 @@ def monta(hist, A):
             "rodape": f"POP {n} · REDE {'-'.join(map(str, Desafio.camadas))} · {G} GERAÇÕES · "
                       "NADA FOI PROGRAMADO NOS CARROS: SÓ SELEÇÃO, CRUZAMENTO E MUTAÇÃO"}
     post = (f"Uma ambulância, 10 segundos e 24 carros no caminho. 🚑 Na geração 1, ela chegava a tempo em só {s0} de {n} "
-            f"avenidas, e em {pct(cb0)} delas os carros batiam uns nos outros. Depois eles descobriram a passagem… e só "
-            f"mais tarde a fazer isso sem se bater.\n"
+            f"avenidas, e em {pct(cb0)} delas os carros batiam uns nos outros. Depois eles descobriram que dava para acelerar e sair da frente… "
+            f"e só mais tarde a se desviar sem se bater.\n"
             f"Simulação real: {n} avenidas, {G} gerações. A ambulância é programada; quem aprende é o cérebro dos 24 carros, "
             f"só por seleção e mutação. Uma série em que a IA aprende sozinha.\n"
             f"Com a sirene atrás de você: ENCOSTO ou FICO NA FAIXA? Comenta 👇 e marca quem nunca dá passagem.\n\n"

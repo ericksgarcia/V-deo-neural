@@ -13,7 +13,7 @@ afirma o que o treino real mostrar. Itens "parecido com X" são variações acei
 | # | Tema | Vista | Dois lados? | Esforço | Estado | Ideia |
 |---|---|---|---|---|---|---|
 | 1 | **Paciente Zero (quarentena)** | de cima | sim | baixo | pendente | Um vírus numa cidade de IAs: elas descobrem o distanciamento sozinhas. **EM ANDAMENTO (sem história ainda):** código em `desafios/paciente.py`; ver `docs/EPISODIOS.md` (pendências). |
-| 2 | **O Dilema da Ambulância** | de cima | sim (assimétrico) | médio | pendente | Carros aprendem (ou não) a dar passagem; o "malandrinho" pega o vácuo. Parecido com a ambulância sugerida no CTA do EP05 (cruzamento). |
+| 2 | **O Dilema da Ambulância** | de cima | sim (assimétrico) | médio | **feito (EP11)** | Carros aprendem (ou não) a dar passagem; o "malandrinho" pega o vácuo. Parecido com a ambulância sugerida no CTA do EP05 (cruzamento). |
 | 3 | **Mudança de Sofá** | de cima | não (cooperativo) | médio | pendente | Duas IAs presas pelas pontas de um sofá numa quina em L; humor pastelão. |
 | 4 | **A Porta Giratória** | de cima | não | alto | pendente | 100 IAs, uma catraca: engarrafamento, fila e dança sincronizada. Parecido com A (evacuação). |
 | 5 | **Escolta VIP** | de cima | sim | baixo | pendente | Seguranças x assassinos; escudo humano e prensa na parede. Parecido com C (torre). |
