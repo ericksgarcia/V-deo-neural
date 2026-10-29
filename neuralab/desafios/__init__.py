@@ -6,6 +6,7 @@ from .cruzamento import Cruzamento
 from .drone import Drone
 from .foguete import Foguete
 from .penalti import Penalti
+from .porta import Porta
 from .sofa import Sofa
 
-DESAFIOS = {"foguete": Foguete, "baliza": Baliza, "penalti": Penalti, "andador": Andador, "drone": Drone, "corrida": Corrida, "cruzamento": Cruzamento, "ambulancia": Ambulancia, "sofa": Sofa}
+DESAFIOS = {"foguete": Foguete, "baliza": Baliza, "penalti": Penalti, "andador": Andador, "drone": Drone, "corrida": Corrida, "cruzamento": Cruzamento, "ambulancia": Ambulancia, "sofa": Sofa, "porta": Porta}
