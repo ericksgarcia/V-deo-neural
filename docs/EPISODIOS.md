@@ -25,5 +25,6 @@ labirinto, arremesso de basquete, corrida de carrinhos. (Se o dono citar outros,
 
 ## Ideias ainda não feitas
 
-Nenhuma pendente em `docs/IDEIAS.md` (todas já feitas, ver seção acima). Descartadas ao propor o EP05 mas ainda
+A fila aprovada está no fim de `docs/IDEIAS.md` (A evacuação, B rio, C torre, D meteoros, E guerra de preços dinâmica).
+As 10 ideias da tabela de cima já foram feitas (ver seção acima). Descartadas ao propor o EP05 mas ainda
 inéditas: blefe (truco), formigas (trilha e guerra), cardume contra tubarão.
