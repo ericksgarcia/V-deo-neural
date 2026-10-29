@@ -13,6 +13,7 @@ import numpy as np
 LARG, ALT = 22.0, 18.0
 A = int(os.environ.get("PAC_A", 80))                                     # agentes por cidade (1 paciente zero + 79 saudáveis)
 RAIO, CONTAGIO = 0.25, 0.8
+RAIO_CORPO = 0.35
 V_SAU, V_INF, ACEL = 3.0, float(os.environ.get("PAC_VINF", 3.3)), 12.0
 DT, PASSOS = 1 / 15, 450                   # 30 s de cidade
 R_VIZ, R_LOCAL = 8.0, 5.0
@@ -50,6 +51,7 @@ class Cidade:
         d2 = dx * dx + dy * dy
         idx = np.arange(A)
         d2[:, idx, idx] = 1e9
+        self._d2_atual = d2
         return d2
 
     def contagia(self, d2):
@@ -102,6 +104,11 @@ class Cidade:
         vel = np.sqrt((v * v).sum(-1, keepdims=True))
         v = v * np.minimum(1.0, vmax / np.maximum(vel, 1e-6))
         p = self.p + v * DT
+        # corpos sólidos: quem se sobrepõe é empurrado para fora (ninguém se empilha no mesmo ponto)
+        d = np.sqrt(self._d2_atual)
+        w = np.maximum(0.0, 2 * RAIO_CORPO - d) / np.maximum(d, 1e-3)
+        w = w.astype(np.float32)
+        p = p + 0.5 * (p * w.sum(2)[..., None] - w @ p)
         for ax, lim in ((0, LARG), (1, ALT)):
             baixo, alto = p[..., ax] < RAIO, p[..., ax] > lim - RAIO
             p[..., ax] = np.where(baixo, RAIO, np.where(alto, lim - RAIO, p[..., ax]))
