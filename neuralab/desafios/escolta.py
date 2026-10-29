@@ -9,11 +9,11 @@ import numpy as np
 VIVO, CHEGOU, MORTO = 0, 1, 2
 
 LARG, ALT = 24.0, 14.0
-VIP0, SAIDA, V_VIP = (2.5, 7.0), 22.0, 1.5
-RAIO, TOQUE = 0.4, 0.9
-V_SEG, V_ASS, ACEL = 4.2, 4.6, 14.0
-M_SEG, M_ASS = 1.6, 1.0
-DT, PASSOS = 1 / 20, 280
+VIP0, SAIDA, V_VIP = (2.5, 7.0), 22.0, 1.8
+RAIO, TOQUE = 0.4, 0.75
+V_SEG, V_ASS, ACEL = 4.6, 4.0, 14.0
+M_SEG, M_ASS = 2.5, 1.0
+DT, PASSOS = 1 / 20, 240
 NS = 3
 CAMADAS = (19, 14, 2)
 
