@@ -46,6 +46,7 @@ class Porta:
         self.s = np.stack([x, y, np.zeros_like(x), np.zeros_like(x)], -1)      # (P, N, 4): x, y, vx, vy
         self.phi = phi0
         self.w = np.zeros(n)
+        self.phi_ini = phi0.copy()
         self.passou = np.zeros((n, N), bool)
         self.t_passou = np.full((n, N), -1.0)
         self.estado = np.zeros(n, np.int8)
@@ -197,6 +198,8 @@ class Porta:
             "trava": float(self.t_trava.mean()),                 # s com 3+ IAs na porta e a porta parada
             "gira": float(self.t_empurra.mean()),                # s com a porta girando forte
             "tempo": float((self.t_fim[suc] * self.dt).mean()) if suc.any() else 0.0,
+            "horario": float(((self.phi - self.phi_ini) < -0.5).mean()),     # salas em que a porta girou no sentido horário
+            "anti": float(((self.phi - self.phi_ini) > 0.5).mean()),
             "sentido": float((np.maximum(self.giro_pos, self.giro_neg) / np.maximum(self.giro_pos + self.giro_neg, 1)).mean()),
         }
 
