@@ -181,5 +181,9 @@ class Ambulancia:
             "livre": float((self.livre.sum(1) / np.maximum(self.livre.sum(1) + self.bloqueio.sum(1), 1e-6)).mean()),
         }
 
+    def extra(self):
+        """O que o vídeo precisa gravar a cada passo: carros (x, y, bateu) e ambulância (x, y, v) -> (P, 3C+3)."""
+        return np.concatenate([self.s, self.y, self.batido, self.a_s[:, None], self.a_y[:, None], self.a_v[:, None]], 1)
+
     def chegou_mas_bateu(self):
         return int((self.bateu & (self.a_s > 0.6 * FIM)).sum())
