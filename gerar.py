@@ -27,6 +27,7 @@ CFG = {
     "corrida": dict(gera=240, ep=3, roteiro="corrida", pop=160),
     "sumo": dict(gera=186, ep=5),
     "policia": dict(gera=250, ep=5),
+    "cabo": dict(gera=150, ep=9),
 }
 DESAFIOS = tuple(CFG)
 GERACOES = {k: v["gera"] for k, v in CFG.items()}
@@ -64,6 +65,25 @@ def treino_sumo(sementes):
         else:
             print(f"treinando sumô (semente {s}, {sum(f[2] for f in FASES)} gerações em fases)…")
             hist = treina(semente=s, log=None)
+            np.savez_compressed(arq, **hist)
+        nota = nota_historia(hist)
+        print(f"  semente {s}: nota da história {nota:.1f}")
+        if melhor is None or nota > melhor[0]:
+            melhor = (nota, s, hist)
+    return melhor[1], melhor[2]
+
+
+def treino_cabo(sementes):
+    from neuralab.coevolucao_cabo import FASES, treina
+    from neuralab.roteiros.cabo import nota_historia
+    melhor = None
+    for s in sementes:
+        arq = os.path.join(".cache", f"cabo_{s}.npz")
+        if os.path.exists(arq):
+            hist = dict(np.load(arq))
+        else:
+            print(f"treinando cabo de guerra (semente {s}, {sum(f[2] for f in FASES)} gerações em fases)…")
+            hist = treina(semente=s, log=print)
             np.savez_compressed(arq, **hist)
         nota = nota_historia(hist)
         print(f"  semente {s}: nota da história {nota:.1f}")
@@ -139,6 +159,12 @@ def main():
         from neuralab.roteiros.sumo import monta
         s, hist = treino_sumo([int(x) for x in (a.sementes or "10").split(",")])
         A = Sumo(hist)
+        cenas, info, post, _ = monta(hist, A)
+    elif a.desafio == "cabo":
+        from neuralab.adaptadores.cabo import Cabo
+        from neuralab.roteiros.cabo import monta
+        s, hist = treino_cabo([int(x) for x in (a.sementes or "3").split(",")])
+        A = Cabo(hist)
         cenas, info, post, _ = monta(hist, A)
     elif a.desafio == "penalti":
         from neuralab.adaptadores.penalti import Penalti
