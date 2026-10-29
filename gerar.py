@@ -16,9 +16,9 @@ import numpy as np
 
 from neuralab.video import Video
 
-DESAFIOS = ("penalti", "foguete", "baliza")
-GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260}
-EPISODIO = {"foguete": 1, "baliza": 2, "penalti": 4}
+DESAFIOS = ("penalti", "foguete", "baliza", "drone")
+GERACOES = {"penalti": 300, "foguete": 160, "baliza": 260, "drone": 340}
+EPISODIO = {"foguete": 1, "baliza": 2, "drone": 3, "penalti": 4}
 
 
 def treino_penalti(G, sementes):
@@ -47,6 +47,8 @@ def treino_simples(nome, G, sementes):
     from neuralab.roteiros.simples import nota_historia
     if nome == "baliza":
         from neuralab.roteiros.baliza import nota_historia
+    if nome == "drone":
+        from neuralab.roteiros.drone import nota_historia
     melhor = None
     for s in sementes:
         arq = os.path.join(".cache", f"treino_{nome}_{G}_150_{s}_v2.npz")
@@ -90,12 +92,16 @@ def main():
         cenas, info, post, _ = monta(hist, A)
     else:
         from neuralab.adaptadores.baliza import Baliza
+        from neuralab.adaptadores.drone import Drone
         from neuralab.adaptadores.foguete import Foguete
-        sementes = [int(x) for x in (a.sementes or "3,5,7,11").split(",")]
+        sementes = [int(x) for x in (a.sementes or ("5,11,17" if a.desafio == "drone" else "3,5,7,11")).split(",")]
         s, hist = treino_simples(a.desafio, G, sementes)
-        A = {"foguete": Foguete, "baliza": Baliza}[a.desafio](hist)
+        A = {"foguete": Foguete, "baliza": Baliza, "drone": Drone}[a.desafio](hist)
         if a.desafio == "baliza":
             from neuralab.roteiros.baliza import monta
+            cenas, info, post, _ = monta(hist, A)
+        elif a.desafio == "drone":
+            from neuralab.roteiros.drone import monta
             cenas, info, post, _ = monta(hist, A)
         else:
             from neuralab.roteiros.simples import monta
