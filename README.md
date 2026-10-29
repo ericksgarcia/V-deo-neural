@@ -12,6 +12,8 @@ treino real  ->  roteiro tirado dos dados  ->  narração + legenda sincronizada
 
 ## Episódios prontos
 
+> Lista completa e atual em `docs/EPISODIOS.md`; próximos temas (em ordem) em `docs/IDEIAS.md`. A tabela abaixo é só um resumo dos primeiros.
+
 | comando | o que é |
 |---|---|
 | `python gerar.py penalti` | **EP 04 · Pênalti**: 100 batedores x 100 goleiros co-evoluindo. Surgem paciência, leitura de corpo e finta. |
