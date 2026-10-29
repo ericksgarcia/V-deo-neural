@@ -156,16 +156,15 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.0,
          titulo_gancho=[("TIREI O SEMÁFORO", BRANCO), ("E DEIXEI UMA IA NO COMANDO", AMARELO)],
          log=[(f"{n} CRUZAMENTOS AO MESMO TEMPO", BRANCO), ("8 CARROS · 4 RUAS · 0 SEMÁFOROS", AMARELO)],
-         fala="Tirei o semáforo. <short pause> Oito carros, quatro ruas, um cruzamento. "
-              "Quantos você acha que passam sem bater?")
+         fala="Tirei o semáforo. <short pause> Oito carros, quatro ruas. Quantos você acha que passam sem bater?")
     cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.0,
          log=[("MESMO CÉREBRO EM TODOS OS CARROS", BRANCO), ("SÓ DECIDE: ACELERAR OU FREAR", CIANO)],
-         fala="Cada carro tem um cérebro de computador, vazio. <short pause> Ele só escolhe: acelerar… ou frear.")
+         fala="Todos usam o mesmo cérebro, sem treino. <short pause> Ele só escolhe: acelerar… ou frear.")
     cena(tipo="ao_vivo", ger=0, grupo="g1b",
          log=[(f"GER 001 · {s0} DE {n} SEM BATER", VERMELHO)],
          carimbo={"texto": f"{s0} DE {n}" if s0 else "NENHUM", "cor": VERMELHO, "em": 0.5, "sub": "PASSAM SEM BATER"},
-         fala=(f"Geração um. Só {NOMES[s0] if s0 < 11 else s0} de {n} cruzamentos termina sem batida."
-               if s0 else f"Geração um. Nenhum dos {n} cruzamentos termina sem batida."))
+         fala=(f"Geração um. De {n} tentativas, só {'uma' if s0 == 1 else (NOMES[s0] if s0 < 11 else s0)} passa sem bater."
+               if s0 else f"Geração um. De {n} tentativas, nenhuma passa sem bater."))
     r0 = A.rodada(0)
     est0 = r0.reg["estado"][:, -1]
     caiu = [k for k in np.argsort(r0.morte) if r0.morte[k] >= 0 and est0[k] == 2 and r0.reg["s"][k, r0.morte[k], :, 0].max() > -2]
@@ -179,8 +178,7 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=g_sel, log=[("OS MELHORES SÃO COPIADOS", VERDE), ("OS PIORES SAEM", VERMELHO),
                                          ("CADA RODADA = 1 GERAÇÃO", BRANCO)],
          carimbo={"texto": "OS MELHORES FICAM", "cor": VERDE, "em": 0.4, "sub": "OS PIORES SAEM"},
-         fala="A regra é cruel. Os melhores cruzamentos são copiados, com pequenas mudanças. "
-              "Os piores? <short pause> Eliminados.")
+         fala="A regra é cruel. Os melhores são copiados, com pequenas mudanças. Os piores? <short pause> Eliminados.")
 
     # ---------------------------------------------------------------- DESCOBERTA 1: FREAR E ESPERAR
     rs = A.rodada(sobe)
@@ -193,14 +191,9 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "DESCOBERTA", "nome": "FREAR E ESPERAR", "cor": CIANO,
                  "stat": f"SEM BATER {s0} → {int(suc[sobe])} DE {n}"},
          log=[(f"GER {sobe + 1:03d} · {int(suc[sobe])}/{n} SEM BATER", CIANO)],
-         fala=f"Geração {sobe + 1}. Um carro percebe uma coisa. <short pause> "
-              "Se tem outro chegando, dá para frear. E esperar ele passar.")
+         fala=f"Geração {sobe + 1}. Um carro descobre que dá para frear e esperar o outro passar. <short pause> "
+              f"De {s0} para {int(suc[sobe])} de {n}. E o truque se espalha.")
     marcos.append((sobe, "FREAR", CIANO))
-    gens = sorted(set(np.linspace(sobe, meio, 4).astype(int)))
-    clipes = [(g, k) for g in gens for k in [A.busca(A.rodada(g), "primeiro")] if k is not None]
-    if len(clipes) >= 3:
-        cena(tipo="montagem", clipes=clipes[:4], log=[("OS PRÓXIMOS COPIAM O JEITO", BRANCO)],
-             fala="Os cruzamentos seguintes copiam o truque. <short pause> E o placar dispara.")
 
     # ---------------------------------------------------------------- DESCOBERTA 2: UMA RUA DE CADA VEZ
     rm = A.rodada(meio)
@@ -216,8 +209,7 @@ def monta(hist, A):
                      "stat": f"{n_ok} DE {n} SEM BATER"},
              log=[(f"GER {meio + 1:03d} · {n_ok}/{n} SEM BATER", MAGENTA)],
              fala=f"Geração {meio + 1}. Aparece um padrão. <short pause> Uma rua passa inteira. "
-                  f"Só depois, a outra. Em todos os {n_ok} que passaram. <short pause> "
-                  "Ninguém programou isso. Eles inventaram o semáforo.")
+                  "Só depois, a outra. <short pause> Ninguém programou isso. Eles inventaram o semáforo.")
         marcos.append((meio, "1 RUA", MAGENTA))
     else:
         cena(tipo="ao_vivo", ger=meio, log=[(f"GER {meio + 1:03d} · {n_ok}/{n} SEM BATER", VERDE)],
@@ -229,11 +221,10 @@ def monta(hist, A):
     # a calmaria só entra no roteiro se os dados confirmam: o placar não passa de ~10% acima do que já tinha
     if not _trava(ev, n):
         raise RuntimeError("O placar não trava entre as descobertas 2 e 3: escolha outra semente.")
-    cena(tipo="ao_vivo", ger=g_calma, log=[(f"GER {g_calma + 1:03d} · {int(suc[g_calma])}/{n}", AMARELO),
+    cena(tipo="ao_vivo", ger=g_calma, log=[(f"GER {meio + 1}→{rap + 1} · MÉDIA {int(round(ev['s'][meio]))}→{int(round(ev['s'][rap]))}/{n}", AMARELO),
                                           ("O PLACAR TRAVA", AMARELO)],
          carimbo={"texto": "O PLACAR TRAVA", "cor": AMARELO, "em": 0.4, "sub": f"GERAÇÃO {g_calma + 1}"},
-         fala=f"Aí o placar trava. <short pause> Em {rap - meio} gerações, ele sai de {int(round(ev['s'][meio]))} "
-              f"para só {int(round(ev['s'][rap]))}, em média. Será que acabou?")
+         fala=f"Aí o placar trava. <short pause> Da geração {meio + 1} à {rap + 1}, ele quase não sobe. Será que acabou?")
 
     # ---------------------------------------------------------------- DESCOBERTA 3: PARAR MENOS
     rr = A.rodada(rap)
@@ -241,12 +232,14 @@ def monta(hist, A):
     p_m, p_r = float(hist["m_parou"][meio]), float(hist["m_parou"][rap])
     t_m, t_r = float(hist["m_tempo"][meio]), float(hist["m_tempo"][rap])
     cena(tipo="replay", ger=rap, foco=kr,
+         marcas=[{"tipo": "circulo", "em": _primeira_espera(rr, kr), "alvo": "espera", "texto": "ESPERA", "rx": 100,
+                  "ry": 55, "desloca": (0, -90)}],
          cartao={"numero": 3, "rotulo": "DESCOBERTA", "nome": "PARAR MENOS", "cor": AMARELO,
                  "stat": f"CARROS PARADOS {pct(p_m)} → {pct(p_r)}"},
          log=[(f"GER {rap + 1:03d} · ESPERA {pct(p_m)} → {pct(p_r)}", AMARELO),
               (f"TEMPO {seg(t_m)} s → {seg(t_r)} s", AMARELO)],
-         fala=f"Geração {rap + 1}. Eles descobrem outra coisa: parar menos. <short pause> "
-              f"Antes, {em_dez(p_m)} carros paravam esperando. Agora, {em_dez(p_r)}.")
+         fala=f"Geração {rap + 1}. Eles aprendem a parar menos. <short pause> "
+              f"Carros esperando: de {pct(p_m)} para {pct(p_r)}.")
     marcos.append((rap, "PARA MENOS", AMARELO))
 
     # ---------------------------------------------------------------- GRÁFICO
@@ -256,25 +249,23 @@ def monta(hist, A):
                (rap, G - 1, "PARA MENOS", VERDE)],
          rotulo_y="CRUZAMENTOS SEM BATIDA POR GERAÇÃO", final=pct(float(serie[-1])),
          log=[(f"{milhar(bateram_tot)} CRUZAMENTOS COM BATIDA NO CAMINHO", VERMELHO)],
-         fala=f"Tudo isso sem aula, sem regra de trânsito. Só tentativa, erro… e {milhar(bateram_tot)} batidas.")
+         fala=f"{G} gerações. Nenhuma aula. Só tentativa, erro… e {milhar(bateram_tot)} batidas.")
 
     # ---------------------------------------------------------------- O TESTE: 1ª geração que funcionou x a última
     s_a, t_a, b_a = duelo(hist, meio)
     s_f, t_f, b_f = duelo(hist, G - 1)
     ganhou = s_f - s_a >= 0.1
     itens = [(f"GER {meio + 1}", s_a, CIANO), (f"GER {G}", s_f, VERDE)]
-    sub = "o melhor cruzamento de cada geração · 600 trânsitos novos · % sem batida"
+    sub = "600 trânsitos novos · melhor de cada geração"
     cena(tipo="barras", grupo="duelo", ger=G - 1, itens=itens, titulo="E EM TRÂNSITO NOVO?", sub=sub,
-         log=[("TESTE: 600 TRÂNSITOS NOVOS", AMARELO)], pausa=0.25,
-         fala=f"Mas será que ela aprendeu de verdade? <short pause> Peguei a geração {meio + 1} e a {G}, "
-              "e joguei as duas em seiscentos trânsitos novos.")
-    cena(tipo="barras", grupo="duelo", ger=G - 1, itens=itens, titulo="E EM TRÂNSITO NOVO?", sub=sub,
-         destaque=1, cor_destaque="verde", revela=0.0,
+         destaque=1, cor_destaque="verde", revela=4.0,
          rotulo_destaque=f"▲ +{(s_f - s_a) * 100:.0f} pts" if ganhou else "◀ MELHOR",
-         log=[(f"SEM BATER {pct(s_a)} → {pct(s_f)}", VERDE), (f"TEMPO {seg(t_a)} s → {seg(t_f)} s", AMARELO)],
-         fala=f"A geração {meio + 1} passa sem bater {pct(s_a)}. A {G}, {pct(s_f)}. <short pause> "
-              + (f"E libera o cruzamento {seg(t_a - t_f)} segundo mais rápido. " if t_a - t_f >= 0.3 else "")
-              + f"Mesmo assim, ainda bate em {pct(b_f)} dos trânsitos novos.")
+         log=[("TESTE: 600 TRÂNSITOS NOVOS", AMARELO), (f"SEM BATER {pct(s_a)} → {pct(s_f)}", VERDE),
+              (f"TEMPO {seg(t_a)} s → {seg(t_f)} s", AMARELO)],
+         fala=f"Teste: o melhor cérebro da geração {meio + 1} e o da {G}, em seiscentos trânsitos novos. <short pause> "
+              f"A {meio + 1} passa sem bater {pct(s_a)}. A {G}, {pct(s_f)}"
+              + (f", e libera o cruzamento {seg(t_a - t_f)} segundo mais rápido. " if t_a - t_f >= 0.3 else ". ")
+              + f"Ainda bate em {pct(b_f)}.")
 
     # ---------------------------------------------------------------- CHAMADA + LAÇO
     rf = A.rodada(G - 1)
@@ -283,7 +274,7 @@ def monta(hist, A):
          escolha={"pergunta": "O QUE ENTRA NO CRUZAMENTO?", "opcoes": [("AMBULÂNCIA", VERMELHO), ("PEDESTRE", CIANO)],
                   "em": 0.2},
          destaques={"ambulância": VERMELHO, "pedestre": CIANO, "votado": VERDE},
-         fala="Agora você decide. <short pause> O que atrapalha mais essa IA? Uma ambulância, ou um pedestre? "
+         fala="Ambulância ou pedestre: o que atrapalha mais essa IA? <short pause> "
               "Comenta seu lado. O mais votado vira o próximo vídeo.")
 
     info = {"marca": "VÍDEO NEURAL", "serie": serie, "serie_rotulo": "% SEM BATIDA POR GERAÇÃO",
