@@ -120,13 +120,15 @@ def monta(hist, A):
     # ---------------------------------------------------------------- PREMISSA + REGRA
     cena(tipo="ao_vivo", ger=min(3, G - 1), grupo="g1b",
          log=[("MESMO CÉREBRO EM TODAS AS IAs", BRANCO), ("QUEM FICA MAIS TEMPO VIVO VIRA PAI", VERDE)],
-         fala="Cérebro vazio, zero aula. <short pause> Quem dura mais vira pai da próxima turma.")
+         fala="Cérebro vazio, zero aula. <short pause> A lava sobe. Quem dura mais vira pai da próxima turma.")
     # ---------------------------------------------------------------- GERAÇÃO 1: a campeã falha
     r0 = A.rodada(0)
-    k0 = r0.lider
+    # a campeã da geração 1 tem que ter caído de verdade: pega a torre onde ninguém escapou e alguém subiu mais
+    sem_vivas = [k for k in range(n) if (A.torre(r0, k)[0] >= 0).all()]
+    k0 = max(sem_vivas, key=lambda k: float(r0.reg["s"][k, :, :, 1].max())) if sem_vivas else r0.lider
     cena(tipo="replay", ger=0, foco=k0, grupo="g1c",
          log=[("CAMPEÃ DA GER 001 · CAIU NA LAVA", VERMELHO)],
-         fala="A campeã da geração um. <short pause> Ai, ai, ai… virou churrasquinho.")
+         fala="A campeã da geração um. <short pause> Ai, ai… virou churrasquinho.")
     # ---------------------------------------------------------------- DESCOBERTA 1: PULAR
     a0, a1 = float(hist["m_alt"][0]), janela(hist["m_alt"], pula)
     rs = A.rodada(pula)
@@ -135,19 +137,20 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "DESCOBERTA", "nome": "PULAR", "cor": CIANO,
                  "stat": f"ALTURA MÉDIA {metros(a0)} → {metros(a1)} m"},
          log=[(f"GER {pula + 1:03d} · ALTURA {metros(a0)} → {metros(a1)} m", CIANO)],
-         fala=f"Geração {pula + 1}. A campeã descobre o pulo. <short pause> Genial, né? <long pause> "
+         fala=f"A campeã descobre o pulo. <short pause> Demorou, hein? <long pause> "
               f"A altura média vai de {metros(a0)} para {metros(a1)} metros.")
     marcos.append((pula, "PULA", CIANO))
     # ---------------------------------------------------------------- DESCOBERTA 2: PISAR NA CABEÇA
     d0, d1 = float(hist["m_subiu"][0]), janela(hist["m_subiu"], degrau)
+    quase = "quase " if d1 * 10 < round(d1 * 10) - 0.15 else ""
     rd = A.rodada(degrau)
     k2 = A.busca(rd, "primeiro")
     cena(tipo="replay", ger=degrau, foco=k2,
          cartao={"numero": 2, "rotulo": "DESCOBERTA", "nome": "A CABEÇA DO COLEGA", "cor": MAGENTA,
                  "stat": f"SOBEM PISANDO EM OUTRA {round(d0 * 10)} EM 10 → {round(d1 * 10)} EM 10"},
          log=[(f"GER {degrau + 1:03d} · SOBEM PISANDO NA CABEÇA {round(d0 * 10)} → {round(d1 * 10)} EM 10", MAGENTA)],
-         fala=f"Geração {degrau + 1}. Aí uma pisa na cabeça da outra. <short pause> Sem pedir licença. <long pause> "
-              f"De {NOMES_F[round(d0 * 10)]} para {em_dez(d1)}.")
+         fala=f"Aí uma descobre: pisar na cabeça da colega. <short pause> Sem pedir licença. <long pause> "
+              f"De {NOMES_F[round(d0 * 10)]} para {quase}{em_dez(d1)}.")
     marcos.append((degrau, "DEGRAU", MAGENTA))
     # ---------------------------------------------------------------- RE-GANCHO
     g_meio = int(np.clip((degrau + topo_g) // 2, degrau + 1, G - 1))
@@ -163,8 +166,8 @@ def monta(hist, A):
          cartao={"numero": 3, "rotulo": "DESCOBERTA", "nome": "O TOPO", "cor": VERDE,
                  "stat": f"TORRES COM ALGUÉM NO TOPO {round(t0 * 10)} EM 10 → {round(t1 * 10)} EM 10"},
          log=[(f"GER {topo_g + 1:03d} · ALGUÉM NO TOPO {round(t0 * 10)} → {round(t1 * 10)} EM 10 TORRES", VERDE)],
-         fala=f"Geração {topo_g + 1}. Dá! A campeã chega no topo. <long pause> "
-              f"Em {NOMES[round(t1 * 10)]} de cada dez torres.")
+         fala=f"Dá! A campeã chega no topo. <long pause> "
+              f"E alguém sobe em {NOMES[round(t1 * 10)]} de cada dez torres.")
     marcos.append((topo_g, "TOPO", VERDE))
     # ---------------------------------------------------------------- O TESTE: torre nova
     s_t, _ = duelo(hist, G - 1, ruido=0.25)
@@ -174,15 +177,15 @@ def monta(hist, A):
          sub="600 torres de cada · salva = 4 ou mais IAs vivas · campeã da última geração", destaque=1, cor_destaque="amarelo", revela=4.0,
          rotulo_destaque=f"▼ {(s_t - s_n) * 100:.0f} pts" if s_t - s_n >= 0.1 else "◀ SEGUROU",
          log=[("TESTE: 600 TORRES COM PLATAFORMAS NOVAS", AMARELO), (f"TORRES SALVAS {pct(s_t)} → {pct(s_n)}", AMARELO)],
-         fala=f"Teste: mudei as plataformas de lugar. <short pause> Na torre de treino, a turma se salva "
-              f"em {NOMES[round(s_t * 10)]} de cada dez. Na nova, só em {NOMES_F[round(s_n * 10)]}.")
+         fala=f"Aí fiz maldade: mudei as plataformas de lugar. <short pause> Na torre de treino, "
+              f"{NOMES[round(s_t * 10)]} em cada dez se salvam. Na nova, só {NOMES_F[round(s_n * 10)]} em cada dez.")
     # ---------------------------------------------------------------- CTA + LAÇO
     rf = A.rodada(G - 1)
     kf = A.busca(rf, "primeiro")
     cena(tipo="replay", ger=G - 1, foco=kf, grupo="fim",
-         escolha={"pergunta": "SUBIR OU DECOROU?", "opcoes": [("APRENDEU", VERDE), ("DECOROU", VERMELHO)], "em": 0.2},
-         destaques={"aprendeu": VERDE, "decorou": VERMELHO},
-         fala="A campeã aprendeu a subir ou só decorou a torre? <short pause> Porque tudo começou quando eu…")
+         escolha={"pergunta": "ESPERTA OU DECOROU?", "opcoes": [("ESPERTA", VERDE), ("DECOROU", VERMELHO)], "em": 0.2},
+         destaques={"esperta": VERDE, "decorou": VERMELHO},
+         fala="A campeã é esperta ou só tem boa memória? <short pause> Porque tudo começou quando eu…")
 
     serie = np.clip(suave(hist["m_vivas"].astype(float)) / N, 0, 1)
     info = {"marca": "VÍDEO NEURAL", "serie": serie, "serie_rotulo": "% DAS IAs QUE ESCAPAM DA LAVA",
