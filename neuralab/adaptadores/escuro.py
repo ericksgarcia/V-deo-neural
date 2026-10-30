@@ -150,7 +150,7 @@ class Escuro(Adaptador):
     def _fantasma(self, h, rod, k, i):
         est = rod.reg["estado"][k, i]
         luz = rod.reg["luz"][k, i]
-        self._feixes(h, rod, k, i, 0.10)
+        self._feixes(h, rod, k, i, 0.035)
         for c in range(E.NC):
             p = rod.reg["c"][k, i, c]
             h.circulo((float(p[0]), float(p[1])), 0.38, MAGENTA, 0.22, 1.6, 0.4)
@@ -199,7 +199,7 @@ class Escuro(Adaptador):
         h.circulo((float(c[0]), float(c[1])), r, cor, 0.8, 2.6, 0.12)
         h.texto("CAMPEÃO" if rod.lado == "cac" else "CAMPEÃ", (float(c[0]), float(c[1]) + r + 0.9), 30, cor, 1.0)
 
-    def visiveis(self, rod, maxn=36):
+    def visiveis(self, rod, maxn=14):
         chave = ("vis", maxn)
         if chave not in rod.__dict__:
             passo = max(1, int(np.ceil(rod.n / maxn)))

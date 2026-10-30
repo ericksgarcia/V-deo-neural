@@ -162,7 +162,7 @@ def monta(hist, A):
     # ------------------------------------------------------------ TESTE
     itens = [("CAMPEÃO 1", s_um, MAGENTA), (f"CAMPEÃO {gp + 1}", s_pico, MAGENTA), (f"CAMPEÃO {G}", s_fin, VERDE)]
     cena(tipo="barras", grupo="duelo", ger=G - 1, itens=itens, titulo="CAMPEÃO x FUGITIVOS FINAIS",
-         sub="600 partidas novas · fugitivos pegos", destaque=1, cor_destaque="verde", revela=4.0,
+         sub="600 partidas novas · fugitivos pegos", destaque=2, cor_destaque="verde", revela=4.0,
          rotulo_destaque="▲ MELHOR",
          log=[("TESTE: 600 PARTIDAS NOVAS", AMARELO), (f"PEGOS {pct(s_um)}% → {pct(s_pico)}% → {pct(s_fin)}%", AMARELO)],
          fala=f"Teste com partidas novas. <short pause> O campeão da geração um pegava {numero(round(100 * s_um))} em cem. "
