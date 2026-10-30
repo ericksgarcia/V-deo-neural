@@ -188,7 +188,7 @@ class Queimada(Adaptador):
             rod.__dict__[chave] = sorted(set(range(0, rod.n, passo)) | {rod.lider})
         return rod.__dict__[chave]
 
-    def _mortes(self, h, rod, k, i):
+    def _mortes(self, h, rod, k, i, t):
         v = rod.reg["vivo"][k]
         for p in range(6):
             if v[0, p] and v[i, p]:
@@ -210,12 +210,12 @@ class Queimada(Adaptador):
         i = rod.i(t)
         if modo == "replay" and foco is not None:
             self._heroi(h, rod, foco, i, t)
-            self._mortes(h, rod, foco, i)
+            self._mortes(h, rod, foco, i, t)
             return
         for k in [k for k in self.visiveis(rod) if k != rod.lider]:
             self._fantasma(h, rod, k, i, t)
         self._heroi(h, rod, rod.lider, i, t)
-        self._mortes(h, rod, rod.lider, i)
+        self._mortes(h, rod, rod.lider, i, t)
 
     def ponto(self, rod, foco, nome, t):
         raise KeyError(nome)
