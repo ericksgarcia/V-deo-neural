@@ -111,8 +111,8 @@ class Queimada(Adaptador):
         m = rod.morte.astype(float)
         eu = 0 if rod.lado == "a" else 1
         crit = {"campeao": (np.ones(rod.n, bool), fa if eu == 0 else fb),
-                "azul_acerta": (rod.time_morte == 1, -m), "azul_cai": (rod.time_morte == 0, -m),
-                "acerta": (rod.time_morte == 1 - eu, -m), "cai": (rod.time_morte == eu, -m),
+                "azul_acerta": (rod.time_morte == 1, -np.abs(m * rod.dt - 7.0)), "azul_cai": (rod.time_morte == 0, -np.abs(m * rod.dt - 7.0)),
+                "acerta": (rod.time_morte == 1 - eu, -np.abs(m * rod.dt - 7.0)), "cai": (rod.time_morte == eu, -np.abs(m * rod.dt - 7.0)),
                 "livre": (rod.morte < 0, fa if eu == 0 else fb),
                 "varre": (pl[:, 1 - eu] == 0, -j.t_fim.astype(float)),
                 "segura": (rod.morte < 0, j.segura[:, eu] / np.maximum(j.t_ult + 1, 1))}
@@ -122,13 +122,13 @@ class Queimada(Adaptador):
 
     # ------------------------------------------------------------ câmera
     def camera(self, rod, t, modo, foco):
-        geral = Camera2D(centro=(Q.LARG / 2, Q.ALT / 2), escala=70, t=t)
+        geral = Camera2D(centro=(Q.LARG / 2, Q.ALT / 2), escala=73, t=t)
         if modo != "replay" or foco is None:
             return geral
         i = rod.i(t)
         v = rod.reg["vivo"][foco, i]
         c = rod.reg["P"][foco, i][v].mean(0) if v.any() else np.array([Q.LARG / 2, Q.ALT / 2])
-        perto = Camera2D(centro=(Q.LARG / 2, float(np.clip(c[1], 5.2, 8.8))), escala=82, t=t)
+        perto = Camera2D(centro=(Q.LARG / 2, float(np.clip(c[1], 5.6, 8.4))), escala=96, t=t)
         cam = geral.mistura(perto, min((t - self._janela(rod, foco)[0]) / 0.8, 1.0))
         m = rod.morte[foco] * rod.dt
         if rod.morte[foco] >= 0 and 0 <= t - m < 0.3:
@@ -176,7 +176,7 @@ class Queimada(Adaptador):
             h.circulo((float(c[0]), float(c[1])), Q.RAIO, COR[e], 0.4, 1.6, 0.12)
             quieto = np.hypot(*(rod.reg["P"][k, i, p] - rod.reg["P"][k, max(i - 1, 0), p])) < 1e-4
             R.avatar(h, (float(c[0]), float(c[1])), float(rod.reg["ang"][k, i, p]), COR[e], t, alfa=1.0,
-                     passo=None if quieto else t * 2.4, escala=1.5, base=False)
+                     passo=None if quieto else t * 2.4, escala=2.0, base=False)
             if (e == 0) == (rod.lado == "a"):          # campeão: seta presa a CADA jogador, recalculada a cada quadro
                 h.destaque((float(c[0]), float(c[1])), AMARELO, t, raio=0.45)
         self._bolas(h, rod, k, i, t)
@@ -200,6 +200,10 @@ class Queimada(Adaptador):
             if 0 <= idade < 1.0:
                 c = rod.reg["P"][k, ti, p]
                 h.pulso((float(c[0]), float(c[1])), idade, BRANCO, 1.8, 0.8, 4)
+                h.particulas((float(c[0]), float(c[1])), idade, AMARELO, n=16, alcance=1.6, dur=0.9, semente=p + 7 * k)
+                if idade < 0.7:        # o queimado se apaga no lugar do acerto
+                    R.avatar(h, (float(c[0]), float(c[1])), float(rod.reg["ang"][k, ti, p]), (0.7, 0.75, 0.85), t,
+                             alfa=0.55 * (1 - idade / 0.7), escala=2.0, base=False)
 
     def desenha(self, h, rod, t, modo, foco):
         self.cenario(h, t)
