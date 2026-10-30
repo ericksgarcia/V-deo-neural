@@ -77,7 +77,7 @@ Portanto:
 - Chame-o sempre de **"o campeão"** (ou "a campeã", conforme o tema: o carro campeão, o drone campeão).
   Diga "o campeão da geração 47", NUNCA "o mesmo carro desde o começo".
 - Em cada replay de descoberta, use como `foco` o melhor da geração (`A.busca(rodada, "primeiro")`) e deixe a câmera
-  nele. O campeão aparece em **pelo menos 3 cenas** e a palavra "campeão"/"campeã" é dita em **pelo menos 2** falas.
+  nele (sem anel nem rótulo "CAMPEÃO" na cena: ver seção 13, item 9). O campeão aparece em **pelo menos 3 cenas** e a palavra "campeão"/"campeã" é dita em **pelo menos 2** falas.
 - Momento emocional obrigatório: **1 queda/erro do campeão** (replay lento, "Bateu." ou "Caiu.") e **1 acerto** dele.
 - No gancho ou na geração 1, mostre o campeão da geração 1 falhando (ele é o "azarão" que a gente quer ver melhorar).
 - Em temas de dois lados, haja um campeão por lado; a fala escolhe um para torcer, o outro é o rival.
@@ -269,9 +269,10 @@ precisa dar (a), (c) e (d).
 7. **Simulações novas: arena em pé.** A tela útil é ~1020x1030 px. Mundo mais alto que largo (ou quadrado) e câmera de
    replay perto (agente ≥ 60 px na tela). Arena deitada desperdiça metade da cena.
 8. Termine em ação (replay do campeão), nunca em tela de dados: o último quadro funde no primeiro (laço).
-9. **Sem círculos e marcações na cena** (decisão do dono, out/2026): o telestrador (`marcas`: círculos, setas, rótulos tipo
-   "PEGO!") foi desligado no motor porque nem sempre caía no lugar/instante certo; não use `marcas`. Também não desenhe
-   anel ou rótulo "CAMPEÃO" no centro de uma equipe (cai no vazio quando ela se espalha). Para o espectador seguir o campeão,
-   use a câmera do replay nele e a fala/cartão; se precisar destacar, destaque o PRÓPRIO corpo do agente (cor/brilho), nunca
-   uma marca solta.
+9. **Nenhum círculo/marcação na cena, em nenhum vídeo** (decisão do dono, out/2026): o telestrador (`marcas`: círculos,
+   setas, rótulos tipo "PEGO!") foi desligado no motor porque nem sempre caía no lugar/instante certo; não use `marcas`.
+   Nos adaptadores, NÃO desenhe anel nem rótulo "CAMPEÃO" (nem em volta de um agente, nem no centro de uma equipe) e nem anéis
+   pulsando em loop para apontar alguém. O campeão aparece pela câmera do replay, pela fala e pelo cartão; no máximo um brilho
+   (`h.ponto_luz`) no próprio corpo. Círculos que SÃO o mundo (corpo, arena, cofre) e o flash curto de um evento no ponto exato
+   (`h.pulso` de batida/chegada) continuam.
 

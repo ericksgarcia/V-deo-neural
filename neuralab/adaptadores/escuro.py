@@ -180,8 +180,6 @@ class Escuro(Adaptador):
             acesa = bool(luz[f])
             R.avatar(h, (float(p[0]), float(p[1])), ang, BRANCO if acesa else CIANO, t,
                      alfa=1.0 if acesa else 0.32, passo=t * 2.4 if np.hypot(*vel) > 1e-4 else None, escala=1.5, base=False)
-            if acesa:
-                h.pulso((float(p[0]), float(p[1])), (t * 2.0) % 0.6, AMARELO, 1.2, 0.6, 2)
 
     def visiveis(self, rod, maxn=14):
         chave = ("vis", maxn)

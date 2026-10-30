@@ -76,6 +76,10 @@ integre ao tronco do mesmo jeito. Os prefixos `epNN` dos arquivos podem repetir;
   descoberta por vez; o gancho é pergunta/tensão. O número final só perto do fim (ex.: teste em situação nova).
 
 - Tudo **2D**, estilo **neon/holograma**, HUD tecnológico; nada de 3D.
+- **Nenhum círculo/marcação na cena, em nenhum vídeo** (decidido em out/2026): sem telestrador (`marcas`: círculos, setas,
+  rótulos tipo "PEGO!"; o motor já ignora), sem anel nem rótulo "CAMPEÃO" em volta de agente ou equipe, sem anéis pulsando
+  em loop para apontar alguém. O campeão é mostrado pela câmera do replay, pela fala e pelo cartão (no máximo um brilho no
+  próprio corpo). Ficam só círculos que SÃO o mundo (corpo do agente, arena, cofre) e o flash curto de um evento no ponto exato.
 - Honestidade: todo número falado vem do treino real (checagens em `roteiros/`). Nada inventado.
 - Narração: **Gemini TTS 3.8** (`gemini-3.8-flash-tts`), **UMA requisição por vídeo**. Limite de 10
   requisições por voz a cada 24 h (ledger em `.cache/tts/uso.json`). Ajuste de ritmo/pausas é local

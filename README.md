@@ -96,11 +96,11 @@ ferramentas/ver_video.py   "assiste" qualquer vídeo: quadros, mosaico, cortes, 
 3. **Roteiro** em `neuralab/roteiros/`: uma lista de cenas (dicionários).
    ```python
    dict(tipo="replay", ger=126, foco=1, fala="O corpo mostra um canto. A bola vai no outro.",
-        marcas=[{"tipo": "circulo", "em": 1.2, "alvo": "goleiro", "texto": "CAIU!"}],
         cartao={"numero": 4, "rotulo": "BATEDOR", "nome": "A FINTA", "stat": "FINTAS QUE VIRAM GOL 89%", "cor": AMARELO})
    ```
    Tipos: `ao_vivo` (geração inteira), `replay` (um lance em câmera lenta), `grafico`, `barras`, `final`.
    O motor ajusta durações pela voz, a velocidade da simulação e a câmera lenta automaticamente.
+   **Sem círculos/marcações na cena** (telestrador desligado; nada de anel "CAMPEÃO"): ver `CLAUDE.md`.
 4. Registre em `gerar.py`.
 
 ## Analistas (Claude Code)

@@ -146,11 +146,9 @@ class Paciente(Adaptador):
         if t < 5.0 or modo == "replay":
             h.texto("PACIENTE ZERO", (z[0], z[1] + 1.35), 17, VERMELHO, 0.95 if t < 4.0 else max(0.0, 5.0 - t))
         if modo == "replay" and foco is not None and foco != 0:
-            f = (float(p[foco, 0]), float(p[foco, 1]))
             tr = rod.p[max(0, i - 30): i + 1: 2, foco]
             if len(tr) > 1:
                 h.rastro([tuple(q) for q in tr], TOXICO if inf[foco] else CIANO, 3, 0.8)
-            h.circulo(f, 0.55, TOXICO if inf[foco] else BRANCO, 0.9, 2.2, 0.0)
 
     def ponto(self, rod, foco, nome, t):
         i = rod.i(t)

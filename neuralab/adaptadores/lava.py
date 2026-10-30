@@ -118,12 +118,9 @@ class Lava(AdaptadorPopulacao):
             sob = int(rod.reg["extra"][k, i, 1 + c])
             if sob >= 0:
                 h.ponto_luz((float(s[c, 0]), float(s[c, 1])), 22, MAGENTA, 0.9)
-                h.pulso((float(s[c, 0]), float(s[c, 1])), (t * 2) % 1.0, MAGENTA, 0.7, 1.0, 3)
         hx, hy = float(s[quem, 0]), float(s[quem, 1])
         if not (0 <= morte[quem] <= i):
-            h.circulo((hx, hy + H_AG * VIS / 2), 0.85 + 0.06 * math.sin(t * 6), AMARELO, 0.7, 2.0, 0.0)
-            h.ponto_luz((hx, hy + H_AG * VIS / 2), 30, AMARELO, 0.5)
-            h.texto("CAMPEÃ", (hx, hy + 1.75), 26, AMARELO, 1.0)
+            h.ponto_luz((hx, hy + H_AG * VIS / 2), 30, AMARELO, 0.5)   # brilho no corpo; sem anel/rótulo (regra do dono)
         vivas = int(sum(1 for c in range(N) if not (0 <= morte[c] <= i)))
         h.texto(f"{vivas}/{N}", (LARG - 1.1, 9.6), 28, VERDE if vivas >= MIN_VIVAS else VERMELHO, 0.95)
         if rod.reg["estado"][k, i] == SUCESSO:

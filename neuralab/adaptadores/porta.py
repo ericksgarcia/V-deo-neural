@@ -108,9 +108,7 @@ class Porta(AdaptadorPopulacao):
                     h.linha([(float(x), float(y)), (float(x + vx * 0.25), float(y + vy * 0.25))], cor, 2, 0.6, halo=False)
         hx, hy = float(s[hero, 0]), float(s[hero, 1])
         if s[hero, 0] <= X_PASSOU:
-            h.circulo((hx, hy), R_AG * (2.2 + 0.3 * math.sin(t * 6)), AMARELO, 0.75, 2.2, 0.0)
-            h.ponto_luz((hx, hy), 26, AMARELO, 0.6)
-        h.texto("CAMPEÃO", (hx, hy + 1.25), 28, AMARELO, 1.0)
+            h.ponto_luz((hx, hy), 26, AMARELO, 0.6)   # brilho no corpo; sem anel/rótulo (regra do dono)
         passou = int((s[:, 0] > X_PASSOU).sum())
         if rod.reg["estado"][k, i] == SUCESSO:
             idade = max((i - rod.morte[k]) * rod.dt, 0.0)
