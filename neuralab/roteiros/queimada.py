@@ -134,39 +134,30 @@ def monta(hist, A):
     k0 = A.busca(r0, "livre") or A.busca(r0, "campeao")
     cena(tipo="replay", ger=C, foco=k0, grupo="g1c", log=[("CAMPEÃO AZUL DA GER 001 · NINGUÉM QUEIMADO", AMARELO)],
          fala="O campeão azul da geração 1. <short pause> Não queimou ninguém. <short pause> Nem sem querer.")
-    # ------------------------------------------------------------ DESCOBERTA 1: o corre-corre
-    r1 = A.rodada(C + g1)
-    k1 = A.busca(r1, "acerta") or A.busca(r1, "campeao")
-    cena(tipo="replay", ger=C + g1, foco=k1,
-         cartao={"numero": 1, "rotulo": "OS DOIS TIMES", "nome": "O CORRE-CORRE", "cor": AZUL,
-                 "stat": f"VELOCIDADE {dec(m0['vel'])} → {dec(m1['vel'])} m/s"},
-         log=[(f"GER {g1 + 1:03d} · VELOCIDADE {dec(m0['vel'])} → {dec(m1['vel'])} m/s", AZUL)],
-         fala=f"Geração {g1 + 1}. Todos correm mais. <long pause> Quase o dobro. <short pause> Correr não queima ninguém.")
-    marcos.append((g1, "1", AZUL))
     # ------------------------------------------------------------ DESCOBERTA 2: a mira
     r2 = A.rodada(C + g2)
-    k2 = A.busca(r2, "acerta", excluir=(k1,) if g2 == g1 else ()) or A.busca(r2, "campeao")
+    k2 = A.busca(r2, "acerta") or A.busca(r2, "campeao")
     cena(tipo="replay", ger=C + g2, foco=k2,
-         cartao={"numero": 2, "rotulo": "VERMELHOS", "nome": "A MIRA", "cor": VERMELHO,
+         cartao={"numero": 1, "rotulo": "VERMELHOS", "nome": "A MIRA", "cor": VERMELHO,
                  "stat": f"ARREMESSOS NO ALVO {pct(m0['mira_b'])}% → {pct(m2['mira_b'])}%"},
          log=[(f"GER {g2 + 1:03d} · MIRA VERMELHA {pct(m0['mira_b'])}% → {pct(m2['mira_b'])}%", VERMELHO)],
          fala=f"Geração {g2 + 1}. Os vermelhos aprendem a mirar. <short pause> De {pct(m0['mira_b'])} para {pct(m2['mira_b'])} em 100 arremessos, direto num adversário.")
-    marcos.append((g2, "2", VERMELHO))
+    marcos.append((g2, "1", VERMELHO))
     # ------------------------------------------------------------ RE-GANCHO
     cena(tipo="ao_vivo", ger=g2,
-         log=[(f"GER {g2 + 1:03d} · OS VERMELHOS MIRAM. E OS AZUIS?", AZUL)],
+         log=[(f"GER {g2 + 1:03d} · OS VERMELHOS MIRAM. E OS AZUIS?", AZUL), (f"AZUIS CORREM {dec(m0['vel'])} → {dec(m1['vel'])} m/s", AMARELO)],
          carimbo={"texto": "E OS AZUIS?", "cor": AZUL, "em": 0.4, "sub": f"GERAÇÃO {g2 + 1}"},
-         fala="Só que o azul quase não aprendeu a mirar. <short pause> Alguém vai se queimar? <long pause>")
+         fala="Só que o azul quase não aprendeu a mirar. Só correu mais. <short pause> Alguém vai se queimar? <long pause>")
     # ------------------------------------------------------------ DESCOBERTA 3: o bombardeio
     r3 = A.rodada(C + g3)
     k3 = A.busca(r3, "azul_acerta") or A.busca(r3, "acerta") or A.busca(r3, "campeao")
     cena(tipo="replay", ger=C + g3, foco=k3,
-         cartao={"numero": 3, "rotulo": "OS DOIS TIMES", "nome": "O JOGO ESQUENTA", "cor": AMARELO,
+         cartao={"numero": 2, "rotulo": "OS DOIS TIMES", "nome": "O JOGO ESQUENTA", "cor": AMARELO,
                  "stat": f"JOGOS SEM NINGUÉM QUEIMADO {pct(m0['nenhum'])}% → {pct(m3['nenhum'])}%"},
          log=[(f"GER {g3 + 1:03d} · SEM QUEIMADO {pct(m0['nenhum'])}% → {pct(m3['nenhum'])}%", AMARELO)],
          fala=f"Geração {g3 + 1}. Jogos sem ninguém queimado. <long pause> De {pct(m0['nenhum'])} para {pct(m3['nenhum'])} em 100. "
               "<short pause> Agora a bola trabalha.")
-    marcos.append((g3, "3", AMARELO))
+    marcos.append((g3, "2", AMARELO))
     # ------------------------------------------------------------ TESTE (o CHUTE fecha a fala; a resposta abre a cena seguinte)
     itens = [("CAMPEÃO 1", v_um, AZUL), (f"CAMPEÃO {g2 + 1}", v_pico, AZUL), (f"CAMPEÃO {G}", v_fin, VERDE)]
     duelo_kw = dict(tipo="barras", grupo="duelo", ger=G - 1, itens=itens, titulo="CAMPEÃO AZUL x VERMELHOS FINAIS",
@@ -175,7 +166,7 @@ def monta(hist, A):
     cena(teste=True, **duelo_kw,
          fala=f"Contra os vermelhos finais. <short pause> O campeão da geração 1 vence {pct(v_um)} em 100. "
               "Chuta aí: e o final? <long pause>")
-    cena(**dict(duelo_kw, sub=f"600 jogos novos · vitórias do azul · o final perde {pct(d_fin)}"), fala=f"{pct(v_fin)} em 100. <short pause> Quase sem mirar.")
+    cena(**dict(duelo_kw, sub=f"600 jogos novos · vitórias do azul · o final perde {pct(d_fin)}"), fala=f"{pct(v_fin)} em 100. <short pause> Quase sem mirar. Juro, eu ri sozinho.")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
     kf = A.busca(rf, "acerta") or A.busca(rf, "campeao")
