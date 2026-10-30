@@ -82,8 +82,8 @@ def monta(hist, A):
     esc = lambda g: int(round(100 * hist["m_escudo"][g]))
     cola = lambda g: int(round(float(hist["m_cola"][g])))
     g_ref = (g2 + g3) // 2
-    s_ref, s_fin = duelo(hist, g_ref, G - 1), duelo(hist, G - 1, G - 1)
-    if s_fin - s_ref < 0.2:
+    s_um, s_ref, s_fin = duelo(hist, 0, G - 1), duelo(hist, g_ref, G - 1), duelo(hist, G - 1, G - 1)
+    if s_ref >= s_um or s_fin - s_ref < 0.2:
         raise RuntimeError("O campeão final não supera o do meio do treino em partidas novas: troque a semente.")
     C = G                                    # ger >= G pede a rodada do campeão (ver Escolta.rodada)
     cenas, marcos = [], []
@@ -114,24 +114,24 @@ def monta(hist, A):
     k0 = A.busca(r0, "morto")
     cena(tipo="replay", ger=C, foco=k0, grupo="g1c", marcas=marca(r0, k0, "assassino", "TOCOU!"),
          log=[("CAMPEÃO DA GER 001 · VIP MORTO", VERMELHO)],
-         fala="O campeão da geração um. <short pause> Falhou.")
+         fala="O campeão da geração um. <short pause> Dessa vez, falhou.")
     # ------------------------------------------------------------ DESCOBERTA 1: assassinos vão direto
     r1 = A.rodada(C + g1)
     k1 = A.busca(r1, "morto")
-    cena(tipo="replay", ger=C + g1, foco=k1, marcas=marca(r1, k1, "assassino", "DIRETO!"),
-         cartao={"numero": 1, "rotulo": "ASSASSINOS", "nome": "VÃO DIRETO", "cor": MAGENTA,
+    cena(tipo="replay", ger=C + g1, foco=k1, marcas=marca(r1, k1, "assassino", "TOCOU!"),
+         cartao={"numero": 1, "rotulo": "ASSASSINOS", "nome": "CHEGAM NO VIP", "cor": MAGENTA,
                  "stat": f"VIPs MORTOS {morte(0)} → {morte(g1)} DE {n}"},
          log=[(f"GER {g1 + 1:03d} · VIPs MORTOS {morte(g1)}/{n}", MAGENTA)],
-         fala=f"Geração {g1 + 1}. Os assassinos vão direto ao VIP. <long pause> De {numero(morte(0))} para {numero(morte(g1))}.")
+         fala=f"Os assassinos aprendem a chegar no VIP. <long pause> De {numero(morte(0))} para {numero(morte(g1))}.")
     marcos.append((g1, "1", MAGENTA))
     # ------------------------------------------------------------ DESCOBERTA 2: seguranças colam
     r2 = A.rodada(C + g2)
     k2 = A.busca(r2, "morto_tarde")
-    cena(tipo="replay", ger=C + g2, foco=k2, marcas=marca(r2, k2, "seguranca", "COLADO", quando=0.8),
-         cartao={"numero": 2, "rotulo": "SEGURANÇAS", "nome": "COLAM NO VIP", "cor": CIANO,
+    cena(tipo="replay", ger=C + g2, foco=k2, marcas=marca(r2, k2, "seguranca", "PERTO", quando=0.8),
+         cartao={"numero": 2, "rotulo": "SEGURANÇAS", "nome": "FICAM PERTO", "cor": CIANO,
                  "stat": f"DISTÂNCIA AO VIP {cola(0)} m → {cola(g2)} m"},
          log=[(f"GER {g2 + 1:03d} · DISTÂNCIA {cola(0)} m → {cola(g2)} m", CIANO)],
-         fala=f"Aí os seguranças aprendem. Colam no VIP. <long pause> De {numero(cola(0))} metros para {numero(cola(g2))}.")
+         fala=f"Aí os seguranças reagem. Chegam perto do VIP. <long pause> De {numero(cola(0))} metros para {numero(cola(g2))}.")
     marcos.append((g2, "2", CIANO))
     # ------------------------------------------------------------ RE-GANCHO: o placar trava
     g_calma = (g2 + g3) // 2
@@ -146,24 +146,24 @@ def monta(hist, A):
          cartao={"numero": 3, "rotulo": "SEGURANÇAS", "nome": "ESCUDO HUMANO", "cor": VERDE,
                  "stat": f"SEGURANÇA NO CAMINHO {esc(0)}% → {esc(g3)}%"},
          log=[(f"GER {g3 + 1:03d} · ESCUDO {esc(0)}% → {esc(g3)}%", VERDE)],
-         fala=f"Geração {g3 + 1}. Aparece o escudo humano. <short pause> O campeão fica no caminho do assassino. "
-              f"<long pause> De {numero(esc(0))} para {numero(esc(g3))} por cento.")
+         fala=f"Escudo humano: <short pause> alguém entra na frente do assassino. "
+              f"<long pause> De {numero(esc(0))} para {numero(esc(g3))} por cento dos perigos.")
     marcos.append((g3, "3", VERDE))
     # ------------------------------------------------------------ TESTE
-    itens = [(f"CAMPEÃO {g_ref + 1}", s_ref, CIANO), (f"CAMPEÃO {G}", s_fin, VERDE)]
+    itens = [("CAMPEÃO 1", s_um, CIANO), (f"CAMPEÃO {g_ref + 1}", s_ref, CIANO), (f"CAMPEÃO {G}", s_fin, VERDE)]
     cena(tipo="barras", grupo="duelo", ger=G - 1, itens=itens, titulo="VIP SALVO CONTRA OS ASSASSINOS FINAIS",
-         sub="600 partidas novas · campeão de cada geração", destaque=1, cor_destaque="verde", revela=4.0,
+         sub="600 partidas novas · campeão de cada geração", destaque=2, cor_destaque="verde", revela=4.0,
          rotulo_destaque="▲ MELHOR",
-         log=[("TESTE: 600 PARTIDAS NOVAS", AMARELO), (f"VIP SALVO {pct(s_ref)}% → {pct(s_fin)}%", AMARELO)],
-         fala=f"Partidas novas, contra os assassinos finais. <short pause> O campeão da {g_ref + 1} salvava {numero(round(100 * s_ref))} em cem. "
-              f"O da {numero(G)}… {numero(round(100 * s_fin))}.")
+         log=[("TESTE: 600 PARTIDAS NOVAS", AMARELO), (f"VIP SALVO {pct(s_um)}% → {pct(s_ref)}% → {pct(s_fin)}%", AMARELO)],
+         fala=f"Partidas novas. <short pause> O campeão da geração um salvava {numero(round(100 * s_um))} em cem. "
+              f"O da {numero(g_ref + 1)}, só {numero(round(100 * s_ref))}. O da {numero(G)}… {numero(round(100 * s_fin))}.")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
     kf = A.busca(rf, "salvo")
     cena(tipo="replay", ger=C + G - 1, foco=kf, grupo="fim",
-         escolha={"pergunta": "VIP SÓ ANDA RETO", "opcoes": [("PROTEGEU", VERDE), ("TRAPACEOU", VERMELHO)], "em": 0.2},
-         destaques={"protegeu": VERDE, "trapaceou": VERMELHO, "reto": AMARELO},
-         fala="Se o VIP só anda reto, o campeão protegeu de verdade… ou trapaceou? <short pause> Porque tudo começou quando eu…")
+         escolha={"pergunta": f"O CAMPEÃO DA {g_ref + 1} PIOROU?", "opcoes": [("PIOROU", VERMELHO), ("SE ESPECIALIZOU", VERDE)], "em": 0.2},
+         destaques={"piorou": VERMELHO, "especializou": VERDE, "campeão": AMARELO},
+         fala=f"O campeão da {numero(g_ref + 1)} piorou ou só se especializou? <short pause> Porque tudo começou quando eu…")
 
     info = {"marca": "VÍDEO NEURAL", "serie": suave(1 - hist["m_vip_vivo"], 5), "serie_rotulo": "% VIPs MORTOS",
             "estilo_voz": ESTILO_VOZ, "marcos": marcos, "rotulo_vivo": f"{n} PARTIDAS",
