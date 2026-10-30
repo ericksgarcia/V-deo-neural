@@ -8,6 +8,13 @@ anunciado). Agora é **um amigo curioso assistindo ao experimento junto com voc�
 - Fala em primeira pessoa quando ajuda: "Eu comecei com 150 carros." "Eu mudei a largada."
 - Reage como gente: "Bateu. De novo." "Chuta aí: quantos bateram?" Humor seco nas falhas, emoção contida nos acertos.
 
+## Humor e humanização (decidido pelo dono em 30/out/2026)
+- Fale como gente contando um "causo" para um amigo: gírias leves ("gente", "aí", "olha só", "não é possível"), zoar as IAs com
+  carinho (como bichinhos desastrados), comentar a própria reação ("eu ri sozinho", "juro que eu não esperava").
+- Pelo menos 3 momentos de humor no vídeo (uma piada de falha, um comentário de bastidor, uma comparação do dia a dia).
+- Sem exagero: a piada nunca esconde o número nem a regra do jogo. Os limites do guia v2 (palavras, números, duração) continuam.
+- A voz padrão é **Achird** (`--voz` só se o dono pedir outra).
+
 ## Regras do texto
 1. **Frases curtas** (até ~9 palavras), uma ideia por frase. Contraste em vez de adjetivo.
 2. **Um número por frase, no fim dela**, depois de uma pausa (`<long pause>`): o número aterrissa sozinho. No vídeo
