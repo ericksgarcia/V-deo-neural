@@ -141,7 +141,7 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "OS DOIS TIMES", "nome": "O CORRE-CORRE", "cor": AZUL,
                  "stat": f"VELOCIDADE {dec(m0['vel'])} → {dec(m1['vel'])} m/s"},
          log=[(f"GER {g1 + 1:03d} · VELOCIDADE {dec(m0['vel'])} → {dec(m1['vel'])} m/s", AZUL)],
-         fala=f"Geração {g1 + 1}. Todos correm mais. <long pause> Quase o dobro da velocidade.")
+         fala=f"Geração {g1 + 1}. Todos correm mais. <long pause> Quase o dobro. <short pause> Mas correr não queima ninguém.")
     marcos.append((g1, "1", AZUL))
     # ------------------------------------------------------------ DESCOBERTA 2: a mira
     r2 = A.rodada(C + g2)
@@ -150,13 +150,13 @@ def monta(hist, A):
          cartao={"numero": 2, "rotulo": "VERMELHOS", "nome": "A MIRA", "cor": VERMELHO,
                  "stat": f"ARREMESSOS NO ALVO {pct(m0['mira_b'])}% → {pct(m2['mira_b'])}%"},
          log=[(f"GER {g2 + 1:03d} · MIRA VERMELHA {pct(m0['mira_b'])}% → {pct(m2['mira_b'])}%", VERMELHO)],
-         fala=f"Geração {g2 + 1}. Os vermelhos aprendem a mirar. <short pause> De {pct(m0['mira_b'])} para {pct(m2['mira_b'])} em 100 arremessos.")
+         fala=f"Geração {g2 + 1}. Os vermelhos aprendem a mirar. <short pause> De {pct(m0['mira_b'])} para {pct(m2['mira_b'])} em 100 arremessos mirados num adversário.")
     marcos.append((g2, "2", VERMELHO))
     # ------------------------------------------------------------ RE-GANCHO
     cena(tipo="ao_vivo", ger=g2,
          log=[(f"GER {g2 + 1:03d} · OS VERMELHOS MIRAM. E OS AZUIS?", AZUL)],
          carimbo={"texto": "E OS AZUIS?", "cor": AZUL, "em": 0.4, "sub": f"GERAÇÃO {g2 + 1}"},
-         fala="Só que o campeão azul ainda joga a bola pra qualquer lado. <short pause> Dá pra vencer assim? <long pause>")
+         fala="Só que o campeão azul quase não aprendeu a mirar. <short pause> Alguém vai se queimar? <long pause>")
     # ------------------------------------------------------------ DESCOBERTA 3: o bombardeio
     r3 = A.rodada(C + g3)
     k3 = A.busca(r3, "azul_acerta") or A.busca(r3, "acerta") or A.busca(r3, "campeao")
@@ -170,12 +170,12 @@ def monta(hist, A):
     # ------------------------------------------------------------ TESTE (o CHUTE fecha a fala; a resposta abre a cena seguinte)
     itens = [("CAMPEÃO 1", v_um, AZUL), (f"CAMPEÃO {g2 + 1}", v_pico, AZUL), (f"CAMPEÃO {G}", v_fin, VERDE)]
     duelo_kw = dict(tipo="barras", grupo="duelo", ger=G - 1, itens=itens, titulo="CAMPEÃO AZUL x VERMELHOS FINAIS",
-                    sub=f"600 jogos novos · vitórias do azul · o campeão final também perde {pct(d_fin)}", destaque=2, cor_destaque="verde", rotulo_destaque="▲ MELHOR",
+                    sub="600 jogos novos · vitórias do azul", destaque=2, cor_destaque="verde", rotulo_destaque="▲ MELHOR",
                     log=[("TESTE: 600 JOGOS NOVOS", AMARELO), (f"VITÓRIAS {pct(v_um)}% → {pct(v_pico)}% → {pct(v_fin)}%", AMARELO)])
     cena(teste=True, **duelo_kw,
          fala=f"Jogos novos. <short pause> O campeão da geração 1 vence {pct(v_um)} em 100. "
               "Chuta aí: e o campeão final? <long pause>")
-    cena(**duelo_kw, fala=f"{pct(v_fin)} em 100. <short pause> Quase sem mirar.")
+    cena(**dict(duelo_kw, sub=f"600 jogos novos · vitórias do azul · o campeão final também perde {pct(d_fin)}"), fala=f"{pct(v_fin)} em 100. <short pause> Quase sem mirar.")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
     kf = A.busca(rf, "acerta") or A.busca(rf, "campeao")
@@ -193,6 +193,6 @@ def monta(hist, A):
             f"IA aprendendo sozinha por seleção natural (rede neural + algoritmo genético). Simulação real: {n} partidas por geração, {G} gerações, "
             "números medidos no treino.\n"
             "Manda pra quem sempre foi o último escolhido na queimada 👇\n\n"
-            "#inteligenciaartificial #ia #redeneural #simulacao #queimada")
+            "#inteligenciaartificial #aprendizadodemaquina #redeneural #algoritmogenetico #queimada")
     ev["duelo"] = {"um": (v_um, d_um), "pico": (g2, v_pico, d_pico), "fin": (G - 1, v_fin, d_fin), "med": (m0, m1, m2, m3)}
     return cenas, info, post, ev
