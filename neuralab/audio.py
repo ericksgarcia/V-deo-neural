@@ -66,12 +66,19 @@ def por_extenso(n):
     return pre + (" e " if r < 100 or r % 100 == 0 else " ") + por_extenso(r)
 
 
+def _decimal(m):
+    i, d = m.group(1), m.group(2)
+    dec = " ".join(por_extenso(int(x)) for x in d) if d.startswith("0") else por_extenso(int(d))
+    return f"{por_extenso(int(i))} vírgula {dec}"
+
+
 def falavel(texto, tags=False):
     """Texto como a voz deve dizer: números por extenso, siglas expandidas. As tags de evento (<short pause>...)
     são removidas, exceto quando `tags=True` (roteiro enviado ao TTS)."""
     if not tags:
         texto = re.sub(r"<[^>]+>", " ", texto)
     texto = re.sub(r"\bIA\b", "inteligência artificial", texto)
+    texto = re.sub(r"(\d+),(\d+)", _decimal, texto)   # 1,8 -> "um vírgula oito"
     texto = re.sub(r"\d{1,3}(?:\.\d{3})+|\d+", lambda m: por_extenso(int(m.group().replace(".", ""))), texto)
     return texto.replace("%", " por cento")
 
@@ -350,7 +357,8 @@ def _nota(f, dur, forma="serra"):
 
 
 def trilha(dur, bpm=124, semente=0):
-    """Arpejo eletrônico em lá menor com baixo, bumbo e chimbal."""
+    """Arpejo eletrônico em lá menor com baixo, bumbo e chimbal. Vai abrindo (filtro e volume) do começo ao fim:
+    a energia sobe junto com a história."""
     n = int(dur * SR)
     out = np.zeros(n + SR, np.float32)
     batida = 60 / bpm
@@ -386,8 +394,31 @@ def trilha(dur, bpm=124, semente=0):
         s = sum(_nota(hz(f), batida * 4, "seno") for f in acordes[c % 4][:3]) * 0.03
         fade = np.minimum(1, np.minimum(np.arange(m), m - np.arange(m)) / (0.3 * SR))
         pad[i:i + m] += (s * fade)[: len(pad) - i]
-    out = _lp(out, 6000) + pad
+    w = np.linspace(0.0, 1.0, len(out)).astype(np.float32)
+    out = (_lp(out, 2200) * (1 - w) + _lp(out, 7000) * w) * (0.8 + 0.2 * w) + pad
     return out[:n]
+
+
+def riser(dur=0.6, semente=0):
+    """Subida de suspense que preenche o silêncio antes de uma revelação (ruído que abre + tom que sobe)."""
+    dur = float(min(max(dur, 0.25), 2.0))
+    m = int(dur * SR)
+    tt = np.arange(m) / SR
+    u = tt / dur
+    r = np.random.default_rng(semente).normal(0, 1, m).astype(np.float32)
+    ruido = (_lp(r, 900) * (1 - u) + _lp(r, 5000) * u) * 0.25
+    tom = np.sin(2 * np.pi * (220 * tt + 330 * tt * u)) * 0.35
+    return ((ruido + tom) * u ** 2).astype(np.float32)
+
+
+def impacto(intensidade=1.0, semente=0):
+    """Batida grave curta no instante da revelação."""
+    m = int(0.6 * SR)
+    tt = np.arange(m) / SR
+    sub = np.sin(2 * np.pi * (40 + 70 * np.exp(-tt * 25)) * tt) * np.exp(-tt * 7)
+    r = np.random.default_rng(semente).normal(0, 1, m)
+    ar = _lp(r, 3000) * np.exp(-tt * 30) * 0.3
+    return ((sub + ar) * intensidade).astype(np.float32)
 
 
 def boom(intensidade=1.0, semente=0):
@@ -510,7 +541,7 @@ def torcida(dur, semente=0):
 
 SONS = {"boom": boom, "raio": raio, "batida": batida, "chute": chute, "rede": rede, "defesa": defesa, "fora": fora,
         "glitch": lambda i, k: glitch(k), "tique": lambda i, k: tique(k), "whoosh": lambda i, k: whoosh(k),
-        "ding": lambda i, k: ding(i > 1)}
+        "ding": lambda i, k: ding(i > 1), "riser": lambda i, k: riser(i, k), "impacto": impacto}
 
 
 # Regra do canal: efeitos NUNCA competem com a voz. Cada efeito é limitado a este pico (≈ -14 dBFS)
@@ -518,8 +549,9 @@ SONS = {"boom": boom, "raio": raio, "batida": batida, "chute": chute, "rede": re
 SFX_PICO = 0.2
 
 
-def mixa(dur, falas, eventos, semente=0, ambiente=None, musica=0.55):
-    """falas: [(t, audio)], eventos: [(t, tipo, intensidade)] -> estéreo float32."""
+def mixa(dur, falas, eventos, semente=0, ambiente=None, musica=0.55, silencios=()):
+    """falas: [(t, audio)], eventos: [(t, tipo, intensidade)] -> estéreo float32.
+    silencios: [(t0, t1)] trechos de suspense em que a música quase some (volta com a revelação em t1)."""
     n = int(dur * SR)
     voz = np.zeros(n + SR * 3, np.float32)
     for t, a in falas:
@@ -536,6 +568,13 @@ def mixa(dur, falas, eventos, semente=0, ambiente=None, musica=0.55):
         sfx[i:i + len(s)] += s[: len(sfx) - i]
     mus = np.zeros_like(voz)
     mus[:n] = trilha(dur, semente=semente)
+    corte = np.ones(len(mus), np.float32)
+    for t0, t1 in silencios:
+        i0, i1 = int(t0 * SR), int(t1 * SR)
+        ramp = int(0.08 * SR)
+        corte[i0:i1] = np.minimum(corte[i0:i1], 0.12)
+        corte[max(i0 - ramp, 0):i0] = np.minimum(corte[max(i0 - ramp, 0):i0], np.linspace(1, 0.12, i0 - max(i0 - ramp, 0)))
+    mus *= corte
     amb = np.zeros_like(voz)
     if ambiente is not None:
         amb[: min(n, len(ambiente))] = ambiente[:n]

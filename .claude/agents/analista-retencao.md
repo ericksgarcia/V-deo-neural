@@ -9,6 +9,8 @@ Entrada: `*_analise/roteiro.md` (tempos e falas), `mosaico.jpg` e quadros de cad
 
 Leia também `docs/ROTEIRO.md`. Alvo do vídeo: 40-55 s, teto 60 s. Verifique: gancho nos 3 primeiros segundos; mudança visual a cada <= 5 s;
 re-gancho entre 40% e 60%; o campeão aparece e dá para torcer por ele; laço falado ("…quando eu…") + último quadro fundindo no primeiro.
+Retenção v3 (§13): há PROMESSA do teste final nas 3 primeiras cenas? As revelações (`<long pause>`, listadas em `roteiro.md`) caem nos
+momentos certos e são 2-4? Alguma cena com mais de ~7 s? A cena 1 é curta? O vídeo termina em ação (não em tela de dados)?
 
 Entregue:
 1. Curva estimada de retenção (% que ainda assiste) em 0s, 1s, 3s, 5s, 10s, 20s, 30s, 45s, 60s e fim, com justificativa curta em cada queda.

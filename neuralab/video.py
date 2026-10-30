@@ -12,6 +12,11 @@ Uma cena é um dicionário. Campos comuns:
   cartao    {"numero", "rotulo", "nome", "stat", "cor"}
   log       linhas para o console: [(texto, cor)]
   destaques {palavra: cor} para colorir palavras da legenda
+  teste     True na cena do teste final (casa "TESTE" da trilha); sem ele, vale a 1ª cena "barras"
+
+Retenção automática (layout v3): cada <long pause> da fala vira uma REVELAÇÃO (a música some, sobe um riser,
+e a palavra seguinte entra com impacto + zoom na cena); cenas ao vivo têm um zoom lento contínuo; a trilha de
+descobertas no topo mostra as casas ainda fechadas; telas de dados mostram a simulação ao fundo.
 Campos de telas de dados: eras/serie/titulo (grafico), itens/destaque/titulo/sub (barras),
 pergunta/opcoes (final).
 """
@@ -75,6 +80,51 @@ class Video:
         self._tempos()
         self._legendas()
         self._console()
+        self._revelacoes()
+        self._trilha()
+
+    def _revelacoes(self):
+        """Cada <long pause> = suspense: (início do silêncio, instante da revelação). A revelação é a palavra
+        depois da pausa ou, se a pausa fecha a fala, o começo da cena seguinte (corte em suspense)."""
+        self.revelacoes = []
+        for k, c in enumerate(self.cenas):
+            tts = c.get("fala_tts", "")
+            pos = 0
+            while "<long pause>" in tts[pos:]:
+                j = tts.index("<long pause>", pos)
+                pos = j + 1
+                n = len(re.sub(r"<[^>]+>", " ", tts[:j]).split())
+                ps = c["palavras"]
+                base = c["ini"] + 0.05
+                t0 = base + ps[n - 1][1] if 0 < n <= len(ps) else c["ini"]
+                if n < len(ps):
+                    t1 = base + ps[n][0]
+                elif k + 1 < len(self.cenas):
+                    t1 = self.cenas[k + 1]["ini"]
+                else:
+                    continue
+                t1 = max(t1, t0 + 0.25)
+                self.revelacoes.append((t0, t1))
+                if c["tipo"] == "barras" and n < len(ps) and "revela" not in c:
+                    c["revela"] = t1 - c["ini"]   # o destaque (o vencedor) só aparece quando a voz revela
+
+    def _trilha(self):
+        """Casas da trilha de descobertas: uma por cartão + o teste final."""
+        pts = [(c["ini"], c["cartao"]["nome"], c["cartao"]["cor"], False) for c in self.cenas if c.get("cartao")]
+        teste = next((c for c in self.cenas if c.get("teste")), None) or \
+            next((c for c in self.cenas if c["tipo"] == "barras"), None)
+        if teste is not None and pts:
+            pts.append((teste["ini"], self.info.get("nome_teste", "TESTE FINAL"), "verde", True))
+        self.pontos_trilha = pts
+
+    def _zoom(self, c, t, tl):
+        """Zoom da cena: lento e contínuo nas cenas ao vivo (nunca fica parada) + soco curto em cada revelação."""
+        z = 1.0 + (0.06 * min(tl / max(c["dur"], 0.1), 1.0) if c["tipo"] == "ao_vivo" else 0.0)
+        for _, t1 in getattr(self, "revelacoes", []):
+            if 0 <= t - t1 < 0.6:
+                u = (t - t1) / 0.6
+                z += 0.09 * (1 - u) ** 2
+        return z
 
     def _narracao(self, textos):
         """Voz do episódio inteiro com UMA requisição ao TTS (sem tentativas: cada chamada gasta cota).
@@ -154,8 +204,7 @@ class Video:
         self.linhas_log = []
         for c in self.cenas:
             for j, (s, cor) in enumerate(c.get("log", [])):
-                self.linhas_log.append((c["ini"] + 0.3 + 0.55 * j, s, cor))
-                self.eventos.append((c["ini"] + 0.3 + 0.55 * j, "tique", 1))
+                self.linhas_log.append((c["ini"] + 0.3 + 0.55 * j, s, cor))   # (log fora da tela desde o layout v3)
 
     # ------------------------------------------------------------------ quadro
     def cena_em(self, t):
@@ -200,11 +249,25 @@ class Video:
             cena_sup = h.finaliza(bloom=0.8)
             R.cromatica(cena_sup)
             R.varredura(h, t)
+            z = self._zoom(c, t, tl)
+            cx, cy = x0 + w0 / 2, y0 + h0 / 2
+            ctx.save()
+            ctx.translate(cx, cy)
+            ctx.scale(z, z)
+            ctx.translate(-cx, -cy)
             ctx.set_source_surface(cena_sup, x0, y0)
             ctx.paint()
-            palco = lambda p, h=h, x0=x0, y0=y0: tuple(float(v) + o for v, o in zip(h.tela(*p), (x0, y0)))
+            ctx.restore()
+            palco = lambda p, h=h, x0=x0, y0=y0, z=z, cx=cx, cy=cy: tuple(
+                (float(v) + o - m) * z + m for v, o, m in zip(h.tela(*p), (x0, y0), (cx, cy)))
         else:
             self._tela_dados(ctx, c, tl)
+        for _, t1 in getattr(self, "revelacoes", []):   # clarão curto na revelação
+            if 0 <= t - t1 < 0.25:
+                x0, y0, w0, h0 = K.CENA
+                K.cor(ctx, "branco", 0.22 * (1 - (t - t1) / 0.25))
+                ctx.rectangle(x0, y0, w0, h0)
+                ctx.fill()
         ctx.restore()
         vel = None
         if sim:
@@ -226,8 +289,9 @@ class Video:
                 K.recorte_cena(ctx)
                 self._telestrador(ctx, palco, rod, c, ts, tl)
                 ctx.restore()
-        if c.get("titulo_gancho"):
-            K.titulo_gancho(ctx, c["titulo_gancho"], tl)
+        if c.get("titulo_gancho"):   # o título some quando entra o carimbo (não se sobrepõem)
+            fim = c["carimbo"].get("em", 0.2) if c.get("carimbo") else None
+            K.titulo_gancho(ctx, c["titulo_gancho"], tl if fim is None else max(tl, tl + 2.0 - fim))
         if c.get("carimbo"):
             k = c["carimbo"]
             K.carimbo(ctx, k["texto"], k["cor"], tl - k.get("em", 0.2), sub=k.get("sub"))
@@ -241,11 +305,7 @@ class Video:
             K.faixa_escolha(ctx, tl - k.get("em", 0.0), k["pergunta"], k["opcoes"])
         K.legenda(ctx, [(a, b, w) for a, b, w, _ in self.blocos], t,
                   next((d for a, b, w, d in self.blocos if a <= t < b), {}))
-        # fileira de baixo
-        cb = self.A.cerebro(rod, ts, foco)
-        K.console(ctx, 30, K.BAIXO[0], 540, K.BAIXO[1], self.linhas_log, t)
-        K.rede(ctx, 585, K.BAIXO[0], 345, K.BAIXO[1], cb["camadas"], cb["pesos"], cb["ativ"], t, cb["saidas"],
-               cb["titulo"], c=cb["cor"])
+        K.trilha_descobertas(ctx, t, self.pontos_trilha if t > 2.0 else [])
         K.rodape(ctx, info.get("rodape", ""))
         K.scanlines(ctx, t)
         if sons and sim:
@@ -293,7 +353,16 @@ class Video:
 
     def _tela_dados(self, ctx, c, tl):
         x, y, w, h = K.CENA
-        ctx.set_source_rgba(0.01, 0.02, 0.035, 0.94)
+        if c.get("ger") is not None:   # a simulação continua viva ao fundo (tela de dados nunca é tela parada)
+            rod = self.A.rodada(c["ger"])
+            ts = (tl * 1.0) % max(rod.duracao, 0.1)
+            hb = Holo(w, h, self.A.camera(rod, ts, "ao_vivo", None))
+            self.A.desenha(hb, rod, ts, "ao_vivo", None)
+            ctx.set_source_surface(hb.finaliza(bloom=0.5), x, y)
+            ctx.paint_with_alpha(0.7)
+            ctx.set_source_rgba(0.01, 0.02, 0.035, 0.66)
+        else:
+            ctx.set_source_rgba(0.01, 0.02, 0.035, 0.94)
         ctx.paint()
         tg, dg = self.tempo_grupo(c, c["ini"] + tl)
         if c["tipo"] == "grafico":
@@ -303,6 +372,7 @@ class Video:
         elif c["tipo"] == "barras":
             K.barras(ctx, K.CENA, c["itens"], c["titulo"], c.get("sub", ""), tg / 1.6,
                      c.get("destaque") if tl > c.get("revela", 0) else None,
+                     oculta=c.get("destaque") if tl <= c.get("revela", 0) else None,
                      atual=c.get("atual") if tl > c.get("revela", 0) else None,
                      cor_destaque=c.get("cor_destaque", "vermelho"),
                      rotulo_destaque=c.get("rotulo_destaque", "◀ MELHOR"))
@@ -333,8 +403,10 @@ class Video:
         ff.stdin.close()
         ff.wait()
         falas = [(c["ini"] + 0.05, c["audio"]) for c in self.cenas if c["audio"] is not None]
+        for t0, t1 in self.revelacoes:
+            self.eventos += [(t0, "riser", t1 - t0), (t1, "impacto", 1)]
         amb = self.A.ambiente(self.dur)
-        mix = audio.mixa(self.dur, falas, self.eventos, ambiente=amb)
+        mix = audio.mixa(self.dur, falas, self.eventos, ambiente=amb, silencios=self.revelacoes)
         tmp_a = saida + ".audio.f32"
         mix.tofile(tmp_a)
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", tmp_v, "-f", "f32le", "-ar", str(audio.SR), "-ac", "2",
@@ -357,6 +429,9 @@ class Video:
         for k, c in enumerate(self.cenas):
             linhas.append(f"| {k} | {c['ini']:.1f}s | {c['dur']:.1f}s | {c['tipo']} | {c.get('ger', '-')} | "
                           f"{c['fala']} |")
+        if self.revelacoes:
+            linhas += ["", "## Revelações (<long pause>: música some, riser, impacto + zoom)", ""]
+            linhas += [f"- {t0:.1f}s → {t1:.1f}s" for t0, t1 in self.revelacoes]
         if self.relatorio_fala:
             linhas += ["", "## Voz x roteiro (Whisper)", ""]
             linhas += [f"- cena {r['cena']}: {r['semelhanca']:.0%} — ouvido: \"{r['ouvido']}\"" for r in self.relatorio_fala]

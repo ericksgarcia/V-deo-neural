@@ -5,6 +5,10 @@ Decidido pelo dono do canal em out/2026 depois de uma análise de retenção. Va
 Regras antigas que continuam valendo: nunca mostrar o resultado final no início, tudo 2D neon, todo número vem do
 treino real, uma única requisição de TTS por vídeo, efeitos sonoros baixos (ver `CLAUDE.md`).
 
+**Atualização v3 (retenção, out/2026):** leia também a **seção 13** (promessa do teste final, números em algarismos,
+revelações com `<long pause>`, cenas curtas, arena em pé). O motor novo (layout v3) já faz sozinho a trilha de descobertas,
+o suspense das revelações, o zoom contínuo e a simulação ao fundo das telas de dados; o roteiro só precisa dar o material.
+
 O que mudou: **(1)** CTA sem votação, **(2)** vídeo curto, **(3)** gancho com número da geração 1, **(4)** poucos
 números falados, **(5)** um herói, **(6)** re-gancho no meio, **(7)** laço falado, **(9)** legenda do post nova.
 Cada regra tem um limite medível; `python ferramentas/confere_roteiro.py` confere os que dá para medir.
@@ -27,7 +31,7 @@ Cada regra tem um limite medível; `python ferramentas/confere_roteiro.py` confe
 | tempo | bloco | conteúdo |
 |---|---|---|
 | 0–3 s | **GANCHO** | 1 cena, ≤ 16 palavras: premissa + número da geração 1 + estranheza (ver seção 2) |
-| 3–9 s | PREMISSA + REGRA | 1 cena (seção 1 acima); termina com o "Chuta aí" se o tema permitir |
+| 3–9 s | PREMISSA + REGRA + PROMESSA | 1 cena, ≤ 16 palavras (seção 1) + a **promessa do teste final** (seção 13), sem resultado |
 | 9–15 s | GERAÇÃO 1 | o caos, um único número, ex.: "De 150, só uma passa." + 1 montagem de falhas (≤ 3 s) |
 | 15–38 s | **3 DESCOBERTAS** | ~7 s cada; "calmaria enganosa" antes da última; **re-gancho** na metade (seção 6) |
 | 38–46 s | TESTE / IRONIA | situação nova ou torneio entre gerações; o dado irônico do final |
@@ -58,6 +62,9 @@ falha] + [estranheza/pergunta]**. Tem que dar vontade de ver o que acontece depo
   Máx. **1 número "herói" por cena**; um "antes → depois" do mesmo dado conta como 1.
 - O restante dos números vai para o **visual** (cartão, barra, log, gráfico), não para a voz.
 - Fale em "X em cada dez" ("quase nove em cada dez") em vez de "87%" quando possível; arredonde sem mentir.
+- **Escreva o número em ALGARISMOS na fala** (`"73 de 100"`, `"1,8"`, vírgula decimal): a legenda mostra o número grande,
+  em amarelo e com pulo; a voz lê por extenso sozinha (`audio.falavel`). Não use `por_extenso()`/`numero()` na fala
+  (a legenda fica "setenta e três" em três blocos e o conferidor não conta o dado). Unidades por extenso ("metros por segundo").
 - O número vem sempre **no fim da frase**, depois de `<long pause>` ou `<short pause>`.
 - Cada cartão "DESCOBERTA" tem o formato `antes → depois` (mesmo dado). Cartão e voz repetem o MESMO número.
 
@@ -140,6 +147,7 @@ O `post` é montado em `monta()` do roteiro (retorno `cenas, info, post, ev`); e
 - [ ] re-gancho entre 40% e 60% e respondido antes do fim
 - [ ] CTA = 1 pergunta sobre o que se passou; zero palavras proibidas; laço "…quando eu…" no fim
 - [ ] legenda no formato da seção 9
+- [ ] seção 13: promessa do teste nas 3 primeiras cenas, números em algarismos, 2-4 `<long pause>`, nenhuma cena > 18 palavras
 - [ ] analistas sem nota < 8 (roteiro, engajamento antes; retenção, visual no rascunho; diretor no fim)
 
 ---------------------------------------------------------------------------------------------------------------
@@ -205,18 +213,18 @@ def monta(hist, A):
     ...
     # 0 GANCHO (≤16 palavras, verbo -ei, número da geração 1, sem resultado final)
     cena(tipo="ao_vivo", ger=0, grupo="g1", titulo_gancho=[("TIREI O SEMÁFORO", BRANCO), ("E DEIXEI UMA IA NO COMANDO", AMARELO)],
-         fala=f"Tirei o semáforo de um cruzamento. <short pause> De {n} tentativas, só {numero(s0)} passou sem bater.")
-    # 1 PREMISSA + REGRA numa cena só
+         fala=f"Tirei o semáforo de um cruzamento. <short pause> De {n} tentativas, só {s0} passou sem bater.")
+    # 1 PREMISSA + REGRA + PROMESSA (≤ 16 palavras; promessa do teste final SEM o resultado — seção 13)
     cena(tipo="ao_vivo", ger=min(4, G - 1), grupo="g1b",
-         fala="Cada carro tem um cérebro vazio. Quem vai melhor vira pai da próxima turma. <short pause> Quem bate, sai.")
+         fala="Quem vai melhor vira pai da próxima turma. <short pause> No fim, eu testo o campeão num cruzamento que ele nunca viu.")
     # 2 GERAÇÃO 1: o campeão da geração 1 falha (replay lento) + montagem curta de falhas
     cena(tipo="replay", ger=0, foco=A.busca(A.rodada(0), "quase") ..., fala="O campeão da geração um. <short pause> Bateu.")
     # 3-5 até 3 DESCOBERTAS (cartão antes→depois; foco = A.busca(rodada, "primeiro") = campeão da geração)
-    cena(tipo="replay", ger=g1, foco=k1, cartao={...}, fala=f"Geração {g1+1}. O campeão descobre ... <long pause> De X para Y.")
+    cena(tipo="replay", ger=g1, foco=k1, cartao={...}, fala=f"Geração {g1+1}. O campeão descobre ... <long pause> De {x} para {y}.")
     # RE-GANCHO a 40-60% do tempo (calmaria enganosa ou pegadinha), respondido depois
     cena(tipo="ao_vivo", ger=g_calma, fala="O placar trava. <short pause> Será que acabou? <long pause>")
-    # TESTE / IRONIA tirada dos dados (situação nova ou torneio entre gerações)
-    cena(tipo="barras", ..., fala="...")
+    # TESTE / IRONIA tirada dos dados (situação nova ou torneio entre gerações); ger= faz a simulação rodar ao fundo
+    cena(tipo="barras", teste=True, ger=G - 1, ..., fala=f"... O campeão da {G}… <long pause> {pct_final}%.")
     # FINAL (última cena): UMA pergunta sobre o que se passou + laço cortado
     cena(tipo="replay", ger=G - 1, foco=campeao, grupo="fim",
          fala="O campeão aprendeu a regra ou só decorou este cruzamento? <short pause> Porque tudo começou quando eu…")
@@ -226,3 +234,39 @@ def monta(hist, A):
 ```
 Notas: `escolha=` só pode mostrar as DUAS RESPOSTAS da pergunta do CTA (ex.: pergunta "O CAMPEÃO APRENDEU OU DECOROU?", opções "APRENDEU" / "DECOROU"); nunca temas de vídeos futuros.
 Se um cartão/gráfico antigo repete o mesmo número que a voz já disse, mantenha só no visual.
+
+## 13. Retenção v3: o que segura até o fim (vale para todo vídeo novo)
+
+Diagnóstico dos EP13-16 (analistas de retenção, todos os rascunhos): a queda grande vem (a) da cena 1, longa e parada,
+(b) de telas sem movimento (barras/gráfico em fundo preto), (c) de números ditos por extenso, que o olho não pega na legenda,
+(d) de não haver motivo explícito para ficar até o fim, e (e) de HUD ilegível no celular. O motor resolve (b) e (e); o roteiro
+precisa dar (a), (c) e (d).
+
+**O que o motor faz sozinho (layout v3, `neuralab/video.py` + `palco/kit.py`):**
+- **Ação maior**: a fileira de baixo (log + rede) saiu; a cena vai de y=362 a 1392 e a legenda fica dentro dela, deslocada
+  para longe dos botões do TikTok. O rodapé fica acima da descrição do post.
+- **Trilha de descobertas** (faixa logo acima da cena, a partir de 2 s): uma casa por cartão + a casa **TESTE FINAL**. As
+  fechadas pulsam "? ? ?"; cada uma abre com clarão quando a cena chega. É a promessa visível: "faltam 2 descobertas e o teste".
+  A casa do teste é a cena com `teste=True` (ou a 1ª `barras`); nome em `info["nome_teste"]`.
+- **Revelação automática em cada `<long pause>`**: a música quase some, sobe um riser no silêncio, e a palavra seguinte entra
+  com impacto grave + zoom-soco + clarão. Se a pausa fecha a fala, a revelação cai no corte para a cena seguinte (suspense).
+  A lista de revelações sai em `*_analise/roteiro.md`.
+- **Nada parado**: cenas ao vivo têm um zoom lento contínuo; telas `barras`/`grafico` com `ger=` mostram a simulação ao fundo.
+- **Números em algarismos na legenda** saem amarelos e pulam mais. A trilha sonora abre (filtro e volume) do começo ao fim.
+- O título do gancho some quando o carimbo entra (não se sobrepõem mais).
+
+**O que o roteiro precisa dar (o conferidor avisa):**
+1. **Promessa do teste final nas 3 primeiras cenas**, sem o resultado: "No fim, eu testo o campeão num lugar que ele nunca viu."
+   / "No fim, o campeão enfrenta o da geração 1." É o laço aberto que paga o vídeo inteiro; o teste precisa existir e vir no fim.
+2. **Números em algarismos** na `fala` (seção 3). Decimais com vírgula ("1,8"); unidades por extenso.
+3. **2 a 4 `<long pause>`**, sempre logo antes do número/da virada que importa (o re-gancho conta). Mais que 5 cansa.
+4. **Cenas curtas**: nenhuma fala com mais de 18 palavras (≈ 7 s); a premissa (cena 1) com ≤ 16. Se o conteúdo não cabe,
+   ele não é essencial.
+5. **Close antes de plano geral**: o primeiro segundo precisa de movimento grande; prefira abrir num replay do campeão da
+   geração 1 falhando (ou `ao_vivo` com `vel` alta) a uma vista geral calma.
+6. **Teste com suspense**: na cena do teste, diga o número do campeão final por último, depois de `<long pause>`. O motor
+   deixa a barra do vencedor (`destaque`) vazia com "?" até esse instante e revela com o impacto (não precisa de `revela=`).
+7. **Simulações novas: arena em pé.** A tela útil é ~1020x1030 px. Mundo mais alto que largo (ou quadrado) e câmera de
+   replay perto (agente ≥ 60 px na tela). Arena deitada desperdiça metade da cena.
+8. Termine em ação (replay do campeão), nunca em tela de dados: o último quadro funde no primeiro (laço).
+

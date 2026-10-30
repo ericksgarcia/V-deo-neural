@@ -14,4 +14,7 @@ Avalie cada cena e o todo:
 4. Hierarquia: o olho vai primeiro para o lugar certo (ação ou legenda)? Elementos competindo?
 5. Variedade: muda algo visualmente a cada 2–3 s (câmera, cena, cartão, replay)? Algum trecho visualmente parado?
 6. Acabamento: algo quebrado, cortado, sobreposto, desalinhado, feio ou com cara de bug?
+7. Layout v3 (`docs/ROTEIRO.md` §13): a ação ocupa a cena (arena grande, agentes ≥ 60 px)? A trilha de descobertas (faixa acima
+   da cena) está legível e abre na hora certa? Cada revelação (`<long pause>`) tem impacto visível (zoom/clarão)? As barras do teste
+   escondem o vencedor até a voz revelar? Números da legenda em algarismos?
 Responda com nota 0–10, lista de problemas com o nome do arquivo do quadro e correção sugerida (específica: posição, tamanho, cor, câmera).

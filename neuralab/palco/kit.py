@@ -29,11 +29,15 @@ C = {
     "tele": (1.0, 0.92, 0.25),
 }
 
-# layout (y) — o que importa fica longe da coluna de botões do TikTok (x > ~950, y 800-1500)
-TOPO = (150, 150)        # y, altura da fileira de painéis de cima
-CENA = (30, 312, 1020, 868)   # a cena termina em y=1180; a legenda tem faixa própria logo abaixo
-LEGENDA_Y = 1292
-BAIXO = (1345, 165)
+# layout v3 (out/2026, retenção): a AÇÃO ocupa a tela. Zonas do TikTok: abas no topo (y < ~140), botões à direita
+# (x > ~940, y 800-1500), descrição/música embaixo (y > ~1460). Tudo que importa fica em x 40-930, y 150-1440.
+# Sem a fileira de baixo (log e rede eram ilegíveis no celular e ficavam sob a descrição do post).
+TOPO = (150, 150)             # y, altura da fileira de painéis de cima
+TRILHA = (306, 50)            # y, altura da trilha de descobertas (promessa visível: 3 descobertas + teste)
+CENA = (30, 362, 1020, 1030)  # a cena termina em y=1392; a legenda fica DENTRO dela, na faixa de baixo
+LEGENDA_Y = 1290
+LEGENDA_X, LEGENDA_LARG = 500, 760   # um pouco à esquerda do centro: longe da coluna de botões
+RODAPE_Y = 1428
 
 
 def cor(ctx, c, a=1.0):
@@ -595,26 +599,28 @@ def blocos_de_palavras(palavras, max_chars=22, max_palavras=4):
 
 
 def legenda(ctx, blocos, t, destaques, y=LEGENDA_Y):
-    """1-3 palavras por vez, enormes, com contorno e um 'pulo' quando entram."""
+    """1-3 palavras por vez, enormes, com contorno e um 'pulo' quando entram. Números (algarismos) saem em amarelo
+    e pulam mais: são o que o espectador precisa ler de relance."""
     atual = next((b for b in blocos if b[0] <= t < b[1]), None)
     if not atual:
         return
     ini, _, palavras = atual
-    pop = 1 + 0.16 * (1 - suave((t - ini) / 0.1))
+    tem_num = any(ch.isdigit() for p in palavras for ch in p)
+    pop = 1 + (0.3 if tem_num else 0.16) * (1 - suave((t - ini) / (0.14 if tem_num else 0.1)))
     tam = 88
     esp = larg(ctx, " ", tam, TITULO)
     ws = [larg(ctx, p, tam, TITULO) for p in palavras]
     total = sum(ws) + esp * (len(ws) - 1)
-    if total > 840:
-        f = 840 / total
-        tam, ws, esp, total = tam * f, [w * f for w in ws], esp * f, 840
+    if total > LEGENDA_LARG:
+        f = LEGENDA_LARG / total
+        tam, ws, esp, total = tam * f, [w * f for w in ws], esp * f, LEGENDA_LARG
     ctx.save()
-    ctx.translate(W / 2, y)
+    ctx.translate(LEGENDA_X, y)
     ctx.scale(pop, pop)
     xx = -total / 2
     for p, w in zip(palavras, ws):
         limpa = p.strip(".,:;!?…\"'").lower()
-        c = destaques.get(limpa, "branco")
+        c = destaques.get(limpa, "amarelo" if any(ch.isdigit() for ch in p) else "branco")
         texto(ctx, p, xx, 0, tam, c, familia=TITULO, contorno=16)
         xx += w + esp
     ctx.restore()
@@ -686,8 +692,9 @@ def grafico_eras(ctx, ret, serie, total, eras, g_atual, titulo, rotulo_y, a=1.0,
 
 
 def barras(ctx, ret, itens, titulo, sub, progresso, destaque=None, atual=None, cor_destaque="vermelho", a=1.0,
-           rotulo_destaque="◀ MELHOR"):
-    """Barras horizontais (animam uma vez). itens: [(rotulo, valor 0-1, cor)]."""
+           rotulo_destaque="◀ MELHOR", oculta=None):
+    """Barras horizontais (animam uma vez). itens: [(rotulo, valor 0-1, cor)].
+    oculta: índice da barra ainda não revelada (fica vazia com '?' pulsando até a voz dizer o número)."""
     x, y, w, h = ret
     texto(ctx, titulo, x + w / 2, y + 120, 48, "texto", a, familia=TITULO, alinha="c")
     texto(ctx, sub, x + w / 2, y + 166, 26, "texto", 0.7 * a, familia=MONO_B, alinha="c")
@@ -702,6 +709,14 @@ def barras(ctx, ret, itens, titulo, sub, progresso, destaque=None, atual=None, c
         txt = it[3] if len(it) > 3 else None   # texto do valor (ex.: segundos); senão, a porcentagem
         yy = topo + k * alt
         p = suave(progresso * 1.5 - k * 0.07)
+        if k == oculta:
+            texto(ctx, it[0], x + 40, topo + k * alt + alt * 0.62, fs - 2, "texto", a, familia=MONO_B)
+            cor(ctx, "ciano2", 0.2 * a)
+            ctx.rectangle(bx, topo + k * alt + 10, bw, alt - 22)
+            ctx.fill()
+            texto(ctx, "?", bx + 20, topo + k * alt + alt * 0.66, fs + 10, "amarelo",
+                  a * (0.55 + 0.45 * math.sin(progresso * 9)), familia=TITULO)
+            continue
         dest, at = destaque == k, atual == k
         cc = cor_destaque if dest else ("texto" if at else c)
         texto(ctx, rot, x + 40, yy + alt * 0.62, fs - 2, cc if (dest or at) else "texto", a, familia=MONO_B)
@@ -744,10 +759,47 @@ def tela_final(ctx, ret, t_local, pergunta, opcoes, a=1.0):
 
 
 def rodape(ctx, s, a=1.0):
-    cor(ctx, "ciano", 0.35 * a)
-    ctx.rectangle(30, 1520, 1020, 1)
-    ctx.fill()
     tam = 20
-    while larg(ctx, s, tam, MONO) > 1020 and tam > 11:   # o rodapé sempre cabe na largura útil
+    while larg(ctx, s, tam, MONO) > 900 and tam > 11:   # o rodapé sempre cabe na largura útil (longe dos botões)
         tam -= 1
-    texto(ctx, s, 30, 1556, tam, "sutil", a, familia=MONO)
+    texto(ctx, s, 40, RODAPE_Y, tam, "sutil", a, familia=MONO)
+
+
+def trilha_descobertas(ctx, t, pontos, a=1.0):
+    """Promessa visível do vídeo: uma fileira de casas '#1 · #2 · #3 · TESTE FINAL' que começam trancadas ('? ? ?')
+    e abrem quando a cena chega. Quem vê casas fechadas sabe que ainda tem coisa para ver (laço aberto).
+
+    pontos: [(instante, nome, cor, final?)] em ordem."""
+    if not pontos:
+        return
+    y, h = TRILHA
+    x0, w0 = 30, 1020
+    n = len(pontos)
+    gap = 10
+    cw = (w0 - gap * (n - 1)) / n
+    tam = 26
+    for j, (t0, nome, c, final) in enumerate(pontos):
+        x = x0 + j * (cw + gap)
+        aberto = t >= t0
+        k = suave((t - t0) / 0.3) if aberto else 0.0
+        chanfro(ctx, x, y, cw, h, 10)
+        cor(ctx, c if aberto else (0.02, 0.035, 0.07), (0.16 if aberto else 0.9) * a)
+        ctx.fill_preserve()
+        _neon(ctx, c if aberto else "ciano2", a * (0.6 + 0.4 * k), 2.0 if aberto else 1.0)
+        if aberto and t - t0 < 0.5:      # clarão quando a casa abre
+            cor(ctx, c, 0.5 * (1 - (t - t0) / 0.5) * a)
+            ctx.rectangle(x, y, cw, h)
+            ctx.fill()
+        rot = "" if final else f"#{j + 1}"
+        texto(ctx, rot, x + 12, y + h * 0.72, tam, c if aberto else "sutil", a, familia=MONO_B)
+        xn = x + 12 + (larg(ctx, rot, tam, MONO_B) + 10 if rot else 0)
+        livre = cw - (xn - x) - 10
+        if aberto or final:
+            s, tt = nome, tam
+            while larg(ctx, s, tt, MONO_B) > livre and tt > 14:
+                tt -= 1
+            texto(ctx, s, xn, y + h * 0.72, tt, "texto" if aberto else "sutil", a * (k if aberto else 0.8),
+                  familia=MONO_B)
+        else:
+            pul = 0.45 + 0.4 * math.sin(t * 3 + j)
+            texto(ctx, "? ? ?", xn, y + h * 0.72, tam, "ciano", a * pul, familia=MONO_B)

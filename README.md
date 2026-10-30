@@ -53,6 +53,14 @@ usam o **Whisper local** (faster-whisper, grátis). A análise dos vídeos é fe
   transparentes (a soma aditiva de luz vira uma névoa que mostra por onde a turma passa). Quem erra pisca vermelho e
   se dissolve em ~1 s; quem acerta fica verde e nítido, sempre incluído. Poucos acertos aparecem com força.
 
+## Layout v3 e retenção automática (out/2026)
+
+A ação ocupa a tela (sem a fileira de log/rede, ilegível no celular), a legenda fica dentro da cena e longe dos botões do
+TikTok, e o motor faz sozinho: **trilha de descobertas** (casas "? ? ?" que abrem a cada cartão até o TESTE FINAL),
+**revelação em cada `<long pause>`** (música some, riser, impacto + zoom-soco; barra do vencedor do teste escondida até a voz
+revelar), zoom lento nas cenas ao vivo, simulação ao fundo das telas de dados, números da legenda em amarelo e trilha
+sonora que cresce. O que o roteiro precisa fornecer está em `docs/ROTEIRO.md` §13 (o conferidor avisa).
+
 ## Como a base funciona (para fazer QUALQUER vídeo)
 
 ```

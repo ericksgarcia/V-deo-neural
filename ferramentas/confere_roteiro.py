@@ -17,6 +17,13 @@ PROIBIDAS = [
     r"motor mais r[áa]pido", r"ganha um motor", r"vai ganhar",
 ]
 RE_NUM = re.compile(r"\d[\d.,]*%?")
+# números por extenso (de 11 para cima, e decimais): escapavam da contagem e saem pequenos na legenda
+_EXT = (r"onze|doze|treze|catorze|quatorze|quinze|dezesseis|dezessete|dezoito|dezenove|vinte|trinta|quarenta|"
+        r"cinquenta|sessenta|setenta|oitenta|noventa|cento|duzentos|trezentos|quatrocentos|quinhentos|seiscentos|"
+        r"setecentos|oitocentos|novecentos|mil")
+RE_EXT = re.compile(rf"(?i)\b\w+\s+v[íi]rgula\s+\w+\b|\b(?:{_EXT})(?:\s+(?:e\s+)?(?:{_EXT}|um|uma|dois|duas|três|quatro|cinco|seis|sete|oito|nove|"
+                    rf"dez))*(?:\s+v[íi]rgula\s+\w+)?\b")
+PROMESSA = re.compile(r"(?i)\bno (fim|final)\b|at[ée] o (fim|final)|teste final|[úu]ltimo teste|no teste")
 PAUSA = {"short": 0.15, "long": 0.55}
 PAL_S = 2.6   # palavras por segundo (README/NARRACAO)
 
@@ -51,8 +58,9 @@ def palavras(f):
 
 def dados(f):
     """Números de dado numa fala, sem contar o número da geração ('Geração 47', 'ger. 47')."""
-    sem = re.sub(r"(?i)\b(gera[çc][ãa]o|ger\.?)\s*\d+", " ", limpa(f))
-    achados = RE_NUM.findall(sem)
+    sem = re.sub(rf"(?i)\b(gera[çc][ãa]o|ger\.?)\s*(\d+|(?:(?:{_EXT}|e|um|dois|três|quatro|cinco|seis|sete|oito|nove)\s*)+)",
+                 " ", limpa(f))
+    achados = RE_NUM.findall(sem) + RE_EXT.findall(sem)
     return achados[: (len(achados) + 1) // 2] if len(achados) > 1 else achados   # "de X para Y" conta como 1 dado
 
 
@@ -119,6 +127,27 @@ def main():
     for k, nn in enumerate(todos):
         if nn > 3:
             r("AVISO", f"cena {k}: {nn} números na mesma fala (1 número herói por cena)")
+
+    # ---- números por extenso (desde o layout v3: algarismos na fala; a voz lê por extenso sozinha)
+    ext = [(k, m.group(0)) for k, c in enumerate(cenas)
+           for m in RE_EXT.finditer(re.sub(r"(?i)\b(gera[çc][ãa]o|ger\.?)\s+\w+", " ", limpa(c["fala"])))]
+    if ext:
+        r("AVISO", "número por extenso na fala (" + "; ".join(f"cena {k}: '{x}'" for k, x in ext[:4]) +
+          "): escreva em algarismos (\"73\", \"1,8\"); a legenda mostra o número grande em amarelo e a voz lê por extenso")
+
+    # ---- ritmo por cena e revelações (retenção v3, docs/ROTEIRO.md §13)
+    for k, p in enumerate(pal):
+        if k and p > 18:
+            r("AVISO", f"cena {k}: {p} palavras (≈ {p / PAL_S:.0f} s de fala): cena longa demais; quebre em 2 ou corte")
+    if len(cenas) > 1 and pal[1] > 16:
+        r("AVISO", f"cena 1 (premissa + regra) com {pal[1]} palavras (≤ 16): é onde mais gente sai")
+    if n_long < 2:
+        r("AVISO", f"{n_long} <long pause>: use 2 a 4 revelações (a pausa longa antes do número vira suspense automático)")
+    elif n_long > 5:
+        r("AVISO", f"{n_long} <long pause>: suspense demais cansa (2 a 4)")
+    if not any(PROMESSA.search(c["fala"]) for c in cenas[:3]):
+        r("AVISO", "nenhuma promessa do teste final nas 3 primeiras cenas (ex.: \"No fim, eu testo o campeão num lugar "
+                   "que ele nunca viu.\") — é o que segura até o fim (§13)")
 
     # ---- herói
     n_fala = sum(bool(re.search(r"(?i)\bcampe[ãa]o\b|\bcampe[ãa]\b", c["fala"])) for c in cenas)
