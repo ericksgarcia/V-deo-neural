@@ -33,6 +33,7 @@ CFG = {
     "ambulancia": dict(gera=120, ep=11, roteiro="ambulancia", pop=150, sementes="3,5,7"),
     "sofa": dict(gera=200, ep=12, roteiro="sofa", pop=150, sementes="3,7"),
     "porta": dict(gera=100, ep=13, roteiro="porta", pop=150, sementes="3,5,7"),
+    "escolta": dict(gera=160, ep=14),
 }
 DESAFIOS = tuple(CFG)
 GERACOES = {k: v["gera"] for k, v in CFG.items()}
@@ -116,6 +117,25 @@ def treino_policia(G, sementes):
     return melhor[1], melhor[2]
 
 
+def treino_escolta(G, sementes):
+    from neuralab.coevolucao_escolta import treina
+    from neuralab.roteiros.escolta import nota_historia
+    melhor = None
+    for s in sementes:
+        arq = os.path.join(".cache", f"escolta_{G}_{s}.npz")
+        if os.path.exists(arq):
+            hist = dict(np.load(arq))
+        else:
+            print(f"treinando escolta VIP (semente {s}, {G} gerações)…")
+            hist = treina(G, semente=s, log=None)
+            np.savez_compressed(arq, **hist)
+        nota = nota_historia(hist)
+        print(f"  semente {s}: nota da história {nota:.2f}")
+        if melhor is None or nota > melhor[0]:
+            melhor = (nota, s, hist)
+    return melhor[1], melhor[2]
+
+
 def treino_paciente(G, sementes):
     from neuralab.coevolucao_paciente import treina
     from neuralab.roteiros.paciente import nota_historia
@@ -189,6 +209,12 @@ def main():
         from neuralab.roteiros.cabo import monta
         s, hist = treino_cabo([int(x) for x in (a.sementes or "3").split(",")])
         A = Cabo(hist)
+        cenas, info, post, _ = monta(hist, A)
+    elif a.desafio == "escolta":
+        from neuralab.adaptadores.escolta import Escolta
+        from neuralab.roteiros.escolta import monta
+        s, hist = treino_escolta(G, [int(x) for x in (a.sementes or "5").split(",")])
+        A = Escolta(hist)
         cenas, info, post, _ = monta(hist, A)
     elif a.desafio == "paciente":
         from neuralab.adaptadores.paciente import Paciente
