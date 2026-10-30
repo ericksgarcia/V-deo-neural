@@ -19,6 +19,7 @@ def medida(rod):
     v = np.hypot(*(P[:, 1:] - P[:, :-1]).transpose(3, 0, 1, 2)) / Q.DT
     vel = float(v[vivo[:, 1:]].mean())
     lanc = mira = 0
+    lanc_b = mira_b = 0
     for b in range(2):
         ks, ts = np.where((bst[:, 1:, b] == Q.VOA) & (bst[:, :-1, b] != Q.VOA))
         for k, i in zip(ks, ts + 1):
@@ -31,8 +32,10 @@ def medida(rod):
                     if 0 < rel @ d < Q.ALCANCE and abs(rel[0] * d[1] - rel[1] * d[0]) < Q.HIT:
                         alvo = True
             lanc += 1
+            lanc_b += int(Q.EQUIPE[th] == 1)
+            mira_b += int(Q.EQUIPE[th] == 1 and alvo)
             mira += alvo
-    return {"vel": vel, "lanc": lanc / n, "mira": mira / max(lanc, 1), "nenhum": float((rod.morte < 0).mean())}
+    return {"vel": vel, "lanc": lanc / n, "lanc_b": lanc_b / n, "mira_b": mira_b / max(lanc_b, 1), "mira_a": (mira - mira_b) / max(lanc - lanc_b, 1), "mira": mira / max(lanc, 1), "nenhum": float((rod.morte < 0).mean())}
 
 
 def serie(A, passo=4, arq=None):
@@ -40,10 +43,10 @@ def serie(A, passo=4, arq=None):
     G = A.total_ger
     if arq and os.path.exists(arq):
         d = dict(np.load(arq))
-        if len(d["g"]) and d["G"] == G:
-            return {k: d[k] for k in ("g", "vel", "lanc", "mira", "nenhum")}
+        if len(d["g"]) and d["G"] == G and "mira_a" in d:
+            return {k: d[k] for k in ("g", "vel", "lanc", "mira", "mira_a", "mira_b", "nenhum")}
     gs = sorted(set(list(range(0, G, passo)) + [G - 1]))
-    out = {k: [] for k in ("vel", "lanc", "mira", "nenhum")}
+    out = {k: [] for k in ("vel", "lanc", "mira", "mira_a", "mira_b", "nenhum")}
     for g in gs:
         m = medida(A.rodada(g))
         A._cache.pop((g, False), None)
