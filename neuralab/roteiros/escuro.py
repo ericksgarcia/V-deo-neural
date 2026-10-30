@@ -113,11 +113,11 @@ def monta(hist, A):
          titulo_gancho=[("3 CAÇADORES NO ESCURO", BRANCO), (f"NINGUÉM PEGO EM {nenhum(0)} DE {n}", AMARELO)],
          log=[(f"{n} PARTIDAS AO MESMO TEMPO", BRANCO), ("LANTERNA x ESCURO · 0 REGRAS", AMARELO)],
          carimbo={"texto": f"{nenhum(0)} DE {n}", "cor": AMARELO, "em": 1.4, "sub": "PARTIDAS SEM NINGUÉM PEGO · GERAÇÃO 1"},
-         fala=f"Soltei três caçadores no escuro. <short pause> Em {numero(nenhum(0))} de cem jogos, ninguém foi pego.")
+         fala=f"Dei lanternas a três caçadores. <short pause> Em {numero(nenhum(0))} de cem jogos, eles não pegaram ninguém.")
     # ------------------------------------------------------------ PREMISSA + REGRA
     cena(tipo="ao_vivo", ger=min(2, G - 1), grupo="g1b",
          log=[("CADA CAÇADOR SÓ VÊ O QUE A LANTERNA ILUMINA", AMARELO), ("QUEM VAI MELHOR VIRA PAI DA PRÓXIMA TURMA", VERDE)],
-         fala="Cada caçador só vê o que a lanterna ilumina. <short pause> Quem vai melhor vira pai da próxima turma.")
+         fala="Eles só veem o que a lanterna ilumina. Três fugitivos tentam não ser vistos. <short pause> Quem vai melhor vira pai da próxima turma.")
     # ------------------------------------------------------------ GERAÇÃO 1: o campeão falha
     r0 = A.rodada(C)
     k0 = A.busca(r0, "livre")
@@ -130,7 +130,7 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "CAÇADORES", "nome": "O FAROL", "cor": AMARELO,
                  "stat": f"GIRAM A LANTERNA {giro(0)}% → {giro(gf)}% DO TEMPO"},
          log=[(f"GER {gf + 1:03d} · GIRO {giro(0)}% → {giro(gf)}%", AMARELO)],
-         fala=f"Geração {numero(gf + 1)}. O campeão descobre o farol: <short pause> gira a lanterna sem parar.")
+         fala=f"Geração {numero(gf + 1)}. O campeão descobre o farol: <short pause> gira a lanterna quase o tempo todo.")
     marcos.append((gf, "1", AMARELO))
     # ------------------------------------------------------------ placar sobe
     r2 = A.rodada(C + gp)
@@ -160,7 +160,7 @@ def monta(hist, A):
          rotulo_destaque="▲ MELHOR",
          log=[("TESTE: 600 PARTIDAS NOVAS", AMARELO), (f"PEGOS {pct(s_um)}% → {pct(s_pico)}% → {pct(s_fin)}%", AMARELO)],
          fala=f"Partidas novas, contra os fugitivos finais. <short pause> O campeão da geração um pegava {numero(round(100 * s_um))} em cem. "
-              f"O último… {numero(round(100 * s_fin))}.")
+              f"O campeão da {numero(G)}… {numero(round(100 * s_fin))}.")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
     kf = A.busca(rf, "livre") or A.busca(rf, "campeao")
@@ -173,10 +173,10 @@ def monta(hist, A):
             "estilo_voz": ESTILO_VOZ, "marcos": marcos, "rotulo_vivo": f"{n} PARTIDAS",
             "rodape": f"{n} PARTIDAS · REDES {'-'.join(map(str, E.CAM_C))} / {'-'.join(map(str, E.CAM_F))} · {G} GERAÇÕES · "
                       "NADA FOI PROGRAMADO: SÓ SELEÇÃO, CRUZAMENTO E MUTAÇÃO"}
-    post = (f"Três caçadores, três fugitivos e um escuro total. Na geração 1, em {nenhum(0)} de {n} jogos ninguém foi pego. 🔦\n"
-            f"IA aprendendo sozinha por seleção natural. Simulação real: {n} partidas por geração, {G} gerações, "
+    post = (f"Dei lanternas a três caçadores e a IA inventou o farol sozinha. 🔦\n"
+            f"IA aprendendo sozinha por seleção natural (rede neural + algoritmo genético). Simulação real: {n} partidas por geração, {G} gerações, "
             "números medidos no treino.\n"
             "Marca o amigo que sempre se dá bem no esconde-esconde 👇\n\n"
-            "#inteligenciaartificial #ia #aprendizadodemaquina #simulacao #escondeesconde")
+            "#inteligenciaartificial #ia #redeneural #simulacao #escondeesconde")
     ev["duelo"] = {"um": s_um, "pico": (gp, s_pico), "fin": (G - 1, s_fin), "vel": (vp, vc)}
     return cenas, info, post, ev
