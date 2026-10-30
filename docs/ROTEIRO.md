@@ -269,4 +269,9 @@ precisa dar (a), (c) e (d).
 7. **Simulações novas: arena em pé.** A tela útil é ~1020x1030 px. Mundo mais alto que largo (ou quadrado) e câmera de
    replay perto (agente ≥ 60 px na tela). Arena deitada desperdiça metade da cena.
 8. Termine em ação (replay do campeão), nunca em tela de dados: o último quadro funde no primeiro (laço).
+9. **Sem círculos e marcações na cena** (decisão do dono, out/2026): o telestrador (`marcas`: círculos, setas, rótulos tipo
+   "PEGO!") foi desligado no motor porque nem sempre caía no lugar/instante certo; não use `marcas`. Também não desenhe
+   anel ou rótulo "CAMPEÃO" no centro de uma equipe (cai no vazio quando ela se espalha). Para o espectador seguir o campeão,
+   use a câmera do replay nele e a fala/cartão; se precisar destacar, destaque o PRÓPRIO corpo do agente (cor/brilho), nunca
+   uma marca solta.
 

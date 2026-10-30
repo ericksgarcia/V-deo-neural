@@ -8,7 +8,7 @@ Uma cena é um dicionário. Campos comuns:
   grupo     cenas com o mesmo grupo continuam o mesmo trecho da simulação
   vel       velocidade fixa (s de simulação por s de vídeo); se omitida, o motor ajusta
   pausa     segundos de silêncio depois da fala (suspense)
-  marcas    telestrador: [{"tipo": "circulo"|"seta"|"rotulo", "em": t_sim, "alvo": nome, "ate": nome, "texto": s}]
+  marcas    (IGNORADO desde out/2026: o telestrador saía no lugar errado e foi desligado)
   cartao    {"numero", "rotulo", "nome", "stat", "cor"}
   log       linhas para o console: [(texto, cor)]
   destaques {palavra: cor} para colorir palavras da legenda
@@ -284,11 +284,8 @@ class Video:
             ini_clip = tl if c["tipo"] == "replay" else (tl % (c["dur"] / len(c["clipes"])))
             if c["tipo"] != "replay" or c is self._primeira_do_grupo(c):
                 K.selo_replay(ctx, ini_clip)
-            if c["tipo"] == "replay":
-                ctx.save()
-                K.recorte_cena(ctx)
-                self._telestrador(ctx, palco, rod, c, ts, tl)
-                ctx.restore()
+            # telestrador (círculos/setas/rótulos de `marcas`) desligado a pedido do dono: o lugar e o instante
+            # das marcas nem sempre batiam com a ação. `marcas` nos roteiros é ignorado.
         if c.get("titulo_gancho"):   # o título some quando entra o carimbo (não se sobrepõem)
             fim = c["carimbo"].get("em", 0.2) if c.get("carimbo") else None
             K.titulo_gancho(ctx, c["titulo_gancho"], tl if fim is None else max(tl, tl + 2.0 - fim))

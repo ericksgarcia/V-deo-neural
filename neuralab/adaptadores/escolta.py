@@ -212,15 +212,6 @@ class Escolta(Adaptador):
                 h.linha([tuple(v), tuple(a[ia])], VERDE if escudo else VERMELHO, 1.4, 0.55, tracejado=[6, 8], halo=False)
             if escudo and d[ia] < 4.0:
                 h.texto("ESCUDO", (float(v[0]), float(v[1]) - 1.3), 22, VERDE, 0.95)
-        self._legenda_campeao(h, g, t, vivo)
-
-    @staticmethod
-    def _legenda_campeao(h, g, t, vivo):
-        """Anel pulsante em volta da equipe campeã + rótulo grande (o espectador sempre sabe quem acompanhar)."""
-        c = g.mean(0)
-        r = 1.9 + 0.25 * math.sin(t * 5)
-        h.circulo((float(c[0]), float(c[1])), r, CIANO, 0.8, 2.6, 0.12)
-        h.texto("CAMPEÃO", (float(c[0]), float(c[1]) + r + 0.9), 32, CIANO, 1.0)
 
     def desenha(self, h, rod, t, modo, foco):
         self.cenario(h, t)

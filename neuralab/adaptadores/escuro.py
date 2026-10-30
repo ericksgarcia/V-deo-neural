@@ -1,7 +1,7 @@
 """Adaptador do Esconde-Esconde no Escuro, vista de cima em estilo holograma (mundo = metros da arena).
 
 Caçadores magenta com lanterna (cone amarelo), fugitivos ciano que só ficam nítidos quando a luz os pega. O destaque
-("o campeão") é a melhor equipe do lado escolhido (`lado`: "fug" ou "cac") e aparece com anel e rótulo.
+("o campeão") é a melhor equipe do lado escolhido (`lado`: "fug" ou "cac"); a câmera do replay o segue (sem anel/rótulo).
 """
 import math
 
@@ -160,7 +160,7 @@ class Escuro(Adaptador):
             p = rod.reg["f"][k, i, f]
             h.circulo((float(p[0]), float(p[1])), 0.36, BRANCO if luz[f] else CIANO, 0.45 if luz[f] else 0.08, 1.6, 0.4)
 
-    def _heroi(self, h, rod, k, i, t, destaca=True):
+    def _heroi(self, h, rod, k, i, t):
         """Partida em destaque: caçadores com feixe, fugitivos só nítidos quando iluminados."""
         est = rod.reg["estado"][k, i]
         luz = rod.reg["luz"][k, i]
@@ -182,22 +182,6 @@ class Escuro(Adaptador):
                      alfa=1.0 if acesa else 0.32, passo=t * 2.4 if np.hypot(*vel) > 1e-4 else None, escala=1.5, base=False)
             if acesa:
                 h.pulso((float(p[0]), float(p[1])), (t * 2.0) % 0.6, AMARELO, 1.2, 0.6, 2)
-        if destaca:
-            self._anel(h, rod, k, i, t)
-
-    def _anel(self, h, rod, k, i, t):
-        """Anel pulsante em volta da equipe campeã + rótulo grande (o espectador sempre sabe quem acompanhar)."""
-        if rod.lado == "fug":
-            alvo, cor = rod.reg["f"][k, i], CIANO
-            vivos = rod.reg["estado"][k, i] == E.VIVO
-            if vivos.any():
-                alvo = alvo[vivos]
-        else:
-            alvo, cor = rod.reg["c"][k, i], MAGENTA
-        c = alvo.mean(0)
-        r = 1.9 + 0.25 * math.sin(t * 5)
-        h.circulo((float(c[0]), float(c[1])), r, cor, 0.8, 2.6, 0.12)
-        h.texto("CAMPEÃO" if rod.lado == "cac" else "CAMPEÃ", (float(c[0]), float(c[1]) + r + 0.9), 30, cor, 1.0)
 
     def visiveis(self, rod, maxn=14):
         chave = ("vis", maxn)
