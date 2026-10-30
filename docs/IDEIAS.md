@@ -18,7 +18,7 @@ afirma o que o treino real mostrar. Itens "parecido com X" são variações acei
 | 4 | **A Porta Giratória** | de cima | não | alto | **feito (EP13)** | 100 IAs, uma catraca: engarrafamento, fila e dança sincronizada. Parecido com A (evacuação). |
 | 5 | **Escolta VIP** | de cima | sim | baixo | **feito (EP14)** | Seguranças x assassinos; escudo humano e prensa na parede. Parecido com C (torre). |
 | 6 | **O Chão é Lava** | de lado | não | baixo | **feito (EP15)** | Plataformas e lava subindo; IAs usam as outras como degrau. |
-| 7 | **Esconde-Esconde no Escuro** | de cima | sim | médio | pendente | Cones de lanterna: o fugitivo vira estátua ou cola nas costas do caçador. |
+| 7 | **Esconde-Esconde no Escuro** | de cima | sim | médio | **feito (EP16)** | Cones de lanterna: o fugitivo vira estátua ou cola nas costas do caçador. |
 | 8 | **Queimada de IAs** | de cima | sim | alto | pendente | Azul x vermelho; vence quem descobre que não arremessar também ganha. Parecido com J (queimada 3x3). |
 | 9 | **Fuga com Cobertura** | de cima | sim | médio | pendente | Atravessar a zona de tiro de uma torreta atrás de blocos móveis. |
 | 10 | **Cão Pastor** | de cima | sim | alto | pendente | 1 cão x 15 ovelhas rebeldes. Parecido com F (cão pastor). |
