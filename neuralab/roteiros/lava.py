@@ -120,7 +120,7 @@ def monta(hist, A):
     # ---------------------------------------------------------------- PREMISSA + REGRA
     cena(tipo="ao_vivo", ger=min(3, G - 1), grupo="g1b",
          log=[("MESMO CÉREBRO EM TODAS AS IAs", BRANCO), ("QUEM FICA MAIS TEMPO VIVO VIRA PAI", VERDE)],
-         fala="Cérebro vazio, zero aula. <short pause> A lava sobe. Quem dura mais vira pai da próxima turma.")
+         fala="Cérebro vazio. <short pause> A lava sobe. Quem dura mais vira pai da próxima turma.")
     # ---------------------------------------------------------------- GERAÇÃO 1: a campeã falha
     r0 = A.rodada(0)
     # a campeã da geração 1 tem que ter caído de verdade: pega a torre onde ninguém escapou e alguém subiu mais
@@ -137,7 +137,7 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "DESCOBERTA", "nome": "PULAR", "cor": CIANO,
                  "stat": f"ALTURA MÉDIA {metros(a0)} → {metros(a1)} m"},
          log=[(f"GER {pula + 1:03d} · ALTURA {metros(a0)} → {metros(a1)} m", CIANO)],
-         fala=f"A campeã descobre o pulo. <short pause> Demorou, hein? <long pause> "
+         fala=f"A campeã descobre o pulo. <short pause> Demorou. <long pause> "
               f"A altura média vai de {metros(a0)} para {metros(a1)} metros.")
     marcos.append((pula, "PULA", CIANO))
     # ---------------------------------------------------------------- DESCOBERTA 2: PISAR NA CABEÇA
@@ -147,8 +147,8 @@ def monta(hist, A):
     k2 = A.busca(rd, "primeiro")
     cena(tipo="replay", ger=degrau, foco=k2,
          cartao={"numero": 2, "rotulo": "DESCOBERTA", "nome": "A CABEÇA DO COLEGA", "cor": MAGENTA,
-                 "stat": f"SOBEM PISANDO EM OUTRA {round(d0 * 10)} EM 10 → {round(d1 * 10)} EM 10"},
-         log=[(f"GER {degrau + 1:03d} · SOBEM PISANDO NA CABEÇA {round(d0 * 10)} → {round(d1 * 10)} EM 10", MAGENTA)],
+                 "stat": f"SOBEM PISANDO EM OUTRA {pct(d0)} → {pct(d1)}"},
+         log=[(f"GER {degrau + 1:03d} · SOBEM PISANDO NA CABEÇA {pct(d0)} → {pct(d1)}", MAGENTA)],
          fala=f"Aí uma descobre: pisar na cabeça da colega. <short pause> Sem pedir licença. <long pause> "
               f"De {NOMES_F[round(d0 * 10)]} para {quase}{em_dez(d1)}.")
     marcos.append((degrau, "DEGRAU", MAGENTA))
@@ -167,7 +167,7 @@ def monta(hist, A):
                  "stat": f"TORRES COM ALGUÉM NO TOPO {round(t0 * 10)} EM 10 → {round(t1 * 10)} EM 10"},
          log=[(f"GER {topo_g + 1:03d} · ALGUÉM NO TOPO {round(t0 * 10)} → {round(t1 * 10)} EM 10 TORRES", VERDE)],
          fala=f"Dá! A campeã chega no topo. <long pause> "
-              f"E alguém sobe em {NOMES[round(t1 * 10)]} de cada dez torres.")
+              f"Alguém sobe em {NOMES[round(t1 * 10)]} de cada dez.")
     marcos.append((topo_g, "TOPO", VERDE))
     # ---------------------------------------------------------------- O TESTE: torre nova
     s_t, _ = duelo(hist, G - 1, ruido=0.25)
@@ -177,8 +177,8 @@ def monta(hist, A):
          sub="600 torres de cada · salva = 4 ou mais IAs vivas · campeã da última geração", destaque=1, cor_destaque="amarelo", revela=4.0,
          rotulo_destaque=f"▼ {(s_t - s_n) * 100:.0f} pts" if s_t - s_n >= 0.1 else "◀ SEGUROU",
          log=[("TESTE: 600 TORRES COM PLATAFORMAS NOVAS", AMARELO), (f"TORRES SALVAS {pct(s_t)} → {pct(s_n)}", AMARELO)],
-         fala=f"Aí fiz maldade: mudei as plataformas de lugar. <short pause> Na torre de treino, "
-              f"{NOMES[round(s_t * 10)]} em cada dez se salvam. Na nova, só {NOMES_F[round(s_n * 10)]} em cada dez.")
+         fala=f"Aí fiz maldade: mudei as plataformas de lugar. <short pause> Na de treino, "
+              f"{NOMES[round(s_t * 10)]} em cada dez se salvam. Na nova, {NOMES_F[round(s_n * 10)]}.")
     # ---------------------------------------------------------------- CTA + LAÇO
     rf = A.rodada(G - 1)
     kf = A.busca(rf, "primeiro")
@@ -192,10 +192,10 @@ def monta(hist, A):
             "estilo_voz": ESTILO_VOZ, "marcos": marcos, "rotulo_vivo": f"{n} TORRES",
             "rodape": f"POP {n} · REDE {'-'.join(map(str, Desafio.camadas))} · {G} GERAÇÕES · "
                       "NADA FOI PROGRAMADO: SÓ SELEÇÃO, CRUZAMENTO E MUTAÇÃO"}
-    post = (f"{n} torres, lava subindo e {N} IAs em cada uma: na geração 1, {quantas.replace('só ', 'só ')}. 🌋\n"
+    post = (f"Botei lava embaixo de {N} IAs. Na geração 1, {quantas}. A fofoca é como as outras aprenderam. 🌋\n"
             f"IA aprendendo sozinha por seleção natural (algoritmo genético). Simulação real: {n} torres de {N} IAs, "
             f"{G} gerações, nenhum número inventado.\n"
             "Manda pra quem sobe em cima dos outros pra não se queimar 👇\n\n"
-            "#inteligenciaartificial #ia #algoritmogenetico #curiosidades #tecnologia")
+            "#inteligenciaartificial #ia #algoritmogenetico #curiosidades #simulacao")
     ev["duelo"] = {"treino": s_t, "novo": s_n}
     return cenas, info, post, ev
