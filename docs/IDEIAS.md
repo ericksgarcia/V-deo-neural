@@ -16,7 +16,7 @@ afirma o que o treino real mostrar. Itens "parecido com X" são variações acei
 | 2 | **O Dilema da Ambulância** | de cima | sim (assimétrico) | médio | **feito (EP11)** | Carros aprendem (ou não) a dar passagem; o "malandrinho" pega o vácuo. Parecido com a ambulância sugerida no CTA do EP05 (cruzamento). |
 | 3 | **Mudança de Sofá** | de cima | não (cooperativo) | médio | **feito (EP12)** | Duas IAs presas pelas pontas de um sofá numa quina em L; humor pastelão. |
 | 4 | **A Porta Giratória** | de cima | não | alto | **feito (EP13)** | 100 IAs, uma catraca: engarrafamento, fila e dança sincronizada. Parecido com A (evacuação). |
-| 5 | **Escolta VIP** | de cima | sim | baixo | pendente | Seguranças x assassinos; escudo humano e prensa na parede. Parecido com C (torre). |
+| 5 | **Escolta VIP** | de cima | sim | baixo | **feito (EP14)** | Seguranças x assassinos; escudo humano e prensa na parede. Parecido com C (torre). |
 | 6 | **O Chão é Lava** | de lado | não | baixo | pendente | Plataformas e lava subindo; IAs usam as outras como degrau. |
 | 7 | **Esconde-Esconde no Escuro** | de cima | sim | médio | pendente | Cones de lanterna: o fugitivo vira estátua ou cola nas costas do caçador. |
 | 8 | **Queimada de IAs** | de cima | sim | alto | pendente | Azul x vermelho; vence quem descobre que não arremessar também ganha. Parecido com J (queimada 3x3). |

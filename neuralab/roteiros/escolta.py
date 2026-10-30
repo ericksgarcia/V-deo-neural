@@ -101,7 +101,7 @@ def monta(hist, A):
 
     # ------------------------------------------------------------ GANCHO
     cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.0,
-         titulo_gancho=[("3 IAs PROTEGEM UM VIP", BRANCO), ("3 QUEREM MATÁ-LO", MAGENTA)],
+         titulo_gancho=[("3 IAs PROTEGEM UM VIP", BRANCO), (f"MORTO EM {morte(0)} DE {n}", VERMELHO)],
          log=[(f"{n} PARTIDAS AO MESMO TEMPO", BRANCO), ("SEGURANÇAS x ASSASSINOS · 0 REGRAS", CIANO)],
          carimbo={"texto": f"{morte(0)} DE {n}", "cor": VERMELHO, "em": 1.4, "sub": "VIPs MORTOS · GERAÇÃO 1"},
          fala=f"Coloquei três IAs para proteger um VIP. <short pause> Na geração um, ele morreu em {morte(0)} de cem.")
@@ -151,7 +151,7 @@ def monta(hist, A):
     marcos.append((g3, "3", VERDE))
     # ------------------------------------------------------------ TESTE
     itens = [("CAMPEÃO 1", s_um, CIANO), (f"CAMPEÃO {g_ref + 1}", s_ref, CIANO), (f"CAMPEÃO {G}", s_fin, VERDE)]
-    cena(tipo="barras", grupo="duelo", ger=G - 1, itens=itens, titulo="VIP SALVO CONTRA OS ASSASSINOS FINAIS",
+    cena(tipo="barras", grupo="duelo", ger=G - 1, itens=itens, titulo="CAMPEÃO x ASSASSINOS FINAIS",
          sub="600 partidas novas · campeão de cada geração", destaque=2, cor_destaque="verde", revela=4.0,
          rotulo_destaque="▲ MELHOR",
          log=[("TESTE: 600 PARTIDAS NOVAS", AMARELO), (f"VIP SALVO {pct(s_um)}% → {pct(s_ref)}% → {pct(s_fin)}%", AMARELO)],

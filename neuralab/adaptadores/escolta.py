@@ -216,9 +216,11 @@ class Escolta(Adaptador):
 
     @staticmethod
     def _legenda_campeao(h, g, t, vivo):
-        if vivo:
-            p = g[int(np.argmax(g[:, 0]))]
-            h.texto("CAMPEÃO", (float(p[0]), float(p[1]) + 1.3), 22, CIANO, 0.95)
+        """Anel pulsante em volta da equipe campeã + rótulo grande (o espectador sempre sabe quem acompanhar)."""
+        c = g.mean(0)
+        r = 1.9 + 0.25 * math.sin(t * 5)
+        h.circulo((float(c[0]), float(c[1])), r, CIANO, 0.8, 2.6, 0.12)
+        h.texto("CAMPEÃO", (float(c[0]), float(c[1]) + r + 0.9), 32, CIANO, 1.0)
 
     def desenha(self, h, rod, t, modo, foco):
         self.cenario(h, t)
@@ -260,6 +262,9 @@ class Escolta(Adaptador):
         if foco is not None:
             t = rod.duracao
         s, m = rod.contagem(t)
+        if foco is not None and hasattr(rod, "campeao"):     # replay do campeão: mostra a geração (os números da voz)
+            s = int(round(rod.n * float(self.hist["m_vip_vivo"][rod.g])))
+            m = rod.n - s
         return [("VIPs SALVOS", f"{s}/{rod.n}", s / rod.n, VERDE), ("VIPs MORTOS", f"{m}/{rod.n}", m / rod.n, VERMELHO)]
 
     def cerebro(self, rod, t, foco):
