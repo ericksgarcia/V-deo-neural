@@ -131,14 +131,14 @@ def monta(hist, A):
          cartao={"numero": 2, "rotulo": "SEGURANÇAS", "nome": "FICAM PERTO", "cor": CIANO,
                  "stat": f"DISTÂNCIA AO VIP {cola(0)} m → {cola(g2)} m"},
          log=[(f"GER {g2 + 1:03d} · DISTÂNCIA {cola(0)} m → {cola(g2)} m", CIANO)],
-         fala=f"Aí os seguranças reagem. Chegam perto do VIP. <long pause> De {numero(cola(0))} metros para {numero(cola(g2))}.")
+         fala=f"Aí os seguranças reagem. <long pause> De {numero(cola(0))} metros para {numero(cola(g2))}.")
     marcos.append((g2, "2", CIANO))
     # ------------------------------------------------------------ RE-GANCHO: o placar trava
     g_calma = (g2 + g3) // 2
     cena(tipo="ao_vivo", ger=g_calma,
          log=[(f"GER {g_calma + 1:03d} · VIPs MORTOS {morte(g_calma)}/{n}", AMARELO), ("O PLACAR TRAVA", AMARELO)],
          carimbo={"texto": "O PLACAR TRAVA", "cor": AMARELO, "em": 0.4, "sub": f"GERAÇÃO {g_calma + 1}"},
-         fala="Parado por dezenas de gerações. <short pause> Será que acabou? <long pause>")
+         fala="O placar trava. <short pause> Será que acabou? <long pause>")
     # ------------------------------------------------------------ DESCOBERTA 3: o escudo humano
     r3 = A.rodada(C + g3)
     k3 = A.busca(r3, "salvo")
@@ -155,7 +155,7 @@ def monta(hist, A):
          sub="600 partidas novas · campeão de cada geração", destaque=2, cor_destaque="verde", revela=4.0,
          rotulo_destaque="▲ MELHOR",
          log=[("TESTE: 600 PARTIDAS NOVAS", AMARELO), (f"VIP SALVO {pct(s_um)}% → {pct(s_ref)}% → {pct(s_fin)}%", AMARELO)],
-         fala=f"Partidas novas. <short pause> O campeão da geração um salvava {numero(round(100 * s_um))} em cem. "
+         fala=f"Partidas novas, contra os assassinos finais. <short pause> O campeão da geração um salvava {numero(round(100 * s_um))} em cem. "
               f"O da {numero(g_ref + 1)}, só {numero(round(100 * s_ref))}. O da {numero(G)}… {numero(round(100 * s_fin))}.")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
