@@ -1,0 +1,5 @@
+Botei lava embaixo de 8 IAs. Na geração 1, só uma escapou. A fofoca é como as outras aprenderam. 🌋
+IA aprendendo sozinha por seleção natural (algoritmo genético). Simulação real: 150 torres de 8 IAs, 160 gerações, nenhum número inventado.
+Manda pra quem sobe em cima dos outros pra não se queimar 👇
+
+#inteligenciaartificial #ia #algoritmogenetico #curiosidades #simulacao
