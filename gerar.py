@@ -279,6 +279,7 @@ def main():
     print(f"usando semente {s}\nroteiro:")
     for k, c in enumerate(cenas):
         cartao = f"  [CARTÃO {c['cartao']['numero']}]" if c.get("cartao") else ""
+        cartao += "  [TESTE]" if c.get("teste") else ""
         print(f"  {k:2d} {c['tipo']:<8} {c['fala']}{cartao}")
     print("legenda:")
     print(post)

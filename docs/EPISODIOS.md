@@ -36,6 +36,15 @@ Os prefixos `epNN` repetem (sessões paralelas); o que vale é o NOME do tema. *
 
 ## Pendências conhecidas
 
+- **Receita v4: diversão + suspense (out/2026, motor + receita):** `docs/ROTEIRO.md` §14. Tensão → revelação → riso → nova tensão;
+  piada só nas falhas e DEPOIS dos números; **o CHUTE** ("Chuta aí… <long pause>" no fim da fala do teste, número no começo da cena
+  seguinte): o motor estica o silêncio para ~2,4 s e mostra "SEU CHUTE?" + contagem 3-2-1 + barra de tempo, com tique e coração, e o
+  vencedor fica "?" até a resposta; em todo `<long pause>` a simulação entra em câmera lenta e a borda da cena escurece. O conferidor
+  avisa quando falta chute, humor (lista `HUMOR`) ou pontes, e quando a resposta do teste sai de 70-88%. O roteiro do EP16
+  (`roteiros/escuro.py`) foi portado para v4 como exemplo (mesmos números: teste 12 → 30 em 100; rascunho sem voz ≈ 49 s, resposta a
+  83%; analista-roteiro: 7 → correções aplicadas). O vídeo publicado continua sendo o antigo; refazer com voz = 1 requisição TTS (pedir licença).
+  Atenção: a duração estimada pelo conferidor fica ~7 s acima da real; confirme com `--so-voz`.
+
 - **Retenção v3 (out/2026, motor + receita):** layout novo (sem fileira de log/rede, cena maior, legenda dentro da cena e longe dos
   botões), trilha de descobertas, revelação automática em cada `<long pause>` (música some, riser, impacto, zoom; barra do vencedor
   escondida até a voz), zoom lento nas cenas ao vivo, simulação ao fundo das telas de dados, números em algarismos na legenda, trilha

@@ -9,6 +9,9 @@ treino real, uma única requisição de TTS por vídeo, efeitos sonoros baixos (
 revelações com `<long pause>`, cenas curtas, arena em pé). O motor novo (layout v3) já faz sozinho a trilha de descobertas,
 o suspense das revelações, o zoom contínuo e a simulação ao fundo das telas de dados; o roteiro só precisa dar o material.
 
+**Atualização v4 (diversão + suspense, out/2026):** leia também a **seção 14** (alternar tensão e riso; piada nas falhas e
+depois das revelações; **o CHUTE** antes do número final, com contagem 3-2-1 automática; resposta do teste a 70-88% do vídeo).
+
 O que mudou: **(1)** CTA sem votação, **(2)** vídeo curto, **(3)** gancho com número da geração 1, **(4)** poucos
 números falados, **(5)** um herói, **(6)** re-gancho no meio, **(7)** laço falado, **(9)** legenda do post nova.
 Cada regra tem um limite medível; `python ferramentas/confere_roteiro.py` confere os que dá para medir.
@@ -34,7 +37,7 @@ Cada regra tem um limite medível; `python ferramentas/confere_roteiro.py` confe
 | 3–9 s | PREMISSA + REGRA + PROMESSA | 1 cena, ≤ 16 palavras (seção 1) + a **promessa do teste final** (seção 13), sem resultado |
 | 9–15 s | GERAÇÃO 1 | o caos, um único número, ex.: "De 150, só uma passa." + 1 montagem de falhas (≤ 3 s) |
 | 15–38 s | **3 DESCOBERTAS** | ~7 s cada; "calmaria enganosa" antes da última; **re-gancho** na metade (seção 6) |
-| 38–46 s | TESTE / IRONIA | situação nova ou torneio entre gerações; o dado irônico do final |
+| 38–46 s | TESTE / IRONIA | situação nova ou torneio entre gerações; número da geração 1, **CHUTE** (§14.3), número final na cena seguinte |
 | 46–52 s | CTA + LAÇO | 1 pergunta sobre o que se passou (seção 8) + a frase que fecha o laço (seção 7) |
 
 ## 2. Gancho (regra 3) — cena 0, primeiros 3 segundos
@@ -148,6 +151,7 @@ O `post` é montado em `monta()` do roteiro (retorno `cenas, info, post, ev`); e
 - [ ] CTA = 1 pergunta sobre o que se passou; zero palavras proibidas; laço "…quando eu…" no fim
 - [ ] legenda no formato da seção 9
 - [ ] seção 13: promessa do teste nas 3 primeiras cenas, números em algarismos, 2-4 `<long pause>`, nenhuma cena > 18 palavras
+- [ ] seção 14: 1 chute no teste, resposta a 70-88% do vídeo, 2-3 momentos de humor, ≥ 2 pontes
 - [ ] analistas sem nota < 8 (roteiro, engajamento antes; retenção, visual no rascunho; diretor no fim)
 
 ---------------------------------------------------------------------------------------------------------------
@@ -167,7 +171,9 @@ na MESMA cena. Aponte o que cortar. (3) NÚMEROS: ≤ 6 dados falados, 1 por cen
 (5) RE-GANCHO entre 40% e 60% do tempo, e é respondido antes do fim? (6) CTA: UMA pergunta sobre o que se passou, ≤ 16 palavras,
 SEM voto e SEM promessa de próximo vídeo; sugira 2 perguntas melhores tiradas do dado irônico do final. (7) LAÇO: última fala termina
 "Porque tudo começou quando eu…" e completa o gancho? (8) CLAREZA: alguém que nunca ouviu falar de IA entende cada frase?
-(9) HONESTIDADE: cada número bate com os FATOS abaixo? Aponte qualquer exagero.
+(9) HONESTIDADE: cada número bate com os FATOS abaixo? Aponte qualquer exagero. (10) DIVERSÃO + SUSPENSE (§14): há 2-3 momentos
+de humor, nas falhas ou logo DEPOIS de uma revelação (nunca entre pergunta e resposta)? o teste final tem o CHUTE ("Chuta aí… <long pause>")
+e a cena seguinte começa pelo número? as cenas do meio terminam abrindo a próxima dúvida? Sugira 2 piadas curtas (≤ 6 palavras) e verdadeiras.
 Responda em português: nota 0-10 por critério e geral; os 3 maiores problemas; reescrita linha a linha só do que melhora
 (formato `cena N: "antiga" -> "nova"`, mantendo exatamente os mesmos números e fatos); veredito APROVADO (todas as notas ≥ 8) ou REPROVADO.
 ROTEIRO:
@@ -194,7 +200,8 @@ ROTEIRO + LEGENDA:
 Preveja a retenção segundo a segundo do vídeo "<tema>" (alvo 40-55 s, teto 60 s). Entregue a curva em 0, 1, 3, 5, 10, 20, 30, 45 s e fim, com o motivo de
 cada queda. Confira: (a) gancho cria dúvida nos 3 primeiros segundos? (b) há mudança visual/sonora a cada ≤ 5 s (liste as cenas paradas)?
 (c) existe re-gancho entre 40% e 60% e ele segura? (d) o campeão aparece e dá para torcer por ele? (e) o laço falado ("…quando eu…") +
-fusão do último quadro com o primeiro dá vontade de rever? (f) quais cenas cortar para ficar ≤ 55 s, em ordem de ganho. Dê os 3 maiores riscos de deslize.
+fusão do último quadro com o primeiro dá vontade de rever? (e2) o CHUTE (contagem 3-2-1 antes do número final) segura quem ia sair, e a
+resposta cai entre 70% e 88%? o humor alivia sem soltar a tensão antes da hora? (f) quais cenas cortar para ficar ≤ 55 s, em ordem de ganho. Dê os 3 maiores riscos de deslize.
 ```
 
 **analista-visual** (no rascunho): usar o prompt padrão de `.claude/agents/analista-visual.md`, mais: "o campeão está destacado na tela
@@ -224,7 +231,11 @@ def monta(hist, A):
     # RE-GANCHO a 40-60% do tempo (calmaria enganosa ou pegadinha), respondido depois
     cena(tipo="ao_vivo", ger=g_calma, fala="O placar trava. <short pause> Será que acabou? <long pause>")
     # TESTE / IRONIA tirada dos dados (situação nova ou torneio entre gerações); ger= faz a simulação rodar ao fundo
-    cena(tipo="barras", teste=True, ger=G - 1, ..., fala=f"... O campeão da {G}… <long pause> {pct_final}%.")
+    # CHUTE (§14.3): a fala TERMINA em "Chuta aí… <long pause>"; o motor faz a contagem 3-2-1 e esconde o vencedor
+    cena(tipo="barras", teste=True, grupo="teste", ger=G - 1, ...,
+         fala=f"Jogos novos. <short pause> O campeão da geração 1 fazia {x0}. Chuta aí: e o campeão final? <long pause>")
+    # a resposta começa pelo número (mesmo grupo: as barras continuam e o vencedor aparece com impacto no corte)
+    cena(tipo="barras", grupo="teste", ger=G - 1, ..., fala=f"{x_final} em 100. <short pause> Coitados dos fugitivos.")
     # FINAL (última cena): UMA pergunta sobre o que se passou + laço cortado
     cena(tipo="replay", ger=G - 1, foco=campeao, grupo="fim",
          fala="O campeão aprendeu a regra ou só decorou este cruzamento? <short pause> Porque tudo começou quando eu…")
@@ -278,3 +289,75 @@ precisa dar (a), (c) e (d).
    agente morre/sai. Nunca no centro de um grupo, nunca com instante fixo. Círculos que SÃO o mundo (corpo, arena, cofre) e o flash curto de um evento no ponto exato
    (`h.pulso` de batida/chegada) continuam.
 
+
+## 14. Receita v4: diversão + suspense (vale para todo vídeo novo)
+
+Decisão de out/2026: **sim, misturar diversão com suspense é o melhor formato para o canal**, desde que cada um tenha o seu
+lugar. Suspense é o que faz a pessoa **ficar** (ela quer a resposta); humor é o que faz ela **gostar** (curtir, comentar,
+mandar para alguém) e é o que "zera" a tensão para o próximo suspense bater de novo. Suspense o tempo todo cansa e vira
+trailer; piada o tempo todo dispersa e ninguém espera o fim. O vídeo alterna: **tensão → revelação → alívio (riso) → nova
+tensão**.
+
+**Regra de ouro: piada nas FALHAS e DEPOIS das revelações; suspense nos NÚMEROS e no TESTE.** Nunca uma piada entre a
+pergunta e a resposta (ela solta a tensão antes da hora). Nunca piada no lugar do número.
+
+### 14.1 Mapa emocional (encaixa no orçamento da seção 1)
+
+| bloco | emoção dominante | o que fazer |
+|---|---|---|
+| gancho + premissa | curiosidade | o absurdo da geração 1 + a promessa do teste final (laço 1) |
+| geração 1 | **comédia** | o campeão da geração 1 falhando, zoado com carinho ("Não achou ninguém. Nem sem querer.") |
+| descoberta 1 | curiosidade → alívio | o truque com nome; depois do número, 2-4 palavras de reação ("Coitados.") |
+| re-gancho (40-60%) | **ameaça** | "Mas os fugitivos têm uma resposta. <long pause>" (laço 2) |
+| descoberta 2-3 | surpresa | a resposta do outro lado / a virada; termina com a dúvida que o teste resolve |
+| teste final | **suspense máximo** | o número da geração 1, depois o **CHUTE** (14.3) e só então o número final |
+| CTA + laço | provocação leve | uma pergunta com dois lados + "Porque tudo começou quando eu…" |
+
+### 14.2 A batida de cada descoberta (4 tempos, ≤ 18 palavras)
+
+1. **Problema/contexto** (com humor, se for falha): "O campeão da geração 1. <short pause> Não achou ninguém."
+2. **O truque com nome** (cartão): "Geração 51. O campeão inventa o farol."
+3. **`<long pause>` + número** (revelação automática): "<long pause> De 14 para 68 em cada 100."
+4. **Alívio ou ponte**: 1-4 palavras de reação ("Coitados.", "Eu ri.") **ou** a próxima dúvida ("Mas tem um problema.").
+   Pelo menos 2 cenas do meio terminam olhando para a frente (pergunta, "Mas…", `<long pause>`): é o corte em suspense.
+
+### 14.3 O CHUTE (aposta do espectador) — 1 por vídeo, no teste final
+
+Quem chuta um número **fica para conferir** e depois **comenta o chute**. Por isso, antes do número que paga o vídeo:
+- Termine a fala da cena do teste em **"Chuta aí: … ? <long pause>"** (a fala TEM que terminar na pausa).
+  Ex.: "Jogos novos. <short pause> O campeão da geração 1 pegava 14 em 100. Chuta aí: e o campeão final? <long pause>"
+- A **cena seguinte começa pelo número** (mesmo `grupo` da tela de barras): "{N} em 100. <short pause> …".
+- O motor faz o resto sozinho (`neuralab/video.py`): estica o silêncio para ~2,4 s (local, sem nova voz), mostra
+  **"SEU CHUTE?" com contagem 3-2-1** e barra de tempo, tique a cada número, coração batendo baixo, música some, a barra do
+  vencedor fica "?" e a resposta entra com impacto no corte. Texto do rótulo: `info["chute_rotulo"]` (padrão "SEU CHUTE?").
+- Só 1 chute por vídeo (2 vira truque). Ele não substitui a pergunta do CTA (que continua sendo uma só, sobre o que se passou).
+- Comentário fixado sugerido ao dono: "Qual foi o seu chute? Eu chutei X." (não é voto, é participação).
+
+### 14.4 Quando a resposta chega (o "payoff")
+
+- A resposta do teste começa entre **70% e 88%** do vídeo. Depois dela, **no máximo ~8 s** (pergunta + laço): quem já viu o
+  resultado sai, então o fim precisa ser curto e já reabrir o laço.
+- O re-gancho (seção 6) tem que ser respondido ANTES do teste: o teste é a última dúvida aberta.
+
+### 14.5 Humor que funciona (escolha 2-3, cada um com ≤ 6 palavras)
+
+- **Falha com carinho** (bichinho desastrado): "Bateu. <short pause> De novo." / "Nem sem querer."
+- **Comparação do dia a dia**: "Igual eu procurando o controle." / "Feito doido."
+- **Bastidor do criador**: "Juro, eu ri sozinho." / "Eu não esperava."
+- **Pena do perdedor** (alívio depois do número): "Coitados." / "Tadinhos."
+- **Ironia dos dados** (a melhor piada é verdadeira): o pior vence, o truque é preguiçoso, o "gênio" só gira a lanterna.
+Proibido: piada que inventa fato ("ele ficou com medo" sem medida), piada antes do número, hype ("incrível").
+O conferidor avisa quando a fala tem pouca marca de humor (lista em `ferramentas/confere_roteiro.py`, `HUMOR`).
+
+### 14.6 O que o motor faz no suspense (automático)
+
+Em todo `<long pause>`: música quase some, riser, **câmera lenta** da simulação (35% da velocidade, contínua entre cenas do
+mesmo grupo), **vinheta** que escurece a borda da cena pulsando como coração, e na palavra seguinte impacto + zoom-soco + clarão.
+No chute, além disso, a contagem 3-2-1 e o coração.
+
+### 14.7 Checklist v4 (some ao da seção 10)
+
+- [ ] 1 chute no teste final, fala terminando em `<long pause>`, cena seguinte começando pelo número
+- [ ] resposta do teste a 70-88% do vídeo; ≤ 8 s depois dela
+- [ ] 2-3 momentos de humor (falha, alívio depois do número, comparação), nenhum entre pergunta e resposta
+- [ ] ≥ 2 cenas do meio terminando em ponte (pergunta, "Mas…", `<long pause>`)

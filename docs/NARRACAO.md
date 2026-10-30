@@ -12,6 +12,9 @@ anunciado). Agora é **um amigo curioso assistindo ao experimento junto com voc�
 - Fale como gente contando um "causo" para um amigo: gírias leves ("gente", "aí", "olha só", "não é possível"), zoar as IAs com
   carinho (como bichinhos desastrados), comentar a própria reação ("eu ri sozinho", "juro que eu não esperava").
 - Pelo menos 3 momentos de humor no vídeo (uma piada de falha, um comentário de bastidor, uma comparação do dia a dia).
+- **Onde fica a graça (receita v4, `docs/ROTEIRO.md` §14):** piada nas falhas e logo DEPOIS de uma revelação (alívio);
+  silêncio e voz baixa antes dos números. Nunca piada entre a pergunta e a resposta. No teste final, o "Chuta aí… <long pause>"
+  é dito baixinho, como quem desafia um amigo; a resposta vem seca, na cena seguinte.
 - Sem exagero: a piada nunca esconde o número nem a regra do jogo. Os limites do guia v2 (palavras, números, duração) continuam.
 - A voz padrão é **Achird** (`--voz` só se o dono pedir outra).
 

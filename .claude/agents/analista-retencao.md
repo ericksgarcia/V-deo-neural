@@ -13,6 +13,8 @@ Retenção v3 (§13): há PROMESSA do teste final nas 3 primeiras cenas? As reve
 momentos certos e são 2-4? Alguma cena com mais de ~7 s? A cena 1 é curta? O vídeo termina em ação (não em tela de dados)?
 
 Entregue:
+0. Receita v4 (`docs/ROTEIRO.md` §14): o CHUTE (contagem 3-2-1 antes do número final) segura quem ia sair? a resposta do teste
+   cai entre 70% e 88%? o humor alivia depois das revelações sem soltar a tensão antes da hora? há corte em suspense entre cenas?
 1. Curva estimada de retenção (% que ainda assiste) em 0s, 1s, 3s, 5s, 10s, 20s, 30s, 45s, 60s e fim, com justificativa curta em cada queda.
 2. Os 3 momentos de maior risco de deslize e por quê (fala, imagem ou ritmo).
 3. "Interruptores de padrão": a cada quantos segundos acontece algo novo? Onde falta?

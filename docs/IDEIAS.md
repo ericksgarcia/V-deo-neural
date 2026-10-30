@@ -118,7 +118,9 @@ goleiro x atacante 1 contra 1, arremesso de basquete. Detalhes e arquivos em `do
 3. **Geração 1:** o caos, com um número; o campeão da geração 1 falha.
 4. **Até 3 descobertas**, ~7 s cada, com cartão "DESCOBERTA #n" (antes → depois) e o campeão em foco.
 5. **Re-gancho** entre 40% e 60% do tempo (calmaria enganosa / pegadinha) e resposta antes do fim.
-6. **Final irônico tirado dos dados** (torneio entre gerações, situação nova ou o pior vence o melhor).
+6. **Final irônico tirado dos dados** (torneio entre gerações, situação nova ou o pior vence o melhor), com o **CHUTE**
+   antes do número final ("Chuta aí… <long pause>", resposta na cena seguinte, a 70-88% do vídeo).
+6b. **Diversão + suspense (§14):** riso nas falhas e depois dos números; silêncio antes deles. 2-3 piadas curtas e verdadeiras.
 7. **CTA = UMA pergunta sobre o que se passou** (sem voto, sem prometer próximo vídeo) + **laço falado** ("Porque
    tudo começou quando eu…") + último quadro fundindo no primeiro.
 8. Vídeo de **40–55 s (teto 60 s)**, 100–140 palavras, ≤ 6 dados falados.

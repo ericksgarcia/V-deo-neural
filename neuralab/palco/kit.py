@@ -803,3 +803,55 @@ def trilha_descobertas(ctx, t, pontos, a=1.0):
         else:
             pul = 0.45 + 0.4 * math.sin(t * 3 + j)
             texto(ctx, "? ? ?", xn, y + h * 0.72, tam, "ciano", a * pul, familia=MONO_B)
+
+
+def vinheta(ctx, ret, a):
+    """Borda da cena escurecendo (silêncio de suspense): o olho vai para o centro, onde a ação está."""
+    if a <= 0:
+        return
+    x0, y0, w0, h0 = ret
+    cx, cy = x0 + w0 / 2, y0 + h0 / 2
+    g = cairo.RadialGradient(cx, cy, min(w0, h0) * 0.32, cx, cy, max(w0, h0) * 0.72)
+    g.add_color_stop_rgba(0, 0, 0, 0, 0)
+    g.add_color_stop_rgba(1, 0.0, 0.0, 0.02, min(a, 1.0) * 0.85)
+    ctx.save()
+    ctx.rectangle(x0, y0, w0, h0)
+    ctx.set_source(g)
+    ctx.fill()
+    ctx.restore()
+
+
+def contagem_chute(ctx, t_local, dur, rotulo="SEU CHUTE?", ret=CENA):
+    """Aposta do espectador: 'SEU CHUTE?' + contagem 3-2-1 grande no centro da cena, um número por terço do silêncio.
+    Quem chuta um número fica para conferir (e comenta o chute). A resposta entra no corte para a cena seguinte."""
+    if t_local < 0 or t_local >= dur:
+        return
+    x0, y0, w0, h0 = ret
+    a = suave(t_local / 0.2) * suave((dur - t_local) / 0.1)
+    d = dur / 3
+    j = min(int(t_local / d), 2)
+    u = (t_local - j * d) / d
+    cx, cy = x0 + w0 / 2, y0 + h0 * 0.44
+    ctx.save()
+    ctx.rectangle(x0, y0, w0, h0)          # a cena escurece atrás da aposta: o número não briga com nada
+    cor(ctx, (0.005, 0.01, 0.025), 0.72 * a)
+    ctx.fill()
+    tam = 64
+    if larg(ctx, rotulo, tam, TITULO) > w0 - 120:
+        tam *= (w0 - 120) / larg(ctx, rotulo, tam, TITULO)
+    texto(ctx, rotulo, cx, cy - 170, tam, "amarelo", a, familia=TITULO, alinha="c", contorno=14)
+    resta = 1 - t_local / dur        # barra do tempo do chute acabando (sem círculo: regra do canal)
+    bw = w0 * 0.5
+    chanfro(ctx, cx - bw / 2, cy + 150, bw, 22, 8)
+    cor(ctx, (0.015, 0.025, 0.05), 0.85 * a)
+    ctx.fill_preserve()
+    _neon(ctx, "amarelo", a * 0.7, 1.5)
+    if resta > 0.02:
+        chanfro(ctx, cx - bw / 2 + 4, cy + 154, (bw - 8) * resta, 14, 5)
+        cor(ctx, "amarelo", 0.9 * a)
+        ctx.fill()
+    pop = 1 + 0.45 * (1 - suave(u / 0.25))
+    ctx.translate(cx, cy + 40)
+    ctx.scale(pop, pop)
+    texto(ctx, str(3 - j), 0, 52, 170, "texto", a * (1 - 0.35 * u), familia=TITULO, alinha="c", contorno=16)
+    ctx.restore()

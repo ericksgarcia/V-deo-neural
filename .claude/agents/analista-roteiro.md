@@ -22,6 +22,9 @@ Avalie com rigor, como quem decide se o vídeo vai reter:
 5. RITMO: frases de 3–12 palavras; repetição usada como ritmo; pausas de suspense nos lugares certos.
 6. PAYOFF E FINAL: o final surpreende? A chamada para comentar gera debate (escolher lado) e não só "comenta aí"?
 7. HONESTIDADE: todo número e afirmação bate com os FATOS? Aponte qualquer exagero.
+8. DIVERSÃO + SUSPENSE (`docs/ROTEIRO.md` §14): tensão e riso se alternam? as piadas (2-3, curtas, verdadeiras) caem nas falhas ou logo
+   DEPOIS de um número, nunca entre a pergunta e a resposta? o teste final tem o CHUTE ("Chuta aí… <long pause>" no fim da fala e o número no
+   começo da cena seguinte)? a resposta do teste cai entre 70% e 88% do vídeo?
 
 Responda em português com:
 - Nota 0–10 para cada critério e uma nota geral.

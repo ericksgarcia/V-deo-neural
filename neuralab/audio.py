@@ -175,7 +175,9 @@ ESTILO_PADRAO = (
     "'trailer' voice, never rush. Pace: calm and clear, about 2.6 words per second, with real silences. "
     "Emotional shape: open intrigued and a little incredulous; explain the rules plainly, like to a smart "
     "friend, with dry humor; go quiet and slow before a reveal, then say the number simply, letting it land; "
-    "when something finally works, sound genuinely moved and relieved, not hyped; end light, playful and "
+    "when something finally works, sound genuinely moved and relieved, not hyped; right after a number lands, "
+    "a tiny amused reaction is welcome (the joke comes after the reveal, never before it); when you dare the listener "
+    "to guess ('Chuta aí'), say it low and teasing, like a friend making a bet, then stay silent; end light, playful and "
     "direct, truly curious about the listener's answer.")
 
 
@@ -421,6 +423,17 @@ def impacto(intensidade=1.0, semente=0):
     return ((sub + ar) * intensidade).astype(np.float32)
 
 
+def coracao(intensidade=1.0, semente=0):
+    """Batida dupla de coração (tum-tum), grave e baixa: preenche o silêncio da aposta sem competir com nada."""
+    m = int(0.45 * SR)
+    tt = np.arange(m) / SR
+    x = np.zeros(m, np.float32)
+    for atraso, amp in ((0.0, 1.0), (0.17, 0.7)):
+        u = np.clip(tt - atraso, 0, None)
+        x += (np.sin(2 * np.pi * 52 * u) * np.exp(-u * 18) * (tt >= atraso) * amp).astype(np.float32)
+    return (x * 0.5 * intensidade).astype(np.float32)
+
+
 def boom(intensidade=1.0, semente=0):
     m = int(0.7 * SR)
     rng = np.random.default_rng(semente)
@@ -541,7 +554,8 @@ def torcida(dur, semente=0):
 
 SONS = {"boom": boom, "raio": raio, "batida": batida, "chute": chute, "rede": rede, "defesa": defesa, "fora": fora,
         "glitch": lambda i, k: glitch(k), "tique": lambda i, k: tique(k), "whoosh": lambda i, k: whoosh(k),
-        "ding": lambda i, k: ding(i > 1), "riser": lambda i, k: riser(i, k), "impacto": impacto}
+        "ding": lambda i, k: ding(i > 1), "riser": lambda i, k: riser(i, k), "impacto": impacto,
+        "coracao": coracao}
 
 
 # Regra do canal: efeitos NUNCA competem com a voz. Cada efeito é limitado a este pico (≈ -14 dBFS)

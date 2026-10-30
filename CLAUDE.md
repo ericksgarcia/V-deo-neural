@@ -11,7 +11,9 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
 3. **Só se não houver item pendente:** proponha 3 a 5 temas NOVOS (gancho, vista 2D, dois lados?, descoberta,
    esforço; confirme na web que são inéditos; recomende um) e use `AskUserQuestion`. Depois implemente.
 4. **Leia `docs/ROTEIRO.md` INTEIRO antes de escrever uma linha de roteiro** (inclusive a **seção 13, retenção v3**: promessa do
-   teste final no começo, números em ALGARISMOS na fala, 2-4 `<long pause>` antes das revelações, cenas ≤ 18 palavras, arena em pé). É o guia v2 do canal (vídeo curto,
+   teste final no começo, números em ALGARISMOS na fala, 2-4 `<long pause>` antes das revelações, cenas ≤ 18 palavras, arena em pé;
+   e a **seção 14, receita v4 diversão + suspense**: tensão → revelação → riso → nova tensão, piada só nas falhas e DEPOIS dos
+   números, **o CHUTE** "Chuta aí… <long pause>" antes do número final com a resposta na cena seguinte, resposta do teste a 70-88%). É o guia v2 do canal (vídeo curto,
    gancho com número da geração 1, poucos números, herói "o campeão", re-gancho no meio, laço falado, CTA sem votação,
    legenda nova). Ele vale mais que qualquer roteiro antigo: **não copie o estilo de `roteiros/*.py` anteriores**
    (eles têm CTA de voto, 70-90 s e muitos números); copie só a parte técnica (treino, replays, `A.busca`).

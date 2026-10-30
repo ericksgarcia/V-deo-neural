@@ -25,6 +25,14 @@ RE_EXT = re.compile(rf"(?i)\b\w+\s+v[íi]rgula\s+\w+\b|\b(?:{_EXT})(?:\s+(?:e\s+
                     rf"dez))*(?:\s+v[íi]rgula\s+\w+)?\b")
 PROMESSA = re.compile(r"(?i)\bno (fim|final)\b|at[ée] o (fim|final)|teste final|[úu]ltimo teste|no teste")
 PAUSA = {"short": 0.15, "long": 0.55}
+# receita v4 (diversão + suspense, docs/ROTEIRO.md §14)
+RE_CHUTE = re.compile(r"(?i)\bchut(a|e|em)\b|\bapost(a|o)\b")
+PAUSA_CHUTE = 2.4   # o motor estica o silêncio do chute (neuralab/video.py)
+HUMOR = re.compile(r"(?i)\bgente\b|\bjuro\b|\beu ri\b|\bri sozinho|coitad|tadinh|\bde novo\b|olha s[óo]|n[ãa]o [ée] poss[íi]vel|"
+                   r"\bsocorro\b|\bai,? ai\b|\bvergonha\b|\bpregui[çc]a\b|\bdesistiu\b|\bigual (a )?(eu|voc[êe]|gente)\b|"
+                   r"\bque aud[áa]cia\b|\bque fase\b|\bnem a[íi]\b|\bmeu deus\b|\bt[áa] bom\b|\bque isso\b|\bnossa\b|"
+                   r"\bfeito doido\b|\bque nem doido\b|\bpasse[ia]|\bdeu ruim\b|\bfoi mal\b|\bsem querer\b|\bvexame\b|\bc[ôo]mico\b|\bpiada\b")
+PONTE = re.compile(r"(?i)(\?|…|\.\.\.|<long pause>)\s*$|(^|[.!?…]\s+)(mas|s[óo] que|at[ée] que|a[íi]|e a[íi]|s[óo] tem)\b[^.!?]*[.!?…]?\s*$")
 PAL_S = 2.6   # palavras por segundo (README/NARRACAO)
 
 
@@ -41,10 +49,13 @@ def le(arq):
         m = re.match(r"^\s+(\d+)\s+(\S+)\s+(.*)$", ln)
         if m:
             fala, cartao = m.group(3), None
+            teste = bool(re.search(r"\s+\[TESTE\]\s*$", fala))
+            fala = re.sub(r"\s+\[TESTE\]\s*$", "", fala)
             c = re.search(r"\s+\[CART[ÃA]O (\d+)\]\s*$", fala)
             if c:
                 cartao, fala = int(c.group(1)), fala[:c.start()]
-            cenas.append({"tipo": m.group(2), "fala": fala, "cartao": cartao})
+            chute = bool(RE_CHUTE.search(fala) and fala.rstrip().endswith("<long pause>"))
+            cenas.append({"tipo": m.group(2), "fala": fala, "cartao": cartao, "teste": teste, "chute": chute})
     return cenas, "\n".join(legenda).strip()
 
 
@@ -80,11 +91,14 @@ def main():
     total = sum(pal)
     n_short = sum(c["fala"].count("<short pause>") for c in cenas)
     n_long = sum(c["fala"].count("<long pause>") for c in cenas)
-    dur = total / PAL_S + n_short * PAUSA["short"] + n_long * PAUSA["long"] + 0.22 * len(cenas)
-    ini, t = [], 0.0
+    ini, durs, t = [], [], 0.0
     for c, p in zip(cenas, pal):
         ini.append(t)
-        t += p / PAL_S + c["fala"].count("<short pause>") * 0.15 + c["fala"].count("<long pause>") * 0.55 + 0.22
+        d = p / PAL_S + c["fala"].count("<short pause>") * 0.15 + c["fala"].count("<long pause>") * 0.55 + \
+            (PAUSA_CHUTE if c["chute"] else 0.22)
+        durs.append(d)
+        t += d
+    dur = t
     print(f"cenas: {len(cenas)} · palavras: {total} · duração estimada: {dur:.0f} s (confirme com --so-voz)")
     if total > 150:
         r("FALHA", f"{total} palavras (máx 150; alvo 100–140)")
@@ -148,6 +162,39 @@ def main():
     if not any(PROMESSA.search(c["fala"]) for c in cenas[:3]):
         r("AVISO", "nenhuma promessa do teste final nas 3 primeiras cenas (ex.: \"No fim, eu testo o campeão num lugar "
                    "que ele nunca viu.\") — é o que segura até o fim (§13)")
+
+    # ---- receita v4: diversão + suspense (docs/ROTEIRO.md §14)
+    k_teste = next((k for k, c in enumerate(cenas) if c["teste"]), None)
+    if k_teste is None:
+        k_teste = next((k for k, c in enumerate(cenas) if c["tipo"] == "barras"), None)
+    chutes = [k for k, c in enumerate(cenas) if c["chute"]]
+    if not chutes:
+        r("AVISO", "sem CHUTE: antes do número final, termine uma fala em \"Chuta aí: … <long pause>\" e diga o número na "
+                   "cena seguinte (o motor faz a contagem 3-2-1; quem chuta fica para conferir) (§14)")
+    elif k_teste is not None and not any(k_teste - 1 <= k <= k_teste for k in chutes):
+        r("AVISO", f"o chute (cena {chutes[0]}) não está no teste final (cena {k_teste}); ele vale mais antes do número que paga o vídeo")
+    for k in chutes:
+        if k + 1 >= len(cenas):
+            r("FALHA", f"cena {k}: o chute é a última cena; a resposta precisa vir na cena seguinte")
+        elif not dados(cenas[k + 1]["fala"]):
+            r("AVISO", f"cena {k + 1}: logo depois do chute, a fala deve começar pela resposta (o número)")
+    if k_teste is not None:
+        k_rev = k_teste + 1 if cenas[k_teste]["chute"] and k_teste + 1 < len(cenas) else k_teste
+        pos = ini[k_rev] / dur
+        resto = dur - ini[k_rev] - durs[k_rev]
+        if not 0.62 <= pos <= 0.9:
+            r("AVISO", f"a resposta do teste final começa a {pos:.0%} do vídeo (alvo 70-88%): cedo demais esvazia o fim, "
+                       "tarde demais perde quem já saiu")
+        if resto > 9:
+            r("AVISO", f"{resto:.0f} s depois da resposta do teste (alvo ≤ 8 s: pergunta + laço); quem já viu o resultado sai")
+    pontes = [k for k in range(1, max(len(cenas) - 2, 1)) if PONTE.search(cenas[k]["fala"].strip())]
+    if len(pontes) < 2:
+        r("AVISO", f"só {len(pontes)} cena(s) do meio termina(m) olhando para a frente (\"Mas…\", pergunta, <long pause>): "
+                   "termine pelo menos 2 descobertas abrindo a próxima dúvida (§14)")
+    graca = sorted({m.group(0).lower() for c in cenas for m in HUMOR.finditer(limpa(c["fala"]))})
+    if len(graca) < 2:
+        r("AVISO", f"pouca diversão na fala ({', '.join(graca) or 'nenhuma marca de humor'}): pelo menos 2-3 momentos leves "
+                   "(falha zoada com carinho, comparação do dia a dia, bastidor), sempre DEPOIS de uma revelação ou numa falha (§14)")
 
     # ---- herói
     n_fala = sum(bool(re.search(r"(?i)\bcampe[ãa]o\b|\bcampe[ãa]\b", c["fala"])) for c in cenas)

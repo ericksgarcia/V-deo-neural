@@ -13,10 +13,15 @@ Uma cena é um dicionário. Campos comuns:
   log       linhas para o console: [(texto, cor)]
   destaques {palavra: cor} para colorir palavras da legenda
   teste     True na cena do teste final (casa "TESTE" da trilha); sem ele, vale a 1ª cena "barras"
+  chute     True (ou automático: fala com "Chuta…" que TERMINA em <long pause>): o silêncio vira a aposta do
+            espectador: contagem 3-2-1 na tela, coração batendo, simulação em câmera lenta; a resposta vem no
+            começo da cena seguinte (receita v4, docs/ROTEIRO.md §14)
 
 Retenção automática (layout v3): cada <long pause> da fala vira uma REVELAÇÃO (a música some, sobe um riser,
 e a palavra seguinte entra com impacto + zoom na cena); cenas ao vivo têm um zoom lento contínuo; a trilha de
 descobertas no topo mostra as casas ainda fechadas; telas de dados mostram a simulação ao fundo.
+Receita v4 (diversão + suspense): durante cada silêncio de suspense a simulação desacelera (câmera lenta) e a borda
+da cena escurece; o "chute" (ver campo) dá ao espectador ~2 s para apostar antes do número que importa.
 Campos de telas de dados: eras/serie/titulo (grafico), itens/destaque/titulo/sub (barras),
 pergunta/opcoes (final).
 """
@@ -36,6 +41,9 @@ from .palco.holo import Holo
 
 FPS = 30
 MIN_DUR = {"ao_vivo": 1.6, "replay": 2.0, "montagem": 2.4, "grafico": 2.4, "barras": 2.2, "final": 3.5}
+RE_CHUTE = re.compile(r"(?i)\bchut(a|e|em)\b|\bapost(a|o)\b")
+PAUSA_CHUTE = 2.4   # s de silêncio para o espectador apostar (silêncio local, sem nova requisição de voz)
+LENTO_SUSPENSE = 0.35   # velocidade da simulação durante o silêncio de suspense (câmera lenta)
 
 
 class Video:
@@ -45,6 +53,12 @@ class Video:
         self.voz, self.escala, self.narrar, self.cache, self.log = voz, escala, narrar, cache, log
         self.estilo, self.ritmo = estilo or info.get("estilo_voz"), ritmo
         for c in self.cenas:   # tags de pausa (<short pause>) vão só para a voz, nunca para a legenda
+            if "chute" not in c:
+                c["chute"] = bool(RE_CHUTE.search(c["fala"]) and c["fala"].rstrip().endswith("<long pause>"))
+            if c["chute"]:
+                c["pausa"] = max(c.get("pausa", 0.22), PAUSA_CHUTE)
+                if c["tipo"] == "barras" and c.get("destaque") is not None:
+                    c.setdefault("revela", 1e9)   # o vencedor só aparece depois do chute, na cena seguinte
             if "<" in c["fala"]:
                 c["fala_tts"] = c["fala"]
                 c["fala"] = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", c["fala"])).strip()
@@ -86,7 +100,7 @@ class Video:
     def _revelacoes(self):
         """Cada <long pause> = suspense: (início do silêncio, instante da revelação). A revelação é a palavra
         depois da pausa ou, se a pausa fecha a fala, o começo da cena seguinte (corte em suspense)."""
-        self.revelacoes = []
+        self.revelacoes, self.chutes = [], []
         for k, c in enumerate(self.cenas):
             tts = c.get("fala_tts", "")
             pos = 0
@@ -105,6 +119,8 @@ class Video:
                     continue
                 t1 = max(t1, t0 + 0.25)
                 self.revelacoes.append((t0, t1))
+                if c.get("chute") and n >= len(ps):
+                    self.chutes.append((t0, t1))
                 if c["tipo"] == "barras" and n < len(ps) and "revela" not in c:
                     c["revela"] = t1 - c["ini"]   # o destaque (o vencedor) só aparece quando a voz revela
 
@@ -167,7 +183,24 @@ class Video:
                 off += c["dur"]
 
     def tempo_sim(self, c, tl):
-        return float(c["mapa"](c["off"] + tl))
+        return float(c["mapa"](max(c["off"] + tl - self._atraso(c, tl), 0.0)))
+
+    def _atraso(self, c, tl):
+        """Tempo de simulação 'perdido' na câmera lenta dos silêncios de suspense, desde o início do grupo
+        (contínuo entre cenas do mesmo grupo: a ação não pula no corte)."""
+        a = c["ini"] - c["off"]
+        b = c["ini"] + tl
+        lag = 0.0
+        for t0, t1 in getattr(self, "revelacoes", []):
+            lag += max(0.0, min(b, t1) - max(a, t0))
+        return lag * (1 - LENTO_SUSPENSE)
+
+    def suspense_em(self, t):
+        """0..1: quanto o instante t está dentro de um silêncio de suspense (entra e sai suave)."""
+        for t0, t1 in getattr(self, "revelacoes", []):
+            if t0 <= t < t1:
+                return min(1.0, (t - t0) / 0.2, (t1 - t) / 0.08)
+        return 0.0
 
     def tempo_grupo(self, c, t):
         """Tempo desde o início do grupo de cenas (gráficos/barras não reanimam a cada cena)."""
@@ -262,6 +295,12 @@ class Video:
                 (float(v) + o - m) * z + m for v, o, m in zip(h.tela(*p), (x0, y0), (cx, cy)))
         else:
             self._tela_dados(ctx, c, tl)
+        su = self.suspense_em(t)
+        if su > 0:   # silêncio de suspense: a borda da cena escurece e pulsa como coração
+            K.vinheta(ctx, K.CENA, su * (0.55 + 0.15 * math.sin(t * 2 * math.pi * 1.6)))
+        for t0, t1 in getattr(self, "chutes", []):
+            if t0 <= t < t1:
+                K.contagem_chute(ctx, t - t0, t1 - t0, self.info.get("chute_rotulo", "SEU CHUTE?"))
         for _, t1 in getattr(self, "revelacoes", []):   # clarão curto na revelação
             if 0 <= t - t1 < 0.25:
                 x0, y0, w0, h0 = K.CENA
@@ -401,7 +440,11 @@ class Video:
         ff.wait()
         falas = [(c["ini"] + 0.05, c["audio"]) for c in self.cenas if c["audio"] is not None]
         for t0, t1 in self.revelacoes:
-            self.eventos += [(t0, "riser", t1 - t0), (t1, "impacto", 1)]
+            self.eventos += [(max(t0, t1 - 2.0), "riser", min(t1 - t0, 2.0)), (t1, "impacto", 1)]
+        for t0, t1 in self.chutes:   # aposta: tique a cada número da contagem + coração no silêncio
+            d = (t1 - t0) / 3
+            self.eventos += [(t0 + j * d, "tique", 1) for j in range(3)]
+            self.eventos += [(t0 + 0.1 + j * 0.62, "coracao", 1) for j in range(int((t1 - t0 - 0.2) / 0.62))]
         amb = self.A.ambiente(self.dur)
         mix = audio.mixa(self.dur, falas, self.eventos, ambiente=amb, silencios=self.revelacoes)
         tmp_a = saida + ".audio.f32"
