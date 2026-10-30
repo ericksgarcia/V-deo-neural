@@ -79,6 +79,12 @@ def duelo(hist, g, gf, n=600, semente=77):
     return float((j.estado == E.PEGO).mean())
 
 
+def dec(x):
+    """1.8 -> 'um vírgula oito' (para a voz)."""
+    i, d = f"{x:.1f}".split(".")
+    return f"{numero(int(i))} vírgula {numero(int(d))}"
+
+
 def numero(n):
     from ..audio import por_extenso
     return por_extenso(int(n))
@@ -117,12 +123,12 @@ def monta(hist, A):
     # ------------------------------------------------------------ PREMISSA + REGRA
     cena(tipo="ao_vivo", ger=min(2, G - 1), grupo="g1b",
          log=[("CADA CAÇADOR SÓ VÊ O QUE A LANTERNA ILUMINA", AMARELO), ("QUEM VAI MELHOR VIRA PAI DA PRÓXIMA TURMA", VERDE)],
-         fala="Eles só veem o que a lanterna ilumina. Três fugitivos tentam não ser vistos. <short pause> Quem vai melhor vira pai da próxima turma.")
+         fala="Eles só veem o que a lanterna ilumina. Três fugitivos se escondem. <short pause> Quem vai melhor vira pai da próxima turma.")
     # ------------------------------------------------------------ GERAÇÃO 1: o campeão falha
     r0 = A.rodada(C)
     k0 = A.busca(r0, "livre")
     cena(tipo="replay", ger=C, foco=k0, grupo="g1c", log=[("CAMPEÃO DA GER 001 · NINGUÉM PEGO", AMARELO)],
-         fala="O campeão da geração um. <short pause> Passou a noite sem achar ninguém.")
+         fala="O campeão da geração um. <short pause> Não achou ninguém.")
     # ------------------------------------------------------------ DESCOBERTA 1: o farol
     r1 = A.rodada(C + gf)
     k1 = A.busca(r1, "todos") or A.busca(r1, "pego")
@@ -130,7 +136,7 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "CAÇADORES", "nome": "O FAROL", "cor": AMARELO,
                  "stat": f"GIRAM A LANTERNA {giro(0)}% → {giro(gf)}% DO TEMPO"},
          log=[(f"GER {gf + 1:03d} · GIRO {giro(0)}% → {giro(gf)}%", AMARELO)],
-         fala=f"Geração {numero(gf + 1)}. O campeão descobre o farol: <short pause> gira a lanterna quase o tempo todo.")
+         fala=f"Geração {numero(gf + 1)}. O campeão descobre o farol: <short pause> gira a lanterna na maior parte do tempo.")
     marcos.append((gf, "1", AMARELO))
     # ------------------------------------------------------------ placar sobe
     r2 = A.rodada(C + gp)
@@ -142,7 +148,7 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=gp,
          log=[(f"GER {gp + 1:03d} · O PLACAR É DOS CAÇADORES", AMARELO)],
          carimbo={"texto": "FUGITIVOS SEM SAÍDA?", "cor": CIANO, "em": 0.4, "sub": f"GERAÇÃO {gp + 1}"},
-         fala="Parece o fim para os fugitivos. <short pause> Mas eles têm uma resposta. <long pause>")
+         fala="Os caçadores dominam. <short pause> Mas os fugitivos têm uma resposta. <long pause>")
     # ------------------------------------------------------------ DESCOBERTA 2: correr quando a luz bate
     r3 = A.rodada(C + gc)
     k3 = A.busca(r3, "livre")
@@ -151,7 +157,7 @@ def monta(hist, A):
          cartao={"numero": 2, "rotulo": "FUGITIVOS", "nome": "CORRER DA LUZ", "cor": CIANO,
                  "stat": f"VELOCIDADE SOB A LUZ {vp:.1f} → {vc:.1f} m/s"},
          log=[(f"GER {gc + 1:03d} · SOB A LUZ {vp:.1f} → {vc:.1f} m/s", CIANO)],
-         fala="Quando a luz bate, eles correm. <long pause> Quase o dobro da velocidade.")
+         fala=f"Eles aprendem a correr da luz. <long pause> De {dec(vp)} para {dec(vc)} metros por segundo.")
     marcos.append((gc, "2", CIANO))
     # ------------------------------------------------------------ TESTE
     itens = [("CAMPEÃO 1", s_um, MAGENTA), (f"CAMPEÃO {gp + 1}", s_pico, MAGENTA), (f"CAMPEÃO {G}", s_fin, VERDE)]
@@ -159,7 +165,7 @@ def monta(hist, A):
          sub="600 partidas novas · fugitivos pegos", destaque=1, cor_destaque="verde", revela=4.0,
          rotulo_destaque="▲ MELHOR",
          log=[("TESTE: 600 PARTIDAS NOVAS", AMARELO), (f"PEGOS {pct(s_um)}% → {pct(s_pico)}% → {pct(s_fin)}%", AMARELO)],
-         fala=f"Partidas novas, contra os fugitivos finais. <short pause> O campeão da geração um pegava {numero(round(100 * s_um))} em cem. "
+         fala=f"Teste com partidas novas. <short pause> O campeão da geração um pegava {numero(round(100 * s_um))} em cem. "
               f"O campeão da {numero(G)}… {numero(round(100 * s_fin))}.")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
@@ -167,7 +173,7 @@ def monta(hist, A):
     cena(tipo="replay", ger=C + G - 1, foco=kf, grupo="fim",
          escolha={"pergunta": "QUEM EVOLUIU MAIS?", "opcoes": [("QUEM CAÇA", MAGENTA), ("QUEM CORRE", CIANO)], "em": 0.2},
          destaques={"caça": MAGENTA, "corre": CIANO, "campeão": AMARELO},
-         fala="Quem evoluiu mais: quem caça ou quem corre? <short pause> Porque tudo começou quando eu…")
+         fala=f"Quem evoluiu mais: quem caça ou quem corre? <short pause> Porque tudo começou quando eu…")
 
     info = {"marca": "VÍDEO NEURAL", "serie": suave(hist["m_pegos"], 5), "serie_rotulo": "% FUGITIVOS PEGOS",
             "estilo_voz": ESTILO_VOZ, "marcos": marcos, "rotulo_vivo": f"{n} PARTIDAS",
