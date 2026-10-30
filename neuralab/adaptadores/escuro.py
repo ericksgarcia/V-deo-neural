@@ -170,6 +170,8 @@ class Escuro(Adaptador):
             p = rod.reg["c"][k, i, c]
             R.avatar(h, (float(p[0]), float(p[1])), float(rod.reg["ang"][k, i, c]), MAGENTA, t, alfa=1.0,
                      passo=t * 2.4, escala=1.5, base=False)
+            if rod.lado == "cac":    # campeão: seta presa a CADA caçador, recalculada a cada quadro
+                h.destaque((float(p[0]), float(p[1])), AMARELO, t, raio=0.45)
         for f in range(E.NF):
             p = rod.reg["f"][k, i, f]
             q = rod.reg["f"][k, ip, f]
@@ -180,6 +182,8 @@ class Escuro(Adaptador):
             acesa = bool(luz[f])
             R.avatar(h, (float(p[0]), float(p[1])), ang, BRANCO if acesa else CIANO, t,
                      alfa=1.0 if acesa else 0.32, passo=t * 2.4 if np.hypot(*vel) > 1e-4 else None, escala=1.5, base=False)
+            if rod.lado == "fug":
+                h.destaque((float(p[0]), float(p[1])), AMARELO, t, raio=0.45)
 
     def visiveis(self, rod, maxn=14):
         chave = ("vis", maxn)

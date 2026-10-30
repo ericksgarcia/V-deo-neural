@@ -194,6 +194,7 @@ class Escolta(Adaptador):
             ang = math.atan2(vel[1], vel[0]) if np.hypot(*vel) > 1e-4 else ang_g[c]
             R.avatar(h, (float(g[c][0]), float(g[c][1])), ang, CIANO, t, alfa=1.0, passo=(t * 2.4 if vivo else None),
                      escala=1.5, base=False)
+            h.destaque((float(g[c][0]), float(g[c][1])), AMARELO, t, raio=0.45)   # campeão: seta presa a cada segurança
         preva = rod.reg["a"][k, max(i - 1, 0)]
         for c in range(E.NS):
             vel = a[c] - preva[c]

@@ -217,6 +217,28 @@ class Holo:
         ctx.fill()
         ctx.set_operator(cairo.OPERATOR_OVER)
 
+    def destaque(self, c, cor, t, raio=0.5, rotulo=None, alfa=1.0):
+        """ÚNICO jeito permitido de destacar alguém (regra do dono): preso a UM agente, recalculado da posição dele
+        a cada quadro. Brilho no corpo + seta ▼ acima da cabeça (tamanho fixo na tela) + rótulo opcional curto.
+        Chame só enquanto o agente existe/está vivo; nunca no centro de um grupo, nunca com instante fixo.
+
+        c: posição do agente NESTE quadro (mundo); raio: meio tamanho do corpo (m), para a seta não tampar o agente."""
+        X, Y = (float(v) for v in self.tela(*c))
+        self.ponto_luz(c, max(18.0, self.px(raio) * 1.6), cor, 0.55 * alfa)
+        ctx = self.ctx
+        y = Y - self.px(raio) - 16 - 4 * math.sin(t * 6)
+        ctx.move_to(X, y)
+        ctx.line_to(X - 18, y - 26)
+        ctx.line_to(X + 18, y - 26)
+        ctx.close_path()
+        ctx.set_source_rgba(0.01, 0.02, 0.04, 0.85 * alfa)
+        ctx.set_line_width(6)
+        ctx.stroke_preserve()
+        self._cor(cor, alfa)
+        ctx.fill()
+        if rotulo:
+            self.texto(rotulo, self.mundo(X, y - 36), 24, cor, alfa)
+
     def rastro(self, pts, cor, larg=3.0, alfa=1.0):
         """Rastro que some na cauda (mais forte perto da ponta)."""
         P = np.asarray(pts, float)

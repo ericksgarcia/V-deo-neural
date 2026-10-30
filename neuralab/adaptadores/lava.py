@@ -120,7 +120,7 @@ class Lava(AdaptadorPopulacao):
                 h.ponto_luz((float(s[c, 0]), float(s[c, 1])), 22, MAGENTA, 0.9)
         hx, hy = float(s[quem, 0]), float(s[quem, 1])
         if not (0 <= morte[quem] <= i):
-            h.ponto_luz((hx, hy + H_AG * VIS / 2), 30, AMARELO, 0.5)   # brilho no corpo; sem anel/rótulo (regra do dono)
+            h.destaque((hx, hy + H_AG * VIS / 2), AMARELO, t, raio=H_AG * VIS / 2)   # seta presa à campeã, a cada quadro
         vivas = int(sum(1 for c in range(N) if not (0 <= morte[c] <= i)))
         h.texto(f"{vivas}/{N}", (LARG - 1.1, 9.6), 28, VERDE if vivas >= MIN_VIVAS else VERMELHO, 0.95)
         if rod.reg["estado"][k, i] == SUCESSO:

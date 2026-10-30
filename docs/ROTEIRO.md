@@ -272,7 +272,9 @@ precisa dar (a), (c) e (d).
 9. **Nenhum círculo/marcação na cena, em nenhum vídeo** (decisão do dono, out/2026): o telestrador (`marcas`: círculos,
    setas, rótulos tipo "PEGO!") foi desligado no motor porque nem sempre caía no lugar/instante certo; não use `marcas`.
    Nos adaptadores, NÃO desenhe anel nem rótulo "CAMPEÃO" (nem em volta de um agente, nem no centro de uma equipe) e nem anéis
-   pulsando em loop para apontar alguém. O campeão aparece pela câmera do replay, pela fala e pelo cartão; no máximo um brilho
-   (`h.ponto_luz`) no próprio corpo. Círculos que SÃO o mundo (corpo, arena, cofre) e o flash curto de um evento no ponto exato
+   pulsando em loop para apontar alguém. O campeão aparece pela câmera do replay, pela fala e pelo cartão. **Destacar é permitido só de
+   forma individual e que siga o tempo todo:** use `h.destaque(pos, cor, t, raio)` (brilho no corpo + seta ▼ acima da cabeça),
+   chamado a cada quadro com a posição DAQUELE agente naquele quadro; numa equipe, um destaque em cada membro; some quando o
+   agente morre/sai. Nunca no centro de um grupo, nunca com instante fixo. Círculos que SÃO o mundo (corpo, arena, cofre) e o flash curto de um evento no ponto exato
    (`h.pulso` de batida/chegada) continuam.
 
