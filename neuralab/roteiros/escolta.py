@@ -108,7 +108,7 @@ def monta(hist, A):
     # ------------------------------------------------------------ PREMISSA + REGRA
     cena(tipo="ao_vivo", ger=min(2, G - 1), grupo="g1b",
          log=[("OS ASSASSINOS QUEREM TOCAR NO VIP", MAGENTA), ("QUEM VAI MELHOR VIRA PAI DA PRÓXIMA TURMA", VERDE)],
-         fala="Outras três querem matá-lo. Cérebros vazios. <short pause> Quem vai melhor vira pai da próxima turma.")
+         fala="Outras três querem matá-lo. O VIP só anda reto. <short pause> Quem vai melhor vira pai da próxima turma.")
     # ------------------------------------------------------------ GERAÇÃO 1: o campeão falha
     r0 = A.rodada(C)
     k0 = A.busca(r0, "morto")
@@ -138,7 +138,7 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=g_calma,
          log=[(f"GER {g_calma + 1:03d} · VIPs MORTOS {morte(g_calma)}/{n}", AMARELO), ("O PLACAR TRAVA", AMARELO)],
          carimbo={"texto": "O PLACAR TRAVA", "cor": AMARELO, "em": 0.4, "sub": f"GERAÇÃO {g_calma + 1}"},
-         fala="Aí o placar trava. <short pause> Será que acabou? <long pause>")
+         fala="Parado por dezenas de gerações. <short pause> Será que acabou? <long pause>")
     # ------------------------------------------------------------ DESCOBERTA 3: o escudo humano
     r3 = A.rodada(C + g3)
     k3 = A.busca(r3, "salvo")
@@ -155,24 +155,24 @@ def monta(hist, A):
          sub="600 partidas novas · campeão de cada geração", destaque=1, cor_destaque="verde", revela=4.0,
          rotulo_destaque="▲ MELHOR",
          log=[("TESTE: 600 PARTIDAS NOVAS", AMARELO), (f"VIP SALVO {pct(s_ref)}% → {pct(s_fin)}%", AMARELO)],
-         fala=f"Teste: os assassinos finais. <short pause> O campeão da {g_ref + 1} salvava {numero(round(100 * s_ref))} em cem. "
+         fala=f"Partidas novas, contra os assassinos finais. <short pause> O campeão da {g_ref + 1} salvava {numero(round(100 * s_ref))} em cem. "
               f"O da {numero(G)}… {numero(round(100 * s_fin))}.")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
     kf = A.busca(rf, "salvo")
     cena(tipo="replay", ger=C + G - 1, foco=kf, grupo="fim",
-         escolha={"pergunta": "O CAMPEÃO APRENDEU?", "opcoes": [("PROTEGER", VERDE), ("SÓ COLAR", VERMELHO)], "em": 0.2},
-         destaques={"proteger": VERDE, "colar": VERMELHO},
-         fala="O campeão aprendeu a proteger… ou só a ficar colado no VIP? <short pause> Porque tudo começou quando eu…")
+         escolha={"pergunta": "VIP SÓ ANDA RETO", "opcoes": [("PROTEGEU", VERDE), ("TRAPACEOU", VERMELHO)], "em": 0.2},
+         destaques={"protegeu": VERDE, "trapaceou": VERMELHO, "reto": AMARELO},
+         fala="Se o VIP só anda reto, o campeão protegeu de verdade… ou trapaceou? <short pause> Porque tudo começou quando eu…")
 
     info = {"marca": "VÍDEO NEURAL", "serie": suave(1 - hist["m_vip_vivo"], 5), "serie_rotulo": "% VIPs MORTOS",
             "estilo_voz": ESTILO_VOZ, "marcos": marcos, "rotulo_vivo": f"{n} PARTIDAS",
             "rodape": f"{n} PARTIDAS · REDE {'-'.join(map(str, E.CAMADAS))} · {G} GERAÇÕES · "
                       "NADA FOI PROGRAMADO: SÓ SELEÇÃO, CRUZAMENTO E MUTAÇÃO"}
-    post = (f"Três IAs protegiam um VIP, três queriam matá-lo. Na geração 1, ele morreu em {morte(0)} de {n} partidas. 🕶️\n"
+    post = (f"Três IAs, um VIP e três assassinos. Na geração 1, ele morreu em {morte(0)} de {n}. 🕶️\n"
             f"IA aprendendo sozinha por seleção natural. Simulação real: {n} partidas por geração, {G} gerações, "
-            "nenhum número inventado.\n"
-            "Manda pra quem gruda no amigo VIP da festa e não sai de perto 👇\n\n"
-            "#inteligenciaartificial #ia #aprendizadodemaquina #simulacao #seguranca")
+            "números medidos no treino.\n"
+            "Marca o amigo que gruda em você na festa e não sai de perto 👇\n\n"
+            "#inteligenciaartificial #ia #aprendizadodemaquina #simulacao #selecaonatural")
     ev["duelo"] = {"ref": (g_ref, s_ref), "fin": (G - 1, s_fin)}
     return cenas, info, post, ev
