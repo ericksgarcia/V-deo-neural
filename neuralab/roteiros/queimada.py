@@ -141,7 +141,7 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "VERMELHOS", "nome": "A MIRA", "cor": VERMELHO,
                  "stat": f"ARREMESSOS NO ALVO {pct(m0['mira_b'])}% → {pct(m2['mira_b'])}%"},
          log=[(f"GER {g2 + 1:03d} · MIRA VERMELHA {pct(m0['mira_b'])}% → {pct(m2['mira_b'])}%", VERMELHO)],
-         fala=f"Geração {g2 + 1}. Os vermelhos aprendem a mirar. <short pause> De {pct(m0['mira_b'])} para {pct(m2['mira_b'])} em 100 arremessos, direto num adversário.")
+         fala=f"Geração {g2 + 1}. Os vermelhos começam a mirar. <short pause> De {pct(m0['mira_b'])} para {pct(m2['mira_b'])} em 100 arremessos, direto num adversário.")
     marcos.append((g2, "1", VERMELHO))
     # ------------------------------------------------------------ RE-GANCHO
     cena(tipo="ao_vivo", ger=g2,
@@ -156,24 +156,24 @@ def monta(hist, A):
                  "stat": f"JOGOS SEM NINGUÉM QUEIMADO {pct(m0['nenhum'])}% → {pct(m3['nenhum'])}%"},
          log=[(f"GER {g3 + 1:03d} · SEM QUEIMADO {pct(m0['nenhum'])}% → {pct(m3['nenhum'])}%", AMARELO)],
          fala=f"Geração {g3 + 1}. Jogos sem ninguém queimado. <long pause> De {pct(m0['nenhum'])} para {pct(m3['nenhum'])} em 100. "
-              "<short pause> Agora a bola trabalha.")
+              "<short pause> Agora a bola acha alguém.")
     marcos.append((g3, "2", AMARELO))
     # ------------------------------------------------------------ TESTE (o CHUTE fecha a fala; a resposta abre a cena seguinte)
     itens = [("CAMPEÃO 1", v_um, AZUL), (f"CAMPEÃO {g2 + 1}", v_pico, AZUL), (f"CAMPEÃO {G}", v_fin, VERDE)]
     duelo_kw = dict(tipo="barras", grupo="duelo", ger=G - 1, itens=itens, titulo="CAMPEÃO AZUL x VERMELHOS FINAIS",
-                    sub="600 jogos novos · vitórias do azul", destaque=2, cor_destaque="verde", rotulo_destaque="▲ MELHOR",
+                    sub="600 jogos novos · vitória = mais gente em pé aos 30 s", destaque=2, cor_destaque="verde", rotulo_destaque="▲ MELHOR",
                     log=[("TESTE: 600 JOGOS NOVOS", AMARELO), (f"VITÓRIAS {pct(v_um)}% → {pct(v_pico)}% → {pct(v_fin)}%", AMARELO)])
     cena(teste=True, **duelo_kw,
          fala=f"Contra os vermelhos finais. <short pause> O campeão da geração 1 vence {pct(v_um)} em 100. "
-              "Chuta aí: e o final? <long pause>")
-    cena(**dict(duelo_kw, sub=f"600 jogos novos · vitórias do azul · o final perde {pct(d_fin)}"), fala=f"{pct(v_fin)} em 100. <short pause> Quase sem mirar. Juro, eu ri sozinho.")
+              "Chuta aí: e o campeão final? <long pause>")
+    cena(**dict(duelo_kw, sub=f"vitórias do azul · o final também perde {pct(d_fin)}"), fala=f"{pct(v_fin)} em 100. <short pause> Quase sem mirar. Juro, eu ri sozinho.")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
     kf = A.busca(rf, "acerta") or A.busca(rf, "campeao")
     cena(tipo="replay", ger=C + G - 1, foco=kf, grupo="fim",
          escolha={"pergunta": "O QUE O CAMPEÃO APRENDEU?", "opcoes": [("APRENDEU A JOGAR", AZUL), ("SÓ A CORRER", VERMELHO)], "em": 0.2},
          destaques={"azul": AZUL, "vermelho": VERMELHO, "campeão": AMARELO},
-         fala="Ele aprendeu a jogar ou só a correr? <short pause> Porque tudo começou quando eu…")
+         fala="O campeão aprendeu a jogar ou só a correr? <short pause> Porque tudo começou quando eu…")
 
     serie_ger = 1 - ev["nenhum"]
     info = {"marca": "VÍDEO NEURAL", "serie": serie_ger, "serie_rotulo": "% JOGOS COM ALGUÉM QUEIMADO",
