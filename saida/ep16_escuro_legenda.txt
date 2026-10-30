@@ -1,0 +1,5 @@
+Dei lanternas a três caçadores e a IA inventou o farol sozinha. 🔦
+IA aprendendo sozinha por seleção natural (rede neural + algoritmo genético). Simulação real: 100 partidas por geração, 160 gerações, números medidos no treino.
+Marca o amigo que sempre se dá bem no esconde-esconde 👇
+
+#inteligenciaartificial #ia #redeneural #simulacao #escondeesconde
