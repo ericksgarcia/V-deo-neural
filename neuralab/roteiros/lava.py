@@ -174,7 +174,7 @@ def monta(hist, A):
     s_n, _ = duelo(hist, G - 1, ruido=1.0)
     itens = [("TORRE DE TREINO", s_t, CIANO), ("TORRE NOVA", s_n, AMARELO)]
     cena(tipo="barras", grupo="duelo", ger=G - 1, itens=itens, titulo="E EM TORRE NOVA?",
-         sub="600 torres de cada · salva = 4 ou mais IAs vivas · campeã da última geração", destaque=1, cor_destaque="amarelo", revela=4.0,
+         sub="600 torres de cada · salva = 4+ IAs vivas", destaque=1, cor_destaque="amarelo", revela=4.0,
          rotulo_destaque=f"▼ {(s_t - s_n) * 100:.0f} pts" if s_t - s_n >= 0.1 else "◀ SEGUROU",
          log=[("TESTE: 600 TORRES COM PLATAFORMAS NOVAS", AMARELO), (f"TORRES SALVAS {pct(s_t)} → {pct(s_n)}", AMARELO)],
          fala=f"Aí fiz maldade: mudei as plataformas de lugar. <short pause> Na de treino, "

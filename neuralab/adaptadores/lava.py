@@ -12,7 +12,8 @@ from ..desafios.lava import H_AG, LARG, MIN_VIVAS, TOPO, W_AG, Lava as DesafioLa
 from ..palco.holo import AMARELO, BRANCO, CIANO, LARANJA, MAGENTA, VERDE, VERMELHO, Camera2D, clareia
 from .populacao import AdaptadorPopulacao
 
-ESCALA = 68
+ESCALA = 46
+VIS = 1.6                  # as IAs são desenhadas maiores que a caixa física para se lerem no celular
 
 
 class Lava(AdaptadorPopulacao):
@@ -54,7 +55,7 @@ class Lava(AdaptadorPopulacao):
         c = self.heroi(rod, foco)
         hx = float(np.clip(sk[c, 0], 3.5, LARG - 3.5))
         hy = float(np.clip(sk[c, 1] + 1.6, 2.6, TOPO - 0.3))
-        perto = Camera2D(centro=(hx, hy), escala=ESCALA * 1.55, t=t)
+        perto = Camera2D(centro=(hx, hy), escala=ESCALA * 2.1, t=t)
         return geral.mistura(perto, min(t / 0.8, 1.0))
 
     # ------------------------------------------------------------ cenário
@@ -100,27 +101,29 @@ class Lava(AdaptadorPopulacao):
             x, y = float(s[c, 0]), float(s[c, 1])
             heroi = c == quem
             cor = AMARELO if heroi else CIANO
-            pts = [(x - W_AG / 2, y), (x + W_AG / 2, y), (x + W_AG / 2, y + H_AG), (x - W_AG / 2, y + H_AG)]
+            w, hh = W_AG * VIS / 2, H_AG * VIS
+            pts = [(x - w, y), (x + w, y), (x + w, y + hh), (x - w, y + hh)]
             if heroi:
                 tr = rod.reg["s"][k, max(0, i - 45): i + 1: 3, c, :2]
                 if len(tr) > 1:
                     h.rastro([(float(a), float(b) + H_AG / 2) for a, b in tr], AMARELO, 3, 0.7)
             h.forma(pts, cor, 1.0, 2.6, 0.3, oclusor=True)
-            h.circulo((x, y + H_AG * 0.62), 0.09, BRANCO, 0.95, 1.2, 0.9)       # "olho"
+            h.circulo((x, y + hh * 0.62), 0.11, BRANCO, 0.95, 1.2, 0.9)       # "olho"
             if y - nivel < 0.9:                                                  # lava perto: fica vermelha
-                h.circulo((x, y + H_AG / 2), 0.55, VERMELHO, 0.35, 1.6, 0.0)
+                h.circulo((x, y + hh / 2), 0.7, VERMELHO, 0.35, 1.6, 0.0)
         # degrau: brilho magenta onde alguém pisa na cabeça de outra IA
         for c in range(N):
             if 0 <= morte[c] <= i:
                 continue
             sob = int(rod.reg["extra"][k, i, 1 + c])
             if sob >= 0:
-                h.ponto_luz((float(s[c, 0]), float(s[c, 1])), 14, MAGENTA, 0.8)
+                h.ponto_luz((float(s[c, 0]), float(s[c, 1])), 22, MAGENTA, 0.9)
+                h.pulso((float(s[c, 0]), float(s[c, 1])), (t * 2) % 1.0, MAGENTA, 0.7, 1.0, 3)
         hx, hy = float(s[quem, 0]), float(s[quem, 1])
         if not (0 <= morte[quem] <= i):
-            h.circulo((hx, hy + H_AG / 2), 0.62 + 0.06 * math.sin(t * 6), AMARELO, 0.7, 2.0, 0.0)
-            h.ponto_luz((hx, hy + H_AG / 2), 26, AMARELO, 0.5)
-            h.texto("CAMPEÃ", (hx, hy + 1.35), 26, AMARELO, 1.0)
+            h.circulo((hx, hy + H_AG * VIS / 2), 0.85 + 0.06 * math.sin(t * 6), AMARELO, 0.7, 2.0, 0.0)
+            h.ponto_luz((hx, hy + H_AG * VIS / 2), 30, AMARELO, 0.5)
+            h.texto("CAMPEÃ", (hx, hy + 1.75), 26, AMARELO, 1.0)
         vivas = int(sum(1 for c in range(N) if not (0 <= morte[c] <= i)))
         h.texto(f"{vivas}/{N}", (LARG - 1.1, 9.6), 28, VERDE if vivas >= MIN_VIVAS else VERMELHO, 0.95)
         if rod.reg["estado"][k, i] == SUCESSO:
