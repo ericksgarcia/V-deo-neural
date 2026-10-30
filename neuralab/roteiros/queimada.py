@@ -121,7 +121,7 @@ def monta(hist, A):
 
     # ------------------------------------------------------------ GANCHO
     cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.0,
-         titulo_gancho=[("SOLTEI 6 IAs NA QUADRA", BRANCO), (f"{nen0} DE {n} JOGOS: NINGUÉM QUEIMADO", AMARELO)],
+         titulo_gancho=[("SOLTEI 2 TIMES DE IAs", BRANCO), (f"{nen0} DE {n} JOGOS: NINGUÉM QUEIMADO", AMARELO)],
          log=[(f"{n} PARTIDAS AO MESMO TEMPO", BRANCO), ("AZUL x VERMELHO · 0 REGRAS", AMARELO)],
          carimbo={"texto": f"{nen0} DE {n}", "cor": AMARELO, "em": 1.4, "sub": "JOGOS SEM NINGUÉM QUEIMADO · GERAÇÃO 1"},
          fala=f"Soltei dois times de IAs na queimada. <short pause> Em {nen0} de 100 jogos, ninguém foi queimado.")
@@ -175,7 +175,7 @@ def monta(hist, A):
     cena(teste=True, **duelo_kw,
          fala=f"Contra os vermelhos finais. <short pause> O campeão da geração 1 vence {pct(v_um)} em 100. "
               "Chuta aí: e o final? <long pause>")
-    cena(**dict(duelo_kw, sub=f"600 jogos novos · vitórias do azul · o campeão final também perde {pct(d_fin)}"), fala=f"{pct(v_fin)} em 100. <short pause> Quase sem mirar.")
+    cena(**dict(duelo_kw, sub=f"600 jogos novos · vitórias do azul · o final perde {pct(d_fin)}"), fala=f"{pct(v_fin)} em 100. <short pause> Quase sem mirar.")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
     kf = A.busca(rf, "acerta") or A.busca(rf, "campeao")
