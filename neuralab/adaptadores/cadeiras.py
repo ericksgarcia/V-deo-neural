@@ -107,7 +107,7 @@ class Cadeiras(Adaptador):
         # música: nota piscando enquanto toca; "PAROU!" logo depois
         if musica:
             pisca = 0.65 + 0.35 * math.sin(t * 9.0)
-            h.texto("♪", (K.CX, K.CY - 0.2), 90, ROSA, 0.35 * pisca)
+            h.texto("MÚSICA", (K.CX, K.CY - 0.2), 40, ROSA, 0.45 * pisca)
         elif i - K.KM < 14:
             h.texto("PAROU!", (K.CX, K.CY - 0.2), 56, AMARELO, 0.9)
         # rastro curto de cada IA em pé
@@ -118,8 +118,8 @@ class Cadeiras(Adaptador):
                 h.rastro([tuple(q) for q in tr], CIANO, 5, 0.35)
         # IAs: em pé = ciano; sentada = verde; no fim, quem ficou sem cadeira esmaece em rosa
         fim = (not musica) and i >= rod.T - 1
-        fora = em_pe & fim
-        pe = em_pe & ~fim
+        fora = em_pe if fim else np.zeros_like(em_pe)
+        pe = np.zeros_like(em_pe) if fim else em_pe
         self._pontos(h, p[pe, 0], p[pe, 1], CIANO, 0.62, 0.20)
         self._pontos(h, p[pe, 0], p[pe, 1], (0.8, 1.0, 1.0), 0.40, 1.0)
         self._pontos(h, p[fora, 0], p[fora, 1], ROSA, 0.62, 0.22)
