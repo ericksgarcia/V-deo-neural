@@ -94,12 +94,12 @@ def monta(hist, A):
     # ------------------------------------------------------------ PREMISSA + REGRA + comparação
     cena(tipo="ao_vivo", ger=min(2, G - 1), grupo="g1b",
          log=[("ACERTOU: O OUTRO SAI DA QUADRA", AMARELO), ("QUEM JOGA MELHOR VIRA PAI DA PRÓXIMA TURMA", VERDE)],
-         fala="Então: acertou, o outro sai. Quem joga melhor passa o jeito pros filhos.")
+         fala="Azuis contra vermelhas: acertou, o outro sai. Quem joga melhor passa o jeito pros filhos.")
     # ------------------------------------------------------------ GERAÇÃO 1: o campeão leva bolada + promessa
     r0 = A.rodada(C)
     k0 = A.busca(r0, "levou")
     cena(tipo="replay", ger=C, foco=k0, grupo="g1c", log=[("CAMPEÃO DA GER 001 · ATINGIDO", VERMELHO)],
-         fala="Igual a escolher o time. <short pause> O campeão da geração 1 entrou e levou bolada. No fim, testo ele.")
+         fala="Então o campeão da geração 1 entrou e levou bolada. <short pause> No fim, testo ele.")
     # ------------------------------------------------------------ DESCOBERTA 1: mão quente
     r1 = A.rodada(C + gm)
     k1 = A.busca(r1, "acerto")
@@ -112,14 +112,14 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=gp,
          log=[(f"GER {gp + 1:03d} · AZUIS VENCEM {az_p}% · VERMELHAS {vm_p}%", AMARELO), ("PARELHO", AMARELO)],
          carimbo={"texto": "PARELHO", "cor": AMARELO, "em": 0.4, "sub": f"GERAÇÃO {gp + 1} · {az_p}% x {vm_p}%"},
-         fala=f"Só que as vermelhas aprendiam também. <short pause> Será que o jogo travou de vez? <long pause>")
+         fala=f"Só que o time vermelho aprendia também. <short pause> Será que o jogo travou de vez? <long pause>")
     # ------------------------------------------------------------ DESCOBERTA 2: acertar mais
     r2 = A.rodada(C + gx)
     k2 = A.busca(r2, "acerto")
     cena(tipo="replay", ger=C + gx, foco=k2,
          cartao={"numero": 2, "rotulo": "AZUIS", "nome": "ARREMESSO CERTEIRO", "cor": CIANO, "stat": f"ARREMESSOS QUE ACERTAM {ac0}% → {ac1}%"},
          log=[(f"GER {gx + 1:03d} · ACERTOS {ac0}% → {ac1}%", CIANO)],
-         fala=f"Até que o campeão passou a acertar. <long pause> De {ac0} para {ac1} em 100. <short pause> Eu só deixei rodar.")
+         fala=f"Daí o campeão passou a acertar. <long pause> De {ac0} para {ac1} em 100. <short pause> Eu só dei pontos por acertar.")
     marcos.append((gx, "2", CIANO))
     # ------------------------------------------------------------ TESTE (CHUTE)
     itens = [("CAMPEÃO 1", s_um, CIANO), (f"CAMPEÃO {g_ref + 1}", s_ref, CIANO), (f"CAMPEÃO {G}", s_fin, VERDE)]
@@ -133,7 +133,7 @@ def monta(hist, A):
     rf = A.rodada(C + G - 1)
     kf = A.busca(rf, "vence")
     cena(tipo="replay", ger=C + G - 1, foco=kf, grupo="fim", destaques={"larga": VERDE, "segura": CIANO, "campeão": AMARELO},
-         fala="Quem joga melhor: quem segura ou quem larga? <short pause> Porque tudo começou quando eu…")
+         fala="Largar a bola é esperteza ou fugir do jogo? <short pause> Porque tudo começou quando eu…")
 
     info = {"marca": "VÍDEO NEURAL", "serie": suave(hist["m_azul_vence"], 5), "serie_rotulo": "% VITÓRIAS DO AZUL",
             "marcos": marcos, "rotulo_vivo": f"{n} IAs", "nome_teste": "TESTE FINAL",
