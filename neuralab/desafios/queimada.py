@@ -56,6 +56,7 @@ class Queimada:
         # medidas
         self.arremessos = np.zeros((2, n))
         self.acertos = np.zeros((2, n))
+        self.pegadas = np.zeros((2, n))
         self.seg_passos = np.zeros((2, n))                # passos segurando a bola
         self.seg_lider = np.zeros((2, n))                 # passos segurando a bola ESTANDO na frente
         self.lider_passos = np.zeros((2, n))
@@ -227,6 +228,7 @@ class Queimada:
                     k = np.where(ok[w], -d[w], -1e9).argmax(1)
                     self.estado[w] = SEGURA
                     self.dono_t[w], self.dono_i[w] = t, k
+                    self.pegadas[t, w] += 1
                     self.bv[w] = 0
         # ---- medidas por passo
         seg = (self.estado == SEGURA) & ativo
@@ -261,6 +263,6 @@ class Queimada:
         a, b = self.vivos()
         r = self.resultado()
         tempo = 1 - self.t_fim / PASSOS
-        fa = 4 * (r > 0) + 1.2 * (r == 0) + 0.6 * (a - b) / 3 * 1.0 + acerto * 0.8 * self.acertos[0] + 0.4 * tempo * (r > 0)
-        fb = 4 * (r < 0) + 1.2 * (r == 0) + 0.6 * (b - a) / 3 * 1.0 + acerto * 0.8 * self.acertos[1] + 0.4 * tempo * (r < 0)
+        fa = 4 * (r > 0) + 1.2 * (r == 0) + 0.6 * (a - b) / 3 * 1.0 + acerto * 0.8 * self.acertos[0] + 0.5 * np.minimum(self.pegadas[0], 4) + 0.4 * tempo * (r > 0)
+        fb = 4 * (r < 0) + 1.2 * (r == 0) + 0.6 * (b - a) / 3 * 1.0 + acerto * 0.8 * self.acertos[1] + 0.5 * np.minimum(self.pegadas[1], 4) + 0.4 * tempo * (r < 0)
         return fa, fb

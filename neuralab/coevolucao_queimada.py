@@ -49,7 +49,7 @@ def metricas(j):
             "seg": float((j.seg_passos.sum(0) / passos).mean()),
             "cera": float(j.seg_lider.sum() / max(j.lider_passos.sum(), 1)),
             "arr_lider": float(j.arr_lider.sum() / max(j.lider_passos.sum() / 20.0, 1)),
-            "zero": float((j.acertos.sum(0) == 0).mean()),
+            "pega": float(j.pegadas.sum() / j.n / 2), "zero": float((j.acertos.sum(0) == 0).mean()),
             "dist": float(np.mean(j.dist_arr[0] + j.dist_arr[1])) if (j.dist_arr[0] or j.dist_arr[1]) else 0.0,
             "vivos": float(j.vivos()[0].mean() / 3 + j.vivos()[1].mean() / 3) / 2}
 
@@ -95,7 +95,7 @@ def treina(geracoes=120, pop=60, jogos=4, semente=3, log=print, fase1=20, museu_
             np.add.at(apt_b, ib4, fb4)
         if log and (g % 10 == 0 or g == geracoes - 1):
             log(f"ger {g + 1:3d} az {m['azul_vence']:.0%} vm {m['verm_vence']:.0%} emp {m['empate']:.0%} arr {m['arr']:.1f} "
-                f"acerto {m['acerto']:.0%} hits {m['hits']:.2f} seg {m['seg']:.0%} cera {m['cera']:.0%} dist {m['dist']:.1f}")
+                f"acerto {m['acerto']:.0%} hits {m['hits']:.2f} seg {m['seg']:.0%} pega {m['pega']:.1f} cera {m['cera']:.0%} dist {m['dist']:.1f}")
         if g % museu_cada == museu_cada - 1:
             mus_a.append(ga[np.argsort(-apt_a)[:4]].copy())
             mus_b.append(gb[np.argsort(-apt_b)[:4]].copy())
