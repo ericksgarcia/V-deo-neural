@@ -1,4 +1,4 @@
-Em 66 de 100 jogos, ninguém levou bolada. Aí as IAs aprenderam a jogar... 🏐
+Em 66 de 100 jogos, ninguém acertou ninguém. Aí as IAs aprenderam a jogar... 🏐
 IA aprendendo sozinha por seleção natural. Simulação real: 6 IAs por jogo, 140 gerações, números medidos no treino.
 Marca quem na escola nunca largava a bola 👇
 
