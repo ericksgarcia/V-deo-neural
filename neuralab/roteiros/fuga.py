@@ -107,7 +107,7 @@ def monta(hist, A):
          cartao={"numero": 2, "rotulo": "AZUIS", "nome": "SE ESCONDER MENOS", "cor": VERDE,
                  "stat": f"ESCONDIDOS {a0}% → {a1}% DO TEMPO"},
          log=[(f"GER {ge + 1:03d} · ATRÁS DO BLOCO {a0}% → {a1}%", VERDE)],
-         fala="Mas olha os blocos. <long pause> Ficaram menos tempo escondidos. <short pause> Eu achava que esconder era o truque.")
+         fala="Mas olha os esconderijos. <long pause> Ficaram menos tempo escondidos. <short pause> Eu achava que esconder era o truque.")
     marcos.append((ge, "2", VERDE))
     # ------------------------------------------------------------ TESTE (a turma inteira)
     itens = [("TURMA 1", s_um, CIANO), (f"TURMA {G}", s_fin, VERDE)]
