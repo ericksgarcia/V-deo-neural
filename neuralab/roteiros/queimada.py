@@ -90,19 +90,19 @@ def monta(hist, A):
          titulo_gancho=[("DUAS TURMAS DE IA NA QUEIMADA", BRANCO), (f"NINGUÉM ATINGIDO EM {zero} DE 100", AMARELO)],
          log=[(f"{n} IAs · QUEIMADA", BRANCO), ("AZUIS x VERMELHAS · 0 REGRAS DE COMO JOGAR", CIANO)],
          carimbo={"texto": f"{zero} DE 100", "cor": AMARELO, "em": 0.8, "sub": "JOGOS SEM NINGUÉM ATINGIDO · GERAÇÃO 1"},
-         fala=f"Joguei duas turmas de IA numa queimada: <short pause> em {zero} de 100 jogos, ninguém foi atingido.")
+         fala=f"Joguei seis IAs numa queimada: <short pause> em {zero} de 100 jogos, ninguém acertou ninguém.")
     # ------------------------------------------------------------ GERAÇÃO 1: o campeão leva bolada + promessa
     r0 = A.rodada(C)
     k0 = A.busca(r0, "levou")
     cena(tipo="replay", ger=C, foco=k0, grupo="g1c", log=[("ACERTOU: O OUTRO SAI · QUEM JOGA MELHOR VIRA PAI DA PRÓXIMA TURMA", AMARELO)],
-         fala="Azuis e vermelhas, tipo na escola: acertou, sai. O campeão da geração 1 entrou e levou bolada. <short pause> No fim, testo ele.")
+         fala="Tipo na escola: acertou, sai. O campeão da geração 1 entrou e levou bolada. <short pause> No fim, testo ele.")
     # ------------------------------------------------------------ DESCOBERTA 1: mão quente
     r1 = A.rodada(C + gm)
     k1 = A.busca(r1, "acerto")
     cena(tipo="replay", ger=C + gm, foco=k1,
          cartao={"numero": 1, "rotulo": "AZUIS", "nome": "MÃO QUENTE", "cor": VERDE, "stat": f"BOLA NA MÃO {seg0}% → {seg1}% DO TEMPO"},
          log=[(f"GER {gm + 1:03d} · BOLA NA MÃO {seg0}% → {seg1}%", VERDE)],
-         fala=f"Aí o campeão largou a bola. <long pause> Antes, mais da metade do tempo com ela. Agora, bem pouco. <short pause> Batata quente.")
+         fala=f"Aí o campeão largou a bola. <long pause> Antes, {seg0}% do tempo com ela. Agora, {seg1}. <short pause> Batata quente.")
     marcos.append((gm, "1", VERDE))
     # ------------------------------------------------------------ RE-GANCHO: os vermelhos também aprendem
     cena(tipo="ao_vivo", ger=gp,
@@ -123,7 +123,7 @@ def monta(hist, A):
               titulo="CAMPEÃO AZUL x VERMELHAS FINAIS", sub="600 partidas novas · vitórias do azul", destaque=2, cor_destaque="verde",
               rotulo_destaque="", log=[("TESTE: 600 PARTIDAS NOVAS", AMARELO), (f"VITÓRIAS {pct(s_um)}% → {pct(s_ref)}% → {pct(s_fin)}%", AMARELO)])
     cena(teste=True, **kw,
-         fala="Agora o teste. <short pause> Chuta aí: em 100 jogos, quantos o campeão final vence? <long pause>")
+         fala="Agora o teste. <short pause> Chuta aí: quantos em 100 o campeão final vence? <long pause>")
     cena(**kw, fala=f"{round(100 * s_fin)} em 100. <short pause> Coitadas.")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
@@ -134,7 +134,7 @@ def monta(hist, A):
     info = {"marca": "VÍDEO NEURAL", "serie": suave(hist["m_azul_vence"], 5), "serie_rotulo": "% VITÓRIAS DO AZUL",
             "marcos": marcos, "rotulo_vivo": f"{n} IAs", "nome_teste": "TESTE FINAL",
             "rodape": f"{n} IAs · MIRA AUTOMÁTICA, GANDULA E RELÓGIO DE 20 s PROGRAMADOS · PONTOS POR ACERTAR E PEGAR A BOLA · ADVERSÁRIAS MAIS LENTAS NAS 20 PRIMEIRAS GERAÇÕES"}
-    post = (f"Em {zero} de 100 jogos, ninguém levou bolada. Aí as IAs aprenderam a jogar... 🏐\n"
+    post = (f"Em {zero} de 100 jogos, ninguém acertou ninguém. Aí as IAs aprenderam a jogar... 🏐\n"
             f"IA aprendendo sozinha por seleção natural. Simulação real: {n} IAs por jogo, {G} gerações, números medidos no treino.\n"
             "Marca quem na escola nunca largava a bola 👇\n\n"
             "#inteligenciaartificial #ia #aprendizadodemaquina #simulacao #queimada")
