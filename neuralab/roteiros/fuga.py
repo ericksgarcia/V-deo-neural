@@ -77,8 +77,7 @@ def monta(hist, A):
         return kw
 
     vezes = int(round(s_fin / max(s_um, 0.005)))
-    reacao = ("Mais de dez vezes. Juro, ninguém ensinou isso." if vezes >= 10 else f"{vezes} vezes mais. Juro, ninguém ensinou isso." if vezes >= 2
-              else "Melhorou. Pouco, mas melhorou.")
+    reacao_vis = "MAIS DE DEZ VEZES MAIS" if vezes >= 10 else f"{vezes} VEZES MAIS" if vezes >= 2 else "MELHOROU"
     # ------------------------------------------------------------ GANCHO
     cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.0,
          titulo_gancho=[("1 TORRETA x 12 IAs", BRANCO), (f"NINGUÉM PASSOU EM {zero} DE 100", AMARELO)],
@@ -88,7 +87,7 @@ def monta(hist, A):
     # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA (sem números)
     cena(tipo="ao_vivo", ger=min(3, G - 1), grupo="g1b",
          log=[("A TORRETA ATIRA E OS BLOCOS DESLIZAM", VERMELHO), ("QUEM PASSA VIRA PAI DA PRÓXIMA TURMA", VERDE)],
-         fala="Então fiz assim: quem passa vira pai da próxima turma. <short pause> No fim, tem teste.")
+         fala="Quem passa vira pai da próxima turma. <short pause> No fim, tem teste.")
     # ------------------------------------------------------------ GERAÇÃO 1: o campeão cai
     r0 = A.rodada(C)
     k0 = A.busca(r0, "caiu")
@@ -101,7 +100,7 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "AZUIS", "nome": "CORRER RETO", "cor": CIANO,
                  "stat": f"CHEGARAM {c0}% → {c1}%"},
          log=[(f"GER {gr + 1:03d} · CHEGARAM {c0}% → {c1}%", CIANO)],
-         fala=f"Aí o campeão e a turma pararam de zigue-zaguear. <long pause> Passaram de {c0} para {c1} em 100. <short pause> Coitada.")
+         fala=f"Aí o campeão parou de zigue-zaguear. <long pause> A turma foi de {c0} para {c1} em 100. <short pause> Coitada.")
     marcos.append((gr, "1", CIANO))
     # ------------------------------------------------------------ RE-GANCHO + DESCOBERTA 2 numa cena só (o número fica no cartão)
     r2 = A.rodada(C + ge)
@@ -110,7 +109,7 @@ def monta(hist, A):
          cartao={"numero": 2, "rotulo": "AZUIS", "nome": "SE ESCONDER MENOS", "cor": VERDE,
                  "stat": f"ATRÁS DO BLOCO {a0}% → {a1}% DO TEMPO"},
          log=[(f"GER {ge + 1:03d} · ATRÁS DO BLOCO {a0}% → {a1}%", VERDE)],
-         fala="Só que olha os blocos. <long pause> Ficaram menos tempo escondidos. <short pause> Eu achava que esconder era o truque.")
+         fala="Mas olha os blocos. <long pause> Ficaram menos tempo escondidos. <short pause> Eu achava que esconder era o truque.")
     marcos.append((ge, "2", VERDE))
     # ------------------------------------------------------------ TESTE (a turma inteira)
     itens = [("TURMA 1", s_um, CIANO), (f"TURMA {G}", s_fin, VERDE)]
@@ -119,7 +118,7 @@ def monta(hist, A):
               log=[("TESTE: CIDADES NOVAS", AMARELO), (f"CHEGAM {pct(s_um)}% → {pct(s_fin)}%", AMARELO)])
     cena(teste=True, **kw,
          fala="Faltava o teste. <short pause> Cidades novas, turma final. Chuta aí: quantos passam? <long pause>")
-    cena(**kw, fala=f"{pct(s_fin)} em 100. <short pause> {reacao}")
+    cena(**dict(kw, sub=f"azuis que chegam · {reacao_vis}"), fala=f"{pct(s_fin)} em 100. <short pause> Juro, ninguém ensinou isso.")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
     kf = A.busca(rf, "chegou")
