@@ -193,6 +193,20 @@ class Queimada:
         vel = np.hypot(self.bv[:, 0], self.bv[:, 1])
         para = voo & (vel < 4.5)
         self.estado[para] = LIVRE
+        # o gandula: bola parada é rolada até o jogador vivo mais perto da metade em que ela está
+        vel = np.hypot(self.bv[:, 0], self.bv[:, 1])
+        parada = (self.estado == LIVRE) & ativo & (vel < 2.0)
+        if parada.any():
+            metade = (self.bp[:, 1] > MEIO).astype(int)
+            w = np.where(parada)[0]
+            pos = self.p[metade[w], w]
+            d = np.hypot(*(pos - self.bp[w][:, None]).transpose(2, 0, 1))
+            d = np.where(self.vivo[metade[w], w], d, 99.0)
+            k = d.argmin(1)
+            ok = d[np.arange(len(w)), k] < 90
+            dirv = pos[np.arange(len(w)), k] - self.bp[w]
+            dirv = dirv / np.maximum(np.hypot(dirv[:, 0], dirv[:, 1]), 1e-6)[:, None]
+            self.bv[w[ok]] = dirv[ok] * 4.0
         # ---- acerto
         acerto = np.zeros(n, bool)
         if voo.any():
