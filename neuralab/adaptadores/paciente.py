@@ -128,13 +128,18 @@ class Paciente(Adaptador):
         p, inf = rod.p[i], rod.inf[i]
         sau, vir = ~inf, inf
         zoom = h.cam.escala > 60
-        # saudáveis: núcleo claro + halo suave
-        self._pontos(h, p[sau, 0], p[sau, 1], CIANO, 0.42 if not zoom else 0.3, 0.16)
-        self._pontos(h, p[sau, 0], p[sau, 1], (0.85, 1.0, 1.0), 0.17 if not zoom else 0.14, 0.9)
+        # rastro curto de movimento em todos (a velocidade fica legível no celular)
+        for a in range(P.A):
+            tr = rod.p[max(0, i - 9): i + 1: 3, a]
+            if len(tr) > 1 and np.hypot(*(tr[-1] - tr[0])) > 0.05:
+                h.rastro([tuple(q) for q in tr], TOXICO if inf[a] else CIANO, 3.5, 0.5)
+        # saudáveis: núcleo claro + halo suave (corpos grandes: o olho acha o ponto em tela pequena)
+        self._pontos(h, p[sau, 0], p[sau, 1], CIANO, 0.7 if not zoom else 0.5, 0.20)
+        self._pontos(h, p[sau, 0], p[sau, 1], (0.85, 1.0, 1.0), 0.3 if not zoom else 0.24, 0.95)
         # infectados: halo tóxico pulsando + núcleo
         pulso = 0.8 + 0.2 * math.sin(t * 9)
-        self._pontos(h, p[vir, 0], p[vir, 1], TOXICO, 0.62 * pulso, 0.20)
-        self._pontos(h, p[vir, 0], p[vir, 1], (0.95, 1.0, 0.6), 0.2, 0.95)
+        self._pontos(h, p[vir, 0], p[vir, 1], TOXICO, 0.95 * pulso, 0.26)
+        self._pontos(h, p[vir, 0], p[vir, 1], (0.95, 1.0, 0.6), 0.34, 0.98)
         # anel de pulso de quem acabou de se contagiar
         novos = np.where((rod.t_inf >= 0) & (rod.t_inf <= i) & ((i - rod.t_inf) * P.DT < 0.9) & (rod.t_inf > 0))[0]
         for a in novos[:30]:
