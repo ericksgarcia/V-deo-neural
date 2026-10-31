@@ -94,7 +94,7 @@ def monta(hist, A):
     # ------------------------------------------------------------ PREMISSA + REGRA + comparação
     cena(tipo="ao_vivo", ger=min(2, G - 1), grupo="g1b",
          log=[("ACERTOU: O OUTRO SAI DA QUADRA", AMARELO), ("QUEM JOGA MELHOR VIRA PAI DA PRÓXIMA TURMA", VERDE)],
-         fala="Então: acertou, o outro sai. Quem joga melhor vira pai da turma.")
+         fala="Então: acertou, o outro sai. Quem joga melhor passa o jeito pros filhos.")
     # ------------------------------------------------------------ GERAÇÃO 1: o campeão leva bolada + promessa
     r0 = A.rodada(C)
     k0 = A.busca(r0, "levou")
@@ -112,7 +112,7 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=gp,
          log=[(f"GER {gp + 1:03d} · AZUIS VENCEM {az_p}% · VERMELHAS {vm_p}%", AMARELO), ("PARELHO", AMARELO)],
          carimbo={"texto": "PARELHO", "cor": AMARELO, "em": 0.4, "sub": f"GERAÇÃO {gp + 1} · {az_p}% x {vm_p}%"},
-         fala=f"Só que as vermelhas aprendiam também. <short pause> Será que acabou? <long pause>")
+         fala=f"Só que as vermelhas aprendiam também. <short pause> Será que o jogo travou de vez? <long pause>")
     # ------------------------------------------------------------ DESCOBERTA 2: acertar mais
     r2 = A.rodada(C + gx)
     k2 = A.busca(r2, "acerto")
