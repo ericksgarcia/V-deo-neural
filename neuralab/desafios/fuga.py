@@ -3,9 +3,9 @@
 Mundo 2D visto de cima, ARENA EM PÉ (14 x 22 m). A torreta (centro) e os 4 blocos que deslizam são PROGRAMADOS e fixos; só o
 cérebro azul evolui (os 12 azuis de uma cidade usam o MESMO cérebro). Ninguém recebe regra de "esconder", "zigue-zague" ou "esperar":
 só vê a posição, a torreta, a bala mais próxima, o bloco mais próximo e se há um bloco entre ele e a torreta. Nota = quão longe chega
-(mais bônus por chegar). A torreta mira um azul qualquer dentro do alcance, sem prever o movimento, e erra um pouco; bala lenta e visível.
+(mais bônus por chegar). A torreta mira o azul mais perto, sem prever o movimento, e erra um pouco; bala lenta e visível.
 
-Curadoria (31/out/2026, autorizada pelo dono): bala visível (8 m/s), 1 tiro a cada 0,8 s, pequeno erro de mira; zona de tiro de 10,5 m.
+Curadoria (31/out/2026, autorizada pelo dono): bala visível (9 m/s), 1 tiro a cada 0,4 s, pequeno erro de mira; zona de tiro de 10,5 m.
 """
 import numpy as np
 
@@ -16,11 +16,11 @@ V_MAX, ACEL = 3.0, 12.0
 DT, PASSOS = 1 / 15, 300                  # 20 s por cidade
 TX, TY = LARG / 2, 11.0                   # torreta
 ALCANCE = 10.5
-V_BALA, CAD, ERRO_MIRA = 11.0, 2, 0.035
+V_BALA, CAD, ERRO_MIRA = 9.0, int(0.4 / DT), 0.05
 NB = 6                                    # balas em voo (anel)
 K = 4                                     # blocos
-BLOCO_Y = np.array([5.0, 7.5, 14.5, 17.0], np.float32)
-BLOCO_HW, BLOCO_HH, BLOCO_V = 1.8, 0.3, 1.2
+BLOCO_Y = np.array([6.5, 8.5, 13.5, 15.5], np.float32)
+BLOCO_HW, BLOCO_HH, BLOCO_V = 1.2, 0.3, 1.4
 BLOCO_AMP = 5.0
 CHEGADA = ALT - 1.5
 CAMADAS = (16, 12, 2)
@@ -145,10 +145,9 @@ class Cidade:
         # torreta: a cada CAD passos mira o azul mais perto (sem prever o movimento) com erro
         if self.k % CAD == 0:
             alvo_d = np.where(ativo, np.hypot(TX - self.p[..., 0], TY - self.p[..., 1]), 1e9)
-            sorteio = np.where(alvo_d < ALCANCE, self.rng.random((self.n, A)), -1.0)   # um azul qualquer na zona de tiro
-            j = sorteio.argmax(1)
+            j = alvo_d.argmin(1)                                                        # mira o azul mais perto
             lin = np.arange(self.n)
-            ok = sorteio[lin, j] >= 0
+            ok = alvo_d[lin, j] < ALCANCE
             ang = np.arctan2(self.p[lin, j, 1] - TY, self.p[lin, j, 0] - TX) + self.rng.normal(0, ERRO_MIRA, self.n)
             slot = self.disparos % NB
             self.bp[ok, slot] = (TX, TY)

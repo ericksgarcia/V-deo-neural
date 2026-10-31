@@ -84,16 +84,16 @@ def monta(hist, A):
          titulo_gancho=[("1 TORRETA x 12 IAs", BRANCO), (f"NINGUÉM PASSOU EM {zero} DE 100", AMARELO)],
          log=[(f"{n} IAs · 1 TORRETA", VERMELHO), ("NINGUÉM SABE O QUE FAZER", AMARELO)],
          carimbo={"texto": f"{zero} DE 100", "cor": AMARELO, "em": 1.4, "sub": "CIDADES ONDE NINGUÉM CHEGOU · GERAÇÃO 1"},
-         fala=f"Coloquei uma torreta no caminho de {n} IAs. <short pause> Em {zero} de 100 cidades, ninguém passou.")
+         fala=f"Coloquei uma torreta atirando em IAs. <short pause> Em {zero} de 100 cidades, ninguém passou.")
     # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA (sem números)
     cena(tipo="ao_vivo", ger=min(3, G - 1), grupo="g1b",
          log=[("A TORRETA ATIRA E OS BLOCOS DESLIZAM", VERMELHO), ("QUEM PASSA VIRA PAI DA PRÓXIMA TURMA", VERDE)],
-         fala="Quem passa vira pai da próxima turma. <short pause> No fim, testo o campeão e a turma.")
+         fala="Então fiz assim: quem passa vira pai da próxima turma. <short pause> No fim, tem teste.")
     # ------------------------------------------------------------ GERAÇÃO 1: o campeão cai
     r0 = A.rodada(C)
     k0 = A.busca(r0, "caiu")
     cena(tipo="replay", ger=C, foco=k0, grupo="g1c", log=[("CAMPEÃO DA GER 001 · ATINGIDO", VERMELHO)],
-         fala="É tipo atravessar um campo cheio de bolas voando. <short pause> O campeão da geração 1 tentou. E foi atingido.")
+         fala="É tipo atravessar um campo cheio de bolas. <short pause> O campeão da geração 1 foi atingido.")
     # ------------------------------------------------------------ DESCOBERTA 1: correr reto
     r1 = A.rodada(C + gr)
     k1 = A.busca(r1, "chegou")
@@ -110,7 +110,7 @@ def monta(hist, A):
          cartao={"numero": 2, "rotulo": "AZUIS", "nome": "SE ESCONDER MENOS", "cor": VERDE,
                  "stat": f"ATRÁS DO BLOCO {a0}% → {a1}% DO TEMPO"},
          log=[(f"GER {ge + 1:03d} · ATRÁS DO BLOCO {a0}% → {a1}%", VERDE)],
-         fala="Só que olha o que fizeram com os blocos. <long pause> Se esconderam menos. <short pause> Eu não esperava.")
+         fala="Só que olha o que fizeram com os blocos. <long pause> Ficaram menos tempo escondidos. <short pause> Eu achava que esconder era o truque.")
     marcos.append((ge, "2", VERDE))
     # ------------------------------------------------------------ TESTE (a turma inteira)
     itens = [("TURMA 1", s_um, CIANO), (f"TURMA {G}", s_fin, VERDE)]
@@ -124,9 +124,9 @@ def monta(hist, A):
     rf = A.rodada(C + G - 1)
     kf = A.busca(rf, "chegou")
     cena(tipo="replay", ger=C + G - 1, foco=kf, grupo="fim",
-         escolha={"pergunta": "CORAGEM OU SORTE?", "opcoes": [("CORAGEM", CIANO), ("SORTE", AMARELO)], "em": 0.2},
+         escolha={"pergunta": "CORAGEM OU BURRICE?", "opcoes": [("CORAGEM", CIANO), ("BURRICE", AMARELO)], "em": 0.2},
          destaques={"reto": CIANO, "campeão": AMARELO},
-         fala="Correr reto foi coragem ou só sorte da torreta errar? <short pause> Porque tudo começou quando eu…")
+         fala="Correr reto é coragem ou burrice? <short pause> Porque tudo começou quando eu…")
 
     info = {"marca": "VÍDEO NEURAL", "serie": suave(hist["m_chegou"], 5), "serie_rotulo": "% AZUIS QUE CHEGAM",
             "marcos": marcos, "rotulo_vivo": f"{n} IAs", "nome_teste": "TESTE FINAL",
