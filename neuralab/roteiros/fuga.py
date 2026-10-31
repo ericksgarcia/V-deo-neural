@@ -87,12 +87,12 @@ def monta(hist, A):
     # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA (sem números)
     cena(tipo="ao_vivo", ger=min(3, G - 1), grupo="g1b",
          log=[("A TORRETA ATIRA E OS BLOCOS DESLIZAM", VERMELHO), ("QUEM PASSA VIRA PAI DA PRÓXIMA TURMA", VERDE)],
-         fala="Quem passa vira pai da próxima turma. <short pause> No fim, tem teste.")
+         fala="Quem passa vira pai da próxima turma.")
     # ------------------------------------------------------------ GERAÇÃO 1: o campeão cai
     r0 = A.rodada(C)
     k0 = A.busca(r0, "caiu")
     cena(tipo="replay", ger=C, foco=k0, grupo="g1c", log=[("CAMPEÃO DA GER 001 · ATINGIDO", VERMELHO)],
-         fala="É tipo atravessar um campo cheio de bolas. <short pause> O campeão da geração 1 foi atingido.")
+         fala="É tipo atravessar um campo cheio de bolas. <short pause> O campeão da geração 1 foi atingido. No fim, tem teste.")
     # ------------------------------------------------------------ DESCOBERTA 1: correr reto
     r1 = A.rodada(C + gr)
     k1 = A.busca(r1, "chegou")
@@ -100,14 +100,12 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "AZUIS", "nome": "CORRER RETO", "cor": CIANO,
                  "stat": f"CHEGARAM {c0}% → {c1}%"},
          log=[(f"GER {gr + 1:03d} · CHEGARAM {c0}% → {c1}%", CIANO)],
-         fala=f"Aí o campeão parou de zigue-zaguear. <long pause> A turma foi de {c0} para {c1} em 100. <short pause> Coitada.")
+         fala=f"Aí o campeão parou de zigue-zaguear. <long pause> A turma foi de {c0} para {c1} em 100. <short pause> Mas ficou estranho.")
     marcos.append((gr, "1", CIANO))
     # ------------------------------------------------------------ RE-GANCHO + DESCOBERTA 2 numa cena só (o número fica no cartão)
-    r2 = A.rodada(C + ge)
-    k2 = A.busca(r2, "chegou")
-    cena(tipo="replay", ger=C + ge, foco=k2,
+    cena(tipo="ao_vivo", ger=ge,
          cartao={"numero": 2, "rotulo": "AZUIS", "nome": "SE ESCONDER MENOS", "cor": VERDE,
-                 "stat": f"ATRÁS DO BLOCO {a0}% → {a1}% DO TEMPO"},
+                 "stat": f"ESCONDIDOS {a0}% → {a1}% DO TEMPO"},
          log=[(f"GER {ge + 1:03d} · ATRÁS DO BLOCO {a0}% → {a1}%", VERDE)],
          fala="Mas olha os blocos. <long pause> Ficaram menos tempo escondidos. <short pause> Eu achava que esconder era o truque.")
     marcos.append((ge, "2", VERDE))
