@@ -44,10 +44,11 @@ def nota_historia(hist):
     return float(min(ch[-10:].mean() - ch[:3].mean(), 0.5) * 6 + hist["m_zero"][:3].mean() + min(ev["esconde"] - ev["reto"], 25) / 10)
 
 
-def duelo(hist, g, n=300, semente=77):
-    """Campeão da geração g em n cidades novas: fração de azuis que chega (0-1)."""
-    c = campeao(hist, g)
-    j, _ = cidades(hist["genes"][g], np.full(n, c), semente)
+def duelo(hist, g, rodadas=5, semente=77):
+    """A TURMA inteira da geração g (todos os cérebros) em cidades novas: fração de azuis que chega (0-1)."""
+    genes = hist["genes"][g]
+    pop = len(genes)
+    j, _ = cidades(genes, np.repeat(np.arange(pop), rodadas), semente + g)
     return float(j.chegou.mean())
 
 
@@ -63,10 +64,10 @@ def monta(hist, A):
     gr, ge = ev["reto"], ev["esconde"]
     n = F.A
     zero = int(round(100 * float(hist["m_zero"][:3].mean())))
-    c0, c1 = int(round(100 * float(hist["m_chegou"][:3].mean()))), int(round(100 * float(ev["ch"][gr])))
     a0, a1 = int(round(100 * float(hist["m_atras"][:3].mean()))), int(round(100 * float(ev["at"][ge])))
     l0, l1 = float(hist["m_lat"][:3].mean()), float(ev["lat"][gr])
-    s_um, s_fin = duelo(hist, 0), duelo(hist, G - 1)
+    s_um, s_fin, s_gr = duelo(hist, 0), duelo(hist, G - 1), duelo(hist, gr)   # mesma medida (cidades novas) em todo o vídeo
+    c0, c1 = int(round(100 * s_um)), int(round(100 * s_gr))
     C = G
     cenas, marcos = [], []
 
@@ -75,17 +76,19 @@ def monta(hist, A):
         cenas.append(kw)
         return kw
 
-    reacao = "Mais que o dobro." if s_fin >= 2 * s_um else "Melhorou. Bem pouco, mas melhorou."
+    vezes = int(round(s_fin / max(s_um, 0.005)))
+    reacao = ("Mais de dez vezes. Ninguém ensinou isso." if vezes >= 10 else f"{vezes} vezes mais. Ninguém ensinou isso." if vezes >= 2
+              else "Melhorou. Pouco, mas melhorou.")
     # ------------------------------------------------------------ GANCHO
     cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.0,
-         titulo_gancho=[("1 TORRETA x 12 IAs", BRANCO), (f"NENHUMA PASSOU EM {zero} DE 100", AMARELO)],
+         titulo_gancho=[("1 TORRETA x 12 IAs", BRANCO), (f"NINGUÉM PASSOU EM {zero} DE 100", AMARELO)],
          log=[(f"{n} IAs · 1 TORRETA", VERMELHO), ("NINGUÉM SABE O QUE FAZER", AMARELO)],
          carimbo={"texto": f"{zero} DE 100", "cor": AMARELO, "em": 1.4, "sub": "CIDADES ONDE NINGUÉM CHEGOU · GERAÇÃO 1"},
-         fala=f"Coloquei uma torreta no caminho de {n} IAs. <short pause> Em {zero} de 100 cidades, nenhuma passou.")
-    # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA
+         fala=f"Coloquei uma torreta no caminho de {n} IAs. <short pause> Em {zero} de 100 cidades, ninguém passou.")
+    # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA (sem números)
     cena(tipo="ao_vivo", ger=min(3, G - 1), grupo="g1b",
          log=[("A TORRETA ATIRA E OS BLOCOS DESLIZAM", VERMELHO), ("QUEM PASSA VIRA PAI DA PRÓXIMA TURMA", VERDE)],
-         fala="Quem passa vira pai da próxima turma. <short pause> No fim, testo o campeão em cidades novas.")
+         fala="Quem passa vira pai da próxima turma. <short pause> No fim, testo o campeão e a turma.")
     # ------------------------------------------------------------ GERAÇÃO 1: o campeão cai
     r0 = A.rodada(C)
     k0 = A.busca(r0, "caiu")
@@ -98,31 +101,24 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "AZUIS", "nome": "CORRER RETO", "cor": CIANO,
                  "stat": f"CHEGARAM {c0}% → {c1}%"},
          log=[(f"GER {gr + 1:03d} · CHEGARAM {c0}% → {c1}%", CIANO)],
-         fala=f"Aí, na geração {gr + 1}, os azuis pararam de zigue-zaguear. <long pause> Chegaram de {c0} para {c1} em 100. "
-              "<short pause> Coitada da torreta.")
+         fala=f"Aí o campeão e a turma pararam de zigue-zaguear. <long pause> Passaram de {c0} para {c1} em 100. <short pause> Coitada.")
     marcos.append((gr, "1", CIANO))
-    # ------------------------------------------------------------ RE-GANCHO
-    gq = max(gr - 4, 2)
-    cena(tipo="ao_vivo", ger=gq,
-         log=[(f"GER {gq + 1:03d} · OS AZUIS PASSAM MAIS", CIANO)],
-         carimbo={"texto": "E OS BLOCOS?", "cor": VERDE, "em": 0.4, "sub": f"GERAÇÃO {gq + 1}"},
-         fala="Só que olha o que eles fizeram com os blocos. <long pause>")
-    # ------------------------------------------------------------ DESCOBERTA 2: se escondem menos
+    # ------------------------------------------------------------ RE-GANCHO + DESCOBERTA 2 numa cena só (o número fica no cartão)
     r2 = A.rodada(C + ge)
     k2 = A.busca(r2, "chegou")
     cena(tipo="replay", ger=C + ge, foco=k2,
          cartao={"numero": 2, "rotulo": "AZUIS", "nome": "SE ESCONDER MENOS", "cor": VERDE,
                  "stat": f"ATRÁS DO BLOCO {a0}% → {a1}% DO TEMPO"},
          log=[(f"GER {ge + 1:03d} · ATRÁS DO BLOCO {a0}% → {a1}%", VERDE)],
-         fala=f"Eles se esconderam menos. <long pause> Atrás do bloco: de {a0} para {a1} em 100. <short pause> Eu não esperava.")
+         fala="Só que olha o que fizeram com os blocos. <long pause> Se esconderam menos. <short pause> Eu não esperava.")
     marcos.append((ge, "2", VERDE))
-    # ------------------------------------------------------------ TESTE
-    itens = [("CAMPEÃO 1", s_um, CIANO), (f"CAMPEÃO {G}", s_fin, VERDE)]
-    kw = dict(tipo="barras", grupo="teste", ger=G - 1, itens=itens, titulo="CAMPEÃO AZUL x TORRETA",
-              sub="300 cidades novas · azuis que chegam", destaque=1, cor_destaque="verde", rotulo_destaque="",
-              log=[("TESTE: 300 CIDADES NOVAS", AMARELO), (f"CHEGAM {pct(s_um)}% → {pct(s_fin)}%", AMARELO)])
+    # ------------------------------------------------------------ TESTE (a turma inteira)
+    itens = [("TURMA 1", s_um, CIANO), (f"TURMA {G}", s_fin, VERDE)]
+    kw = dict(tipo="barras", grupo="teste", ger=G - 1, itens=itens, titulo="TURMA AZUL x TORRETA",
+              sub="cidades novas · azuis que chegam", destaque=1, cor_destaque="verde", rotulo_destaque="",
+              log=[("TESTE: CIDADES NOVAS", AMARELO), (f"CHEGAM {pct(s_um)}% → {pct(s_fin)}%", AMARELO)])
     cena(teste=True, **kw,
-         fala=f"Faltava o teste. <short pause> O campeão da geração 1 faz {pct(s_um)} em 100. Chuta aí: e o final? <long pause>")
+         fala="Faltava o teste. <short pause> Cidades novas, turma final. Chuta aí: quantos passam? <long pause>")
     cena(**kw, fala=f"{pct(s_fin)} em 100. <short pause> {reacao}")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
