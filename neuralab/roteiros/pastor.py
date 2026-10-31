@@ -99,7 +99,7 @@ def monta(hist, A):
     marcos.append((g2, "1", AMARELO))
     # ------------------------------------------------------------ RE-GANCHO + DESCOBERTA 2: juntar
     cena(tipo="replay", ger=C + g3, foco=0,
-         cartao={"numero": 2, "rotulo": "CÃO", "nome": "REBANHO JUNTO", "cor": VERDE, "stat": f"NO CURRAL {pc}% → {p3}% DAS OVELHAS"},
+         cartao={"numero": 2, "rotulo": "CÃO", "nome": "REBANHO JUNTO", "cor": VERDE, "stat": f"DE {pc}% PARA {p3}% NO CURRAL"},
          log=[(f"GER {g3 + 1:03d} · NO CURRAL {pc}% → {p3}%", VERDE), (f"REBANHO MAIS JUNTO: ESPALHAMENTO {e0:.1f} → {e1:.1f}", VERDE)],
          fala=f"Mas elas quase pararam de entrar. <short pause> Será que acabou? <long pause> Ele juntou o rebanho sozinho. {p3} em cada 100.")
     marcos.append((g3, "2", VERDE))

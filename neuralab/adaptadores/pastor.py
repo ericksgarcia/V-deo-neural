@@ -93,10 +93,10 @@ class Pastor(Adaptador):
         h.forma(borda, CIANO, 0.5, 2.0, 0.02)
         h.linha(borda, CIANO, 3.5, 0.9, fechado=True)
         # curral: piso verde suave e 3 paredes (esquerda, direita; o topo é a borda da arena)
-        h.forma([(P.PX0, P.PY0), (P.PX1, P.PY0), (P.PX1, P.ALT), (P.PX0, P.ALT)], VERDE, 0.5, 0.0, 0.10)
-        h.linha([(P.PX0, P.PY0), (P.PX0, P.ALT)], VERDE, 5.0, 0.95)
-        h.linha([(P.PX1, P.PY0), (P.PX1, P.ALT)], VERDE, 5.0, 0.95)
-        h.texto("CURRAL", (P.LARG / 2, P.ALT - 1.0), 22, VERDE, 0.8)
+        h.forma([(P.PX0, P.PY0), (P.PX1, P.PY0), (P.PX1, P.ALT), (P.PX0, P.ALT)], VERDE, 0.5, 0.0, 0.26)
+        h.linha([(P.PX0, P.PY0), (P.PX0, P.ALT)], VERDE, 6.0, 1.0)
+        h.linha([(P.PX1, P.PY0), (P.PX1, P.ALT)], VERDE, 6.0, 1.0)
+        h.texto("CURRAL", (P.LARG / 2, P.ALT - 1.1), 34, VERDE, 0.95)
 
     def _pontos(self, h, xs, ys, cor, r_m, alfa):
         import cairo
@@ -119,12 +119,12 @@ class Pastor(Adaptador):
         tr = rod.c[max(0, i - 15): i + 1: 3]
         if len(tr) > 1:
             h.rastro([tuple(q) for q in tr], LARANJA, 7, 0.6)
-        # ovelhas
+        # ovelhas: corpo pequeno e nítido (o halo fraco evita virar uma nuvem branca)
         fora = ~din
-        self._pontos(h, o[fora, 0], o[fora, 1], OVELHA, 0.95 if perto else 1.1, 0.25)
-        self._pontos(h, o[fora, 0], o[fora, 1], (1, 1, 1), 0.5 if perto else 0.6, 1.0)
-        self._pontos(h, o[din, 0], o[din, 1], VERDE, 0.95 if perto else 1.1, 0.30)
-        self._pontos(h, o[din, 0], o[din, 1], (0.8, 1.0, 0.9), 0.5 if perto else 0.6, 1.0)
+        self._pontos(h, o[fora, 0], o[fora, 1], OVELHA, 0.55 if perto else 0.62, 0.14)
+        self._pontos(h, o[fora, 0], o[fora, 1], (1, 1, 1), 0.34 if perto else 0.38, 1.0)
+        self._pontos(h, o[din, 0], o[din, 1], VERDE, 0.55 if perto else 0.62, 0.22)
+        self._pontos(h, o[din, 0], o[din, 1], (0.75, 1.0, 0.85), 0.34 if perto else 0.38, 1.0)
         # cão: corpo grande laranja com halo e nariz na direção do movimento
         self._pontos(h, [c[0]], [c[1]], LARANJA, 1.2 if perto else 1.4, 0.30)
         self._pontos(h, [c[0]], [c[1]], (1.0, 0.75, 0.4), 0.65 if perto else 0.8, 1.0)
