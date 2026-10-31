@@ -39,6 +39,7 @@ CFG = {
     "fuga": dict(gera=100, ep=11),
     "queimada": dict(gera=140, ep=17),
     "pastor": dict(gera=150, ep=18),
+    "cadeiras": dict(gera=200, ep=19),
 }
 DESAFIOS = tuple(CFG)
 GERACOES = {k: v["gera"] for k, v in CFG.items()}
@@ -217,6 +218,25 @@ def treino_pastor(G, sementes):
     return melhor[1], melhor[2]
 
 
+def treino_cadeiras(G, sementes):
+    from neuralab.coevolucao_cadeiras import treina
+    from neuralab.roteiros.cadeiras import nota_historia
+    melhor = None
+    for s in sementes:
+        arq = os.path.join(".cache", f"cadeiras_{G}_{s}.npz")
+        if os.path.exists(arq):
+            hist = dict(np.load(arq))
+        else:
+            print(f"treinando dança das cadeiras (semente {s}, {G} gerações)…")
+            hist = treina(G, semente=s, log=None)
+            np.savez_compressed(arq, **hist)
+        nota = nota_historia(hist)
+        print(f"  semente {s}: nota da história {nota:.2f}")
+        if melhor is None or nota > melhor[0]:
+            melhor = (nota, s, hist)
+    return melhor[1], melhor[2]
+
+
 def treino_paciente(G, sementes):
     from neuralab.coevolucao_paciente import treina
     from neuralab.roteiros.paciente import nota_historia
@@ -320,6 +340,12 @@ def main():
         from neuralab.roteiros.pastor import monta
         s, hist = treino_pastor(G, [int(x) for x in (a.sementes or "3,5,7,11").split(",")])
         A = Pastor(hist)
+        cenas, info, post, _ = monta(hist, A)
+    elif a.desafio == "cadeiras":
+        from neuralab.adaptadores.cadeiras import Cadeiras
+        from neuralab.roteiros.cadeiras import monta
+        s, hist = treino_cadeiras(G, [int(x) for x in (a.sementes or "19").split(",")])
+        A = Cadeiras(hist)
         cenas, info, post, _ = monta(hist, A)
     elif a.desafio == "paciente":
         from neuralab.adaptadores.paciente import Paciente
