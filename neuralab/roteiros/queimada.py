@@ -91,22 +91,18 @@ def monta(hist, A):
          log=[(f"{n} IAs · QUEIMADA", BRANCO), ("AZUIS x VERMELHAS · 0 REGRAS DE COMO JOGAR", CIANO)],
          carimbo={"texto": f"{zero} DE 100", "cor": AMARELO, "em": 0.8, "sub": "JOGOS SEM NINGUÉM ATINGIDO · GERAÇÃO 1"},
          fala=f"Joguei duas turmas de IA numa queimada: <short pause> em {zero} de 100 jogos, ninguém foi atingido.")
-    # ------------------------------------------------------------ PREMISSA + REGRA + comparação
-    cena(tipo="ao_vivo", ger=min(2, G - 1), grupo="g1b",
-         log=[("ACERTOU: O OUTRO SAI DA QUADRA", AMARELO), ("QUEM JOGA MELHOR VIRA PAI DA PRÓXIMA TURMA", VERDE)],
-         fala="Azuis e vermelhas, tipo na escola: acertou, sai. O melhor passa o jeito pros filhos.")
     # ------------------------------------------------------------ GERAÇÃO 1: o campeão leva bolada + promessa
     r0 = A.rodada(C)
     k0 = A.busca(r0, "levou")
-    cena(tipo="replay", ger=C, foco=k0, grupo="g1c", log=[("CAMPEÃO DA GER 001 · ATINGIDO", VERMELHO)],
-         fala="Então o campeão da geração 1 entrou e levou bolada. <short pause> No fim, testo ele.")
+    cena(tipo="replay", ger=C, foco=k0, grupo="g1c", log=[("ACERTOU: O OUTRO SAI · QUEM JOGA MELHOR VIRA PAI DA PRÓXIMA TURMA", AMARELO)],
+         fala="Azuis e vermelhas, tipo na escola: acertou, sai. O campeão da geração 1 entrou e levou bolada. <short pause> No fim, testo ele.")
     # ------------------------------------------------------------ DESCOBERTA 1: mão quente
     r1 = A.rodada(C + gm)
     k1 = A.busca(r1, "acerto")
     cena(tipo="replay", ger=C + gm, foco=k1,
          cartao={"numero": 1, "rotulo": "AZUIS", "nome": "MÃO QUENTE", "cor": VERDE, "stat": f"BOLA NA MÃO {seg0}% → {seg1}% DO TEMPO"},
          log=[(f"GER {gm + 1:03d} · BOLA NA MÃO {seg0}% → {seg1}%", VERDE)],
-         fala=f"Aí o campeão largou a bola. <long pause> Antes, {seg0}% do tempo com ela na mão. Depois, {seg1}. <short pause> Batata quente.")
+         fala=f"Aí o campeão largou a bola. <long pause> Antes, mais da metade do tempo com ela. Agora, bem pouco. <short pause> Batata quente.")
     marcos.append((gm, "1", VERDE))
     # ------------------------------------------------------------ RE-GANCHO: os vermelhos também aprendem
     cena(tipo="ao_vivo", ger=gp,
@@ -119,7 +115,7 @@ def monta(hist, A):
     cena(tipo="replay", ger=C + gx, foco=k2,
          cartao={"numero": 2, "rotulo": "AZUIS", "nome": "ARREMESSO CERTEIRO", "cor": CIANO, "stat": f"ARREMESSOS QUE ACERTAM {ac0}% → {ac1}%"},
          log=[(f"GER {gx + 1:03d} · ACERTOS {ac0}% → {ac1}%", CIANO)],
-         fala=f"O campeão passou a acertar. <long pause> De {ac0} para {ac1} em 100. <short pause> Ninguém mandou: só dei pontos por acertar.")
+         fala=f"O campeão passou a acertar. <long pause> Mais que o dobro de acertos. <short pause> Ninguém mandou: dei pontos por acertar.")
     marcos.append((gx, "2", CIANO))
     # ------------------------------------------------------------ TESTE (CHUTE)
     itens = [("CAMPEÃO 1", s_um, CIANO), (f"CAMPEÃO {g_ref + 1}", s_ref, CIANO), (f"CAMPEÃO {G}", s_fin, VERDE)]
