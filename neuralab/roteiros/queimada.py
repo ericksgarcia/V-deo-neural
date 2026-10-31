@@ -94,7 +94,7 @@ def monta(hist, A):
     # ------------------------------------------------------------ PREMISSA + REGRA + comparação
     cena(tipo="ao_vivo", ger=min(2, G - 1), grupo="g1b",
          log=[("ACERTOU: O OUTRO SAI DA QUADRA", AMARELO), ("QUEM JOGA MELHOR VIRA PAI DA PRÓXIMA TURMA", VERDE)],
-         fala="Azuis contra vermelhas: acertou, o outro sai. Quem joga melhor passa o jeito pros filhos.")
+         fala="Azuis e vermelhas, tipo na escola: acertou, sai. O melhor passa o jeito pros filhos.")
     # ------------------------------------------------------------ GERAÇÃO 1: o campeão leva bolada + promessa
     r0 = A.rodada(C)
     k0 = A.busca(r0, "levou")
@@ -119,7 +119,7 @@ def monta(hist, A):
     cena(tipo="replay", ger=C + gx, foco=k2,
          cartao={"numero": 2, "rotulo": "AZUIS", "nome": "ARREMESSO CERTEIRO", "cor": CIANO, "stat": f"ARREMESSOS QUE ACERTAM {ac0}% → {ac1}%"},
          log=[(f"GER {gx + 1:03d} · ACERTOS {ac0}% → {ac1}%", CIANO)],
-         fala=f"Daí o campeão passou a acertar. <long pause> De {ac0} para {ac1} em 100. <short pause> Eu só dei pontos por acertar.")
+         fala=f"O campeão passou a acertar. <long pause> De {ac0} para {ac1} em 100. <short pause> Ninguém mandou: só dei pontos por acertar.")
     marcos.append((gx, "2", CIANO))
     # ------------------------------------------------------------ TESTE (CHUTE)
     itens = [("CAMPEÃO 1", s_um, CIANO), (f"CAMPEÃO {g_ref + 1}", s_ref, CIANO), (f"CAMPEÃO {G}", s_fin, VERDE)]
