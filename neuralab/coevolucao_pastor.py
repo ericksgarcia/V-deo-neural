@@ -16,7 +16,7 @@ def cidades(genes, idx, semente, gravar=False):
         obs = jogo.observa()
         a, at = ARQ.avalia(ps, obs)
         if gravar:
-            reg["ativ"].append(np.concatenate([x[:, 0] for x in at], 1))
+            reg["ativ"].append(np.concatenate(list(at), 1))
             reg["c"].append(jogo.c.copy())
             reg["o"].append(jogo.o.copy())
         jogo.passo(a)
