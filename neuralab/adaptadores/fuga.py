@@ -125,38 +125,40 @@ class Fuga(Adaptador):
             ret = [(cx - F.BLOCO_HW, cy - F.BLOCO_HH), (cx + F.BLOCO_HW, cy - F.BLOCO_HH),
                    (cx + F.BLOCO_HW, cy + F.BLOCO_HH), (cx - F.BLOCO_HW, cy + F.BLOCO_HH)]
             h.forma(ret, BLOCO, 0.95, 3.0, 0.4)
-        # torreta: corpo + cano apontando para o último disparo
-        h.circulo((F.TX, F.TY), 0.55, VERMELHO, 1.0, 3.0, 0.5)
+        # torreta: base larga quente, corpo e cano grosso apontando para o azul mais perto
+        LARANJA = (1.0, 0.5, 0.2)
+        h.circulo((F.TX, F.TY), 1.0, LARANJA, 0.5, 3.0, 0.25)
+        h.circulo((F.TX, F.TY), 0.62, VERMELHO, 1.0, 3.5, 0.75)
         vivos_i = np.where(vivo & ~cheg)[0]
         if len(vivos_i):
             d = p[vivos_i] - np.array([F.TX, F.TY])
             alvo = p[vivos_i[np.argmin(np.hypot(d[:, 0], d[:, 1]))]]
             ang = math.atan2(alvo[1] - F.TY, alvo[0] - F.TX)
-            h.linha([(F.TX, F.TY), (F.TX + 1.0 * math.cos(ang), F.TY + 1.0 * math.sin(ang))], VERMELHO, 6, 1.0)
-        # balas: laser curto com rastro
+            h.linha([(F.TX, F.TY), (F.TX + 1.5 * math.cos(ang), F.TY + 1.5 * math.sin(ang))], LARANJA, 13, 1.0)
+        # balas: bolinha clara com rastro curto
         for b in np.where(rod.bvivo[i])[0]:
             pb = rod.bp[i, b]
-            ant = rod.bp[max(i - 2, 0), b]
-            h.linha([tuple(ant), tuple(pb)], (1.0, 0.45, 0.4), 4, 0.9)
-            self._pontos(h, [pb[0]], [pb[1]], (1.0, 0.85, 0.8), 0.14, 1.0)
+            ant = rod.bp[max(i - 1, 0), b]
+            h.linha([tuple(ant), tuple(pb)], (1.0, 0.55, 0.35), 8, 0.8)
+            self._pontos(h, [pb[0]], [pb[1]], (1.0, 0.9, 0.7), 0.3, 1.0)
         # azuis: rastro curto, halo e núcleo (corpos grandes para ler no celular)
         for a in range(F.A):
             if vivo[a] or cheg[a]:
                 tr = rod.p[max(0, i - 9): i + 1: 3, a]
                 if len(tr) > 1:
-                    h.rastro([tuple(q) for q in tr], VERDE if cheg[a] else CIANO, 3.5, 0.5)
+                    h.rastro([tuple(q) for q in tr], VERDE if cheg[a] else CIANO, 6, 0.55)
         ativos = vivo
-        self._pontos(h, p[ativos, 0], p[ativos, 1], CIANO, 0.62 if h.cam.escala < 60 else 0.5, 0.22)
-        self._pontos(h, p[ativos, 0], p[ativos, 1], (0.85, 1.0, 1.0), 0.3 if h.cam.escala < 60 else 0.26, 0.97)
+        self._pontos(h, p[ativos, 0], p[ativos, 1], CIANO, 1.0 if h.cam.escala < 60 else 0.75, 0.28)
+        self._pontos(h, p[ativos, 0], p[ativos, 1], (0.85, 1.0, 1.0), 0.55 if h.cam.escala < 60 else 0.42, 1.0)
         # quem chegou fica verde na linha
-        self._pontos(h, p[cheg, 0], p[cheg, 1], VERDE, 0.5, 0.3)
+        self._pontos(h, p[cheg, 0], p[cheg, 1], VERDE, 0.8, 0.35)
         # clarão de quem acabou de ser atingido (evento no ponto exato)
         for a in np.where((rod.t_morte >= 0) & (rod.t_morte <= i) & ((i - rod.t_morte) * F.DT < 0.7))[0]:
             h.pulso((float(rod.p[rod.t_morte[a], a, 0]), float(rod.p[rod.t_morte[a], a, 1])), (i - rod.t_morte[a]) * F.DT,
                     VERMELHO, 1.6, 0.7, 3)
         if modo == "replay" and foco is not None:
             if vivo[foco] or cheg[foco]:
-                h.destaque((float(p[foco, 0]), float(p[foco, 1])), AMARELO, t, 0.35)
+                h.destaque((float(p[foco, 0]), float(p[foco, 1])), AMARELO, t, 0.6)
 
     def ponto(self, rod, foco, nome, t):
         i = rod.i(t)
