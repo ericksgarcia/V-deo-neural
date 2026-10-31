@@ -106,9 +106,10 @@ def monta(hist, A):
               "<short pause> Coitado.")
     marcos.append((gf, "1", CIANO))
     # ------------------------------------------------------------ RE-GANCHO
-    cena(tipo="ao_vivo", ger=gf,
-         log=[(f"GER {gf + 1:03d} · OS AZUIS ESCAPAM MAIS", CIANO)],
-         carimbo={"texto": "UMA PEGADINHA", "cor": AMARELO, "em": 0.4, "sub": f"GERAÇÃO {gf + 1}"},
+    gr = max(gf - 6, 2)      # ainda sem o agrupamento: a pegadinha só aparece na revelação
+    cena(tipo="ao_vivo", ger=gr,
+         log=[(f"GER {gr + 1:03d} · OS AZUIS ESCAPAM MAIS", CIANO)],
+         carimbo={"texto": "UMA PEGADINHA", "cor": AMARELO, "em": 0.4, "sub": f"GERAÇÃO {gr + 1}"},
          fala="Só que tem uma pegadinha. <long pause>")
     # ------------------------------------------------------------ DESCOBERTA 2: eles se juntam
     r2 = A.rodada(C + gj)
@@ -123,7 +124,7 @@ def monta(hist, A):
     # ------------------------------------------------------------ TESTE
     itens = [("CAMPEÃO 1", s_um, CIANO), (f"CAMPEÃO {G}", s_fin, VERDE)]
     kw = dict(tipo="barras", grupo="teste", ger=G - 1, itens=itens, titulo="CAMPEÃO AZUL x VERDES FINAIS",
-              sub="300 cidades novas · azuis no fim", destaque=1, cor_destaque="verde", rotulo_destaque="▲ MELHOR",
+              sub="300 cidades novas · azuis no fim", destaque=1, cor_destaque="verde",
               log=[("TESTE: 300 CIDADES NOVAS", AMARELO), (f"AZUIS NO FIM {pct(s_um)}% → {pct(s_fin)}%", AMARELO)])
     cena(teste=True, **kw,
          fala=f"Hora do teste. <short pause> Na geração 1, {pct(s_um)} em 100 ficavam azuis. Chuta aí: e o campeão final? <long pause>")

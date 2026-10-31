@@ -96,10 +96,13 @@ class Paciente(Adaptador):
         if modo != "replay" or foco is None:
             return geral
         i = rod.i(t)
-        a, z = rod.p[i, foco], rod.p[i, 0]
-        meio = ((a[0] + z[0]) / 2, (a[1] + z[1]) / 2)
-        perto = Camera2D(centro=(float(np.clip(meio[0], 6, P.LARG - 6)), float(np.clip(meio[1], 5, P.ALT - 5))),
-                         escala=70, t=t)
+        a = rod.p[i, foco]
+        grupo = rod.p[i].mean(0)
+        # centro: o agente em foco puxado um pouco para o bando (o grupo aparece), e o foco fica na metade de CIMA da cena
+        # (a legenda ocupa a faixa de baixo). Escala 56 mostra a arena quase inteira: nunca uma tela vazia no canto.
+        cx = float(np.clip(0.65 * a[0] + 0.35 * grupo[0], 8.0, P.LARG - 8.0))
+        cy = float(a[1] * 0.75 + grupo[1] * 0.25 - 1.6)
+        perto = Camera2D(centro=(cx, cy), escala=56, t=t)
         return geral.mistura(perto, min(t / 0.8, 1.0))
 
     # ------------------------------------------------------------ cenário
@@ -138,8 +141,8 @@ class Paciente(Adaptador):
         self._pontos(h, p[sau, 0], p[sau, 1], (0.85, 1.0, 1.0), 0.3 if not zoom else 0.24, 0.95)
         # infectados: halo tóxico pulsando + núcleo
         pulso = 0.8 + 0.2 * math.sin(t * 9)
-        self._pontos(h, p[vir, 0], p[vir, 1], TOXICO, 0.95 * pulso, 0.26)
-        self._pontos(h, p[vir, 0], p[vir, 1], (0.95, 1.0, 0.6), 0.34, 0.98)
+        self._pontos(h, p[vir, 0], p[vir, 1], TOXICO, 1.35 * pulso, 0.30)
+        self._pontos(h, p[vir, 0], p[vir, 1], (0.95, 1.0, 0.6), 0.42, 1.0)
         # anel de pulso de quem acabou de se contagiar
         novos = np.where((rod.t_inf >= 0) & (rod.t_inf <= i) & ((i - rod.t_inf) * P.DT < 0.9) & (rod.t_inf > 0))[0]
         for a in novos[:30]:
