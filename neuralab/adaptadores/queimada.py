@@ -62,9 +62,10 @@ class RodadaQ(Rodada):
     def i(self, t):
         return int(min(max(t / Q.DT, 0), self.T - 1))
 
-    def contagem(self, t):
-        v = self.reg["vivo"][:, self.i(t)]
-        return int(v[:, 0].sum()), int(v[:, 1].sum())
+    def contagem(self, t, k=None):
+        """Jogadores na quadra no instante t: de uma partida (k) ou somados em todas."""
+        v = self.reg["vivo"][:, self.i(t)] if k is None else self.reg["vivo"][k:k + 1, self.i(t)]
+        return int(v[:, 0].sum()), int(v[:, 1].sum()), 3 * len(v)
 
 
 class Queimada(Adaptador):
@@ -211,8 +212,8 @@ class Queimada(Adaptador):
 
     # ------------------------------------------------------------ HUD
     def medidores(self, rod, t, foco):
-        a, b = rod.contagem(t if foco is None else t)
-        return [("AZUIS NA QUADRA", f"{a}/3", a / 3, AZUL), ("VERMELHAS NA QUADRA", f"{b}/3", b / 3, ROSA)]
+        a, b, tot = rod.contagem(t, foco)
+        return [("AZUIS NA QUADRA", f"{a}/{tot}", a / tot, AZUL), ("VERMELHAS NA QUADRA", f"{b}/{tot}", b / tot, ROSA)]
 
     def cerebro(self, rod, t, foco):
         k = rod.lider if foco is None else foco

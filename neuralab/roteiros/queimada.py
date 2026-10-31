@@ -87,7 +87,7 @@ def monta(hist, A):
 
     # ------------------------------------------------------------ GANCHO
     cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.0,
-         titulo_gancho=[("SOLTEI UMA BOLA", BRANCO), (f"NINGUÉM ATINGIDO EM {zero} DE 100", AMARELO)],
+         titulo_gancho=[("DUAS TURMAS DE IA NA QUEIMADA", BRANCO), (f"NINGUÉM ATINGIDO EM {zero} DE 100", AMARELO)],
          log=[(f"{n} IAs · QUEIMADA", BRANCO), ("AZUIS x VERMELHAS · 0 REGRAS DE COMO JOGAR", CIANO)],
          carimbo={"texto": f"{zero} DE 100", "cor": AMARELO, "em": 0.8, "sub": "JOGOS SEM NINGUÉM ATINGIDO · GERAÇÃO 1"},
          fala=f"Joguei duas turmas de IA numa queimada: <short pause> em {zero} de 100 jogos, ninguém foi atingido.")
