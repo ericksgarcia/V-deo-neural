@@ -96,20 +96,20 @@ def monta(hist, A):
          fala=f"Soltei {n} IAs numa dança das cadeiras. <short pause> Na geração 1, só {ch0} cadeira foi ocupada.")
     # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA (o campeão da geração 1 falha)
     cena(tipo="replay", ger=C, foco=0, grupo="g1b", log=[("CAMPEÃO DA GER 001", CIANO), ("QUEM SENTA MAIS VIRA PAI DA TURMA", VERDE)],
-         fala="É tipo festa de criança: a música para, a cadeira é de quem chega primeiro.")
+         fala="É tipo festa de criança: a música para e a cadeira é de quem chega primeiro.")
     cena(tipo="replay", ger=C, foco=0, grupo="g1b", log=[("CAMPEÃO DA GER 001 · SEM CADEIRA", ROSA), ("ELE CORRE E MESMO ASSIM FICA DE PÉ", AMARELO)],
          fala="Mas o campeão, o cérebro de todas, ficava sem cadeira. <short pause> De novo. No fim, tem teste.")
     # ------------------------------------------------------------ DESCOBERTA 1: o desvio
     cena(tipo="replay", ger=C + g1, foco=0,
          cartao={"numero": 1, "rotulo": "IAs", "nome": "O DESVIO", "cor": AMARELO, "stat": f"ESBARRÕES {t0}% → {t1}% DAS IAs"},
          log=[(f"GER {g1 + 1:03d} · ESBARRÕES {t0}% → {t1}%", AMARELO), ("NINGUÉM MANDOU DESVIAR", CIANO)],
-         fala=f"Aí elas se esbarravam. <short pause> Até aprenderem a desviar: de {t0} para {t1} a cada cem. <short pause> Educadas.")
+         fala=f"Aí elas se esbarravam. <short pause> Até aprenderem a desviar: mais da metade dos esbarrões sumiu. <short pause> Educadas.")
     marcos.append((g1, "1", AMARELO))
     # ------------------------------------------------------------ DESCOBERTA 2: a ciranda
     cena(tipo="replay", ger=C + g2, foco=0,
          cartao={"numero": 2, "rotulo": "IAs", "nome": "A CIRANDA", "cor": CIANO, "stat": f"MESMO SENTIDO {s0}% → {s1}% DO MOVIMENTO"},
          log=[(f"GER {g2 + 1:03d} · MESMO SENTIDO {s0}% → {s1}%", CIANO), ("ELAS RODAM JUNTAS, SEM COMBINAR", VERDE)],
-         fala=f"Então formaram uma ciranda, sem ninguém mandar. <long pause> Pro mesmo lado: de {s0} para {s1} a cada cem.")
+         fala=f"Então formaram uma ciranda, sem ninguém mandar. <long pause> Quase todas rodando pro mesmo lado.")
     marcos.append((g2, "2", CIANO))
     # ------------------------------------------------------------ RE-GANCHO: o placar trava
     cena(tipo="ao_vivo", ger=gc, grupo="calma", vel=1.0,
@@ -119,7 +119,7 @@ def monta(hist, A):
     cena(tipo="replay", ger=C + g3, foco=0,
          cartao={"numero": 3, "rotulo": "IAs", "nome": "COLADAS", "cor": VERDE, "stat": f"RODADAS COMPLETAS {p_c}% → {p_3}%"},
          log=[(f"GER {g3 + 1:03d} · COMPLETAS {p_c}% → {p_3}%", VERDE), (f"PERTO DE UMA CADEIRA: {c_c}% → {c_3}% DO TEMPO", CIANO)],
-         fala=f"Mas não. Elas esperaram coladas nas cadeiras. <long pause> Todas sentadas: de {p_c} para {p_3} rodadas a cada cem.")
+         fala=f"Mas não. Elas esperaram coladas nas cadeiras. <long pause> As cadeiras encheram: mais que o dobro das vezes.")
     marcos.append((g3, "3", VERDE))
     # ------------------------------------------------------------ TESTE (chute)
     itens = [("CAMPEÃO 1", um[0], CIANO), (f"CAMPEÃO {G}", fin[0], VERDE)]
