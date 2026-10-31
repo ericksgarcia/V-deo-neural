@@ -77,7 +77,7 @@ def monta(hist, A):
         return kw
 
     vezes = int(round(s_fin / max(s_um, 0.005)))
-    reacao = ("Mais de dez vezes. Ninguém ensinou isso." if vezes >= 10 else f"{vezes} vezes mais. Ninguém ensinou isso." if vezes >= 2
+    reacao = ("Mais de dez vezes. Juro, ninguém ensinou isso." if vezes >= 10 else f"{vezes} vezes mais. Juro, ninguém ensinou isso." if vezes >= 2
               else "Melhorou. Pouco, mas melhorou.")
     # ------------------------------------------------------------ GANCHO
     cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.0,
@@ -110,7 +110,7 @@ def monta(hist, A):
          cartao={"numero": 2, "rotulo": "AZUIS", "nome": "SE ESCONDER MENOS", "cor": VERDE,
                  "stat": f"ATRÁS DO BLOCO {a0}% → {a1}% DO TEMPO"},
          log=[(f"GER {ge + 1:03d} · ATRÁS DO BLOCO {a0}% → {a1}%", VERDE)],
-         fala="Só que olha o que fizeram com os blocos. <long pause> Ficaram menos tempo escondidos. <short pause> Eu achava que esconder era o truque.")
+         fala="Só que olha os blocos. <long pause> Ficaram menos tempo escondidos. <short pause> Eu achava que esconder era o truque.")
     marcos.append((ge, "2", VERDE))
     # ------------------------------------------------------------ TESTE (a turma inteira)
     itens = [("TURMA 1", s_um, CIANO), (f"TURMA {G}", s_fin, VERDE)]
