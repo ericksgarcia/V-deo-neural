@@ -7,7 +7,7 @@ import math
 
 import numpy as np
 
-from ..coevolucao_paciente import ARQ, cidades, vitrine
+from ..coevolucao_paciente import ARQ, campeao_sau, cidades, vitrine
 from ..desafios import paciente as P
 from ..palco.holo import AMARELO, BRANCO, CIANO, VERMELHO, Camera2D
 from .base import Adaptador, Rodada
@@ -17,7 +17,7 @@ CINZA = (0.55, 0.62, 0.8)
 
 
 class RodadaCidade(Rodada):
-    def __init__(self, hist, g):
+    def __init__(self, hist, g, campeao=False):
         self.g, self.dt = g, P.DT
         gs, gv = hist["sau"][g], hist["vir"][g]
         sem = int(hist["semente"][g])
@@ -25,6 +25,8 @@ class RodadaCidade(Rodada):
         jogo, reg = cidades(gs, gv, isa, ivi, sem, gravar=True)
         final = jogo.curva[:, -1]
         w = int(np.argmin(np.abs(final - final.mean())))               # a cidade mais típica
+        if campeao:                                                    # a cidade do campeão: vitrine pareia o saudável i com a cidade i
+            w = campeao_sau(hist, g)
         self.mundo, self.genes_s, self.genes_v, self.isa, self.ivi = w, gs, gv, int(isa[w]), int(ivi[w])
         self.p = reg["p"][w]                                           # (T, A, 2)
         self.inf = reg["inf"][w]                                       # (T, A)
@@ -57,8 +59,10 @@ class Paciente(Adaptador):
         self.suave = np.convolve(np.pad(hist["m_saudaveis"], (k // 2, k // 2), mode="edge"), np.ones(k) / k, "valid")
 
     def rodada(self, g):
+        """g < total_ger: a cidade mais típica da geração; g >= total_ger: a cidade do CAMPEÃO da geração g - total_ger."""
         if g not in self._cache:
-            self._cache[g] = RodadaCidade(self.hist, g)
+            camp = g >= self.total_ger
+            self._cache[g] = RodadaCidade(self.hist, g - self.total_ger if camp else g, camp)
         return self._cache[g]
 
     # ------------------------------------------------------------ lances (replay: foco = agente)
@@ -95,7 +99,7 @@ class Paciente(Adaptador):
         a, z = rod.p[i, foco], rod.p[i, 0]
         meio = ((a[0] + z[0]) / 2, (a[1] + z[1]) / 2)
         perto = Camera2D(centro=(float(np.clip(meio[0], 6, P.LARG - 6)), float(np.clip(meio[1], 5, P.ALT - 5))),
-                         escala=80, t=t)
+                         escala=70, t=t)
         return geral.mistura(perto, min(t / 0.8, 1.0))
 
     # ------------------------------------------------------------ cenário
@@ -131,21 +135,15 @@ class Paciente(Adaptador):
         pulso = 0.8 + 0.2 * math.sin(t * 9)
         self._pontos(h, p[vir, 0], p[vir, 1], TOXICO, 0.62 * pulso, 0.20)
         self._pontos(h, p[vir, 0], p[vir, 1], (0.95, 1.0, 0.6), 0.2, 0.95)
-        # raio de contágio ao redor de cada infectado (anel fino)
-        for a in np.where(vir)[0][:40]:
-            h.linha([(p[a, 0] + P.CONTAGIO * math.cos(u), p[a, 1] + P.CONTAGIO * math.sin(u))
-                     for u in np.linspace(0, 6.4, 18)], TOXICO, 1.0, 0.22, halo=False)
         # anel de pulso de quem acabou de se contagiar
         novos = np.where((rod.t_inf >= 0) & (rod.t_inf <= i) & ((i - rod.t_inf) * P.DT < 0.9) & (rod.t_inf > 0))[0]
         for a in novos[:30]:
             h.pulso((float(p[a, 0]), float(p[a, 1])), (i - rod.t_inf[a]) * P.DT, TOXICO, 1.8, 0.9, 3)
-        # paciente zero
-        z = (float(p[0, 0]), float(p[0, 1]))
-        h.linha([(z[0] + 0.75 * math.cos(u + t * 2), z[1] + 0.75 * math.sin(u + t * 2)) for u in np.linspace(0, 6.4, 24)],
-                VERMELHO, 2.0, 0.8, tracejado=[6, 6], halo=False)
-        if t < 5.0 or modo == "replay":
-            h.texto("PACIENTE ZERO", (z[0], z[1] + 1.35), 17, VERMELHO, 0.95 if t < 4.0 else max(0.0, 5.0 - t))
+        # destaque individual (segue o agente a cada quadro, sem anel nem rótulo): paciente zero e, no replay, o agente em foco
+        if vir[0]:
+            h.destaque((float(p[0, 0]), float(p[0, 1])), VERMELHO, t, 0.45)
         if modo == "replay" and foco is not None and foco != 0:
+            h.destaque((float(p[foco, 0]), float(p[foco, 1])), TOXICO if inf[foco] else AMARELO, t, 0.45)
             tr = rod.p[max(0, i - 30): i + 1: 2, foco]
             if len(tr) > 1:
                 h.rastro([tuple(q) for q in tr], TOXICO if inf[foco] else CIANO, 3, 0.8)

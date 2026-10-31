@@ -1,4 +1,8 @@
-"""Desafio: Paciente Zero. Uma cidade de IAs saudáveis, um vírus e dois cérebros que evoluem juntos.
+"""Curadoria (31/out/2026, autorizada pelo dono): o vírus anda MAIS DEVAGAR que os saudáveis (2,2 contra 3,0 m/s) e a cidade
+tem 30 agentes. Com o vírus mais rápido (2,5 a 3,3 m/s) e 40-80 agentes os saudáveis não aprendiam nada; assim, 3 de 4 sementes
+aprendem. Os comportamentos (fugir, se juntar, ir para a parede) continuam NÃO programados: só seleção, cruzamento e mutação.
+
+Desafio: Paciente Zero. Uma cidade de IAs saudáveis, um vírus e dois cérebros que evoluem juntos.
 
 Mundo 2D visto de cima, em metros. Cada partida é uma cidade com `A` agentes: um começa infectado (paciente zero).
 Encostar num infectado contagia na hora. Todos os saudáveis de uma cidade usam o MESMO cérebro saudável e todos os
@@ -11,10 +15,10 @@ import os
 import numpy as np
 
 LARG, ALT = 22.0, 18.0
-A = int(os.environ.get("PAC_A", 80))                                     # agentes por cidade (1 paciente zero + 79 saudáveis)
+A = int(os.environ.get("PAC_A", 30))                                     # agentes por cidade (1 paciente zero + 29 saudáveis)
 RAIO, CONTAGIO = 0.25, 0.8
 RAIO_CORPO = 0.35
-V_SAU, V_INF, ACEL = 3.0, float(os.environ.get("PAC_VINF", 3.3)), 12.0
+V_SAU, V_INF, ACEL = 3.0, float(os.environ.get("PAC_VINF", 2.2)), 12.0
 DT, PASSOS = 1 / 15, 450                   # 30 s de cidade
 R_VIZ, R_LOCAL = 8.0, 5.0
 CAMADAS = (18, 12, 2)

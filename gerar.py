@@ -29,7 +29,7 @@ CFG = {
     "policia": dict(gera=250, ep=5),
     "cabo": dict(gera=150, ep=9),
     "cruzamento": dict(gera=300, ep=5, roteiro="cruzamento"),
-    "paciente": dict(gera=120, ep=10),
+    "paciente": dict(gera=100, ep=10),
     "ambulancia": dict(gera=120, ep=11, roteiro="ambulancia", pop=150, sementes="3,5,7"),
     "sofa": dict(gera=200, ep=12, roteiro="sofa", pop=150, sementes="3,7"),
     "porta": dict(gera=100, ep=13, roteiro="porta", pop=150, sementes="3,5,7"),

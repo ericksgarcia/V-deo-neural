@@ -48,12 +48,26 @@ def metricas(j, n=None):
             "parede": float((j.s_par[s] / k).mean()), "aglo": float((j.s_aglo[s] / k).mean())}
 
 
+def campeao_sau(hist, g, rodadas=6, semente=4242):
+    """Índice do melhor cérebro saudável da geração g: cada um joga `rodadas` cidades novas contra os vírus da mesma geração
+    e fica o que mais saudáveis mantém no fim. Linhagem real do algoritmo (elitismo), corpo muda a cada geração."""
+    cache = hist.setdefault("_camp", {}) if isinstance(hist, dict) else {}
+    if g not in cache:
+        gs, gv = hist["sau"][g], hist["vir"][g]
+        pop = len(gs)
+        rng = np.random.default_rng(semente + g)
+        isa, ivi = np.repeat(np.arange(pop), rodadas), rng.integers(0, pop, pop * rodadas)
+        j, _ = cidades(gs, gv, isa, ivi, semente + g)
+        cache[g] = int(np.argmax((1 - j.curva[:, -1] / P.A).reshape(pop, rodadas).mean(1)))
+    return cache[g]
+
+
 def vitrine(pop, semente):
     """As cidades que o vídeo mostra e as métricas medem: saudável i x vírus sorteado."""
     return np.arange(pop), np.random.default_rng(semente).permutation(pop)
 
 
-def treina(geracoes=150, pop=60, jogos=2, semente=3, log=print):
+def treina(geracoes=100, pop=30, jogos=2, semente=3, log=print):
     rng = np.random.default_rng(semente)
     gs, gv = ARQ.aleatoria(pop, rng), ARQ.aleatoria(pop, rng)
     hist = {"sau": [], "vir": [], "semente": [], "met": []}
