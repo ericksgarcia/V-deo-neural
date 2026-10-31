@@ -36,6 +36,7 @@ CFG = {
     "escolta": dict(gera=160, ep=14),
     "lava": dict(gera=160, ep=6, roteiro="lava", pop=150, sementes="3,5,7"),
     "escuro": dict(gera=160, ep=16),
+    "fuga": dict(gera=100, ep=11),
 }
 DESAFIOS = tuple(CFG)
 GERACOES = {k: v["gera"] for k, v in CFG.items()}
@@ -157,6 +158,25 @@ def treino_escuro(G, sementes):
     return melhor[1], melhor[2]
 
 
+def treino_fuga(G, sementes):
+    from neuralab.coevolucao_fuga import treina
+    from neuralab.roteiros.fuga import nota_historia
+    melhor = None
+    for s in sementes:
+        arq = os.path.join(".cache", f"fuga_{G}_{s}.npz")
+        if os.path.exists(arq):
+            hist = dict(np.load(arq))
+        else:
+            print(f"treinando fuga com cobertura (semente {s}, {G} gerações)…")
+            hist = treina(G, pop=60, jogos=2, semente=s, log=None)
+            np.savez_compressed(arq, **hist)
+        nota = nota_historia(hist)
+        print(f"  semente {s}: nota da história {nota:.2f}")
+        if melhor is None or nota > melhor[0]:
+            melhor = (nota, s, hist)
+    return melhor[1], melhor[2]
+
+
 def treino_paciente(G, sementes):
     from neuralab.coevolucao_paciente import treina
     from neuralab.roteiros.paciente import nota_historia
@@ -242,6 +262,12 @@ def main():
         from neuralab.roteiros.escuro import monta
         s, hist = treino_escuro(G, [int(x) for x in (a.sementes or "3,5,7").split(",")])
         A = Escuro(hist, lado="cac")
+        cenas, info, post, _ = monta(hist, A)
+    elif a.desafio == "fuga":
+        from neuralab.adaptadores.fuga import Fuga
+        from neuralab.roteiros.fuga import monta
+        s, hist = treino_fuga(G, [int(x) for x in (a.sementes or "3,5,7,11").split(",")])
+        A = Fuga(hist)
         cenas, info, post, _ = monta(hist, A)
     elif a.desafio == "paciente":
         from neuralab.adaptadores.paciente import Paciente
