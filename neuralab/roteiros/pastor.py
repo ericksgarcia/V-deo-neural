@@ -95,28 +95,18 @@ def monta(hist, A):
     # ------------------------------------------------------------ GERAÇÃO 1
     cena(tipo="replay", ger=C, foco=0, grupo="g1c", log=[("CAMPEÃO DA GER 001 · PASSEANDO", LARANJA)],
          fala="Aí o campeão da geração 1. <short pause> Ficou só passeando.")
-    # ------------------------------------------------------------ DESCOBERTA 1: achar o rebanho
-    cena(tipo="replay", ger=C + g1, foco=0,
-         cartao={"numero": 1, "rotulo": "CÃO", "nome": "ACHAR O REBANHO", "cor": LARANJA, "stat": f"DISTÂNCIA {d0:.0f} → {d1:.0f} METROS"},
-         log=[(f"GER {g1 + 1:03d} · DISTÂNCIA {d0:.0f} → {d1:.0f} m", LARANJA)],
-         fala=f"Na geração {g1 + 1}, ele achou as ovelhas. <short pause> Só que elas fugiram.")
-    marcos.append((g1, "1", LARANJA))
-    # ------------------------------------------------------------ DESCOBERTA 2: por trás
+    # ------------------------------------------------------------ DESCOBERTA 1: por trás (achar o rebanho vai na fala)
     cena(tipo="replay", ger=C + g2, foco=0,
-         cartao={"numero": 2, "rotulo": "CÃO", "nome": "POR TRÁS", "cor": AMARELO, "stat": f"ATRÁS DO REBANHO {a0}% → {a1}% DO TEMPO"},
-         log=[(f"GER {g2 + 1:03d} · ATRÁS {a0}% → {a1}%", AMARELO)],
-         fala="Até que ele foi para trás delas. <long pause> Ninguém ensinou isso.")
-    marcos.append((g2, "2", AMARELO))
-    # ------------------------------------------------------------ RE-GANCHO
-    cena(tipo="ao_vivo", ger=gc,
-         log=[(f"GER {gc + 1:03d} · NO CURRAL {pc}%", BRANCO), ("AS OVELHAS PARARAM DE ENTRAR", AMARELO)],
-         fala="Mas aí elas pararam de entrar. <short pause> Será que acabou? <long pause>")
-    # ------------------------------------------------------------ DESCOBERTA 3: juntar
+         cartao={"numero": 1, "rotulo": "CÃO", "nome": "POR TRÁS", "cor": AMARELO, "stat": f"ATRÁS DO REBANHO {a0}% → {a1}% DO TEMPO"},
+         log=[(f"GER {g2 + 1:03d} · ATRÁS {a0}% → {a1}%", AMARELO), (f"DISTÂNCIA DO REBANHO {d0:.0f} → {d1:.0f} m", LARANJA)],
+         fala="Ele achou as ovelhas, mas elas fugiram. <short pause> Até ir para trás delas. <long pause> Ninguém ensinou isso. <short pause> Mas e agora?")
+    marcos.append((g2, "1", AMARELO))
+    # ------------------------------------------------------------ RE-GANCHO + DESCOBERTA 2: juntar
     cena(tipo="replay", ger=C + g3, foco=0,
-         cartao={"numero": 3, "rotulo": "CÃO", "nome": "REBANHO JUNTO", "cor": VERDE, "stat": f"ESPALHAMENTO {e0:.1f} → {e1:.1f}"},
+         cartao={"numero": 2, "rotulo": "CÃO", "nome": "REBANHO JUNTO", "cor": VERDE, "stat": f"ESPALHAMENTO {e0:.1f} → {e1:.1f}"},
          log=[(f"GER {g3 + 1:03d} · NO CURRAL {pc}% → {p3}%", VERDE)],
-         fala=f"Aí ele começou a juntar o rebanho. <long pause> Subiu para {p3} em cada 100.")
-    marcos.append((g3, "3", VERDE))
+         fala=f"Só que elas pararam de entrar. <short pause> Será que acabou? <long pause> Ele juntou o rebanho. {p3} em cada 100.")
+    marcos.append((g3, "2", VERDE))
     # ------------------------------------------------------------ TESTE
     itens = [("CAMPEÃO 1", s_um, LARANJA), (f"CAMPEÃO {G}", s_fin, VERDE)]
     kw = dict(tipo="barras", grupo="teste", ger=G - 1, fundo_escuro=0.35, fundo_vivo=0.9, fundo_vel=2.0, itens=itens, titulo="CÃO x CURRAL",
@@ -127,7 +117,7 @@ def monta(hist, A):
     cena(**dict(kw, sub="ovelhas que entram no curral"), fala=f"{pct(s_fin)} em 100. <short pause> Coitadas das ovelhas.")
     # ------------------------------------------------------------ CTA + LAÇO
     cena(tipo="replay", ger=C + G - 1, foco=0, grupo="fim", destaques={"campeão": AMARELO, "cão": LARANJA},
-         fala="O cão aprendeu a cuidar das ovelhas ou só a mandar nelas? <short pause> Porque tudo começou quando eu…")
+         fala="Ele cuida das ovelhas ou só manda nelas? <short pause> Porque tudo começou quando eu…")
 
     info = {"marca": "VÍDEO NEURAL", "serie": suave(hist["m_pen"], 5), "serie_rotulo": "% OVELHAS NO CURRAL",
             "marcos": marcos, "rotulo_vivo": f"{n} OVELHAS", "nome_teste": "TESTE FINAL",
