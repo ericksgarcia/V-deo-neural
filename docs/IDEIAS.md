@@ -21,7 +21,7 @@ afirma o que o treino real mostrar. Itens "parecido com X" são variações acei
 | 7 | **Esconde-Esconde no Escuro** | de cima | sim | médio | **feito (EP16)** | Cones de lanterna: o fugitivo vira estátua ou cola nas costas do caçador. |
 | 8 | **Queimada de IAs** | de cima | sim | alto | **feito (EP17)** | Azul x vermelho. Triagem 17/20 (GO). A "cera" não apareceu; o vídeo conta "largar a bola" e "acertar mais". Parecido com J (queimada 3x3), que fica como variação. |
 | 9 | **Fuga com Cobertura** | de cima | sim | médio | **feito (EP11)** | Atravessar a zona de tiro de uma torreta atrás de blocos móveis. |
-| 10 | **Cão Pastor** | de cima | sim | alto | pendente | 1 cão x 15 ovelhas rebeldes. Parecido com F (cão pastor). |
+| 10 | **Cão Pastor** | de cima | não (ovelhas programadas) | alto | em andamento | 1 cão x 15 ovelhas rebeldes. Triagem 15/20 (GO): ângulo "o cão aprende a chegar MENOS perto / por trás", só afirmar o medido; recompensa guiada (aproximar o rebanho) vai no rodapé. F foi fundido neste. |
 | A | **Evacuação de incêndio** | de cima | não | baixo | pendente | 100 IAs num prédio em chamas com uma só porta. |
 | B | **Travessia de rio (gnus x crocodilos)** | de cima | sim | médio | pendente | Manada atravessa rio com correnteza e predadores. |
 | C | **Defesa de torre** | de cima | sim | médio | pendente | 5 guardas com escudo x 50 invasores. |
