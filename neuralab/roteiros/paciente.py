@@ -85,7 +85,7 @@ def monta(hist, A):
          titulo_gancho=[("1 PONTO VERDE CONTAGIA", BRANCO), (f"EM 30 SEGUNDOS: {inf0} DE {n}", TOXICO)],
          log=[(f"{n} IAs · 1 CONTAGIADA", TOXICO), ("NINGUÉM SABE O QUE FAZER", AMARELO)],
          carimbo={"texto": f"{inf0} DE {n}", "cor": TOXICO, "em": 1.4, "sub": "VIRARAM VERDES · GERAÇÃO 1"},
-         fala=f"Soltei 1 ponto verde entre {n - 1} azuis. <short pause> Em 30 segundos, {inf0} já eram verdes.")
+         fala=f"Soltei 1 ponto verde contagioso entre {n - 1} azuis. <short pause> Em 30 segundos, {inf0} já eram verdes.")
     # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA
     cena(tipo="ao_vivo", ger=min(3, G - 1), grupo="g1b",
          log=[("ENCOSTAR NO VERDE CONTAGIA", TOXICO), ("QUEM ESCAPA VIRA PAI DA PRÓXIMA TURMA", VERDE)],
@@ -102,7 +102,7 @@ def monta(hist, A):
          cartao={"numero": 1, "rotulo": "AZUIS", "nome": "FUGIR DO VERDE", "cor": CIANO,
                  "stat": f"DISTÂNCIA DO VERDE {dec(d0)} → {dec(d1)} m"},
          log=[(f"GER {gf + 1:03d} · DISTÂNCIA {dec(d0)} → {dec(d1)} m", CIANO)],
-         fala=f"Aí, na geração {gf + 1}, o campeão aprendeu a fugir. <long pause> De {dec(d0)} para {dec(d1)} metros do verde. "
+         fala=f"Aí, na geração {gf + 1}, os azuis aprenderam a fugir. <long pause> De {dec(d0)} para {dec(d1)} metros. "
               "<short pause> Coitado.")
     marcos.append((gf, "1", CIANO))
     # ------------------------------------------------------------ RE-GANCHO
@@ -117,7 +117,7 @@ def monta(hist, A):
          cartao={"numero": 2, "rotulo": "AZUIS", "nome": "SE JUNTAR", "cor": AMARELO,
                  "stat": f"VIZINHO MAIS PERTO {dec(v0)} → {dec(v1)} m"},
          log=[(f"GER {gj + 1:03d} · VIZINHO {dec(v0)} → {dec(v1)} m", AMARELO)],
-         fala=f"Eles não se afastaram: se juntaram. <long pause> De {dec(v0)} para {dec(v1)} metro do vizinho. "
+         fala=f"Os azuis não se espalharam: grudaram. <long pause> De {dec(v0)} para {dec(v1)} metro do vizinho. "
               "<short pause> Ninguém ensinou isso.")
     marcos.append((gj, "2", AMARELO))
     # ------------------------------------------------------------ TESTE
@@ -126,24 +126,24 @@ def monta(hist, A):
               sub="300 cidades novas · azuis no fim", destaque=1, cor_destaque="verde", rotulo_destaque="▲ MELHOR",
               log=[("TESTE: 300 CIDADES NOVAS", AMARELO), (f"AZUIS NO FIM {pct(s_um)}% → {pct(s_fin)}%", AMARELO)])
     cena(teste=True, **kw,
-         fala=f"Hora do teste. <short pause> O campeão da geração 1 mantém {pct(s_um)} em 100 azuis. Chuta aí: e o final? <long pause>")
-    cena(**kw, fala=f"{pct(s_fin)} em 100. <short pause> Juro, eu fiquei olhando.")
+         fala=f"Hora do teste. <short pause> Na geração 1, {pct(s_um)} em 100 ficavam azuis. Chuta aí: e o campeão final? <long pause>")
+    cena(**kw, fala=f"{pct(s_fin)} em 100. <short pause> Juro. Quase todos colados na parede.")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
     kf = A.busca(rf, "ileso")
     cena(tipo="replay", ger=C + G - 1, foco=kf, grupo="fim",
          escolha={"pergunta": "FUGIU OU SE ESCONDEU?", "opcoes": [("FUGIU", CIANO), ("SE ESCONDEU", AMARELO)], "em": 0.2},
          destaques={"fugir": CIANO, "esconder": AMARELO, "campeão": AMARELO},
-         fala="O campeão fugiu ou só se escondeu na parede? <short pause> Porque tudo começou quando eu…")
+         fala="O campeão aprendeu a fugir ou só encostou na parede e esperou? <short pause> Porque tudo começou quando eu…")
 
     info = {"marca": "VÍDEO NEURAL", "serie": suave(hist["m_saudaveis"], 5), "serie_rotulo": "% AZUIS NO FIM",
             "marcos": marcos, "rotulo_vivo": f"{n} IAs", "nome_teste": "TESTE FINAL",
             "rodape": f"{n} IAs · VERDE MAIS LENTO (2,2 x 3,0 m/s) · REDES {'-'.join(map(str, P.CAMADAS))} · {G} GERAÇÕES · "
                       "NINGUÉM PROGRAMOU FUGIR: SÓ SELEÇÃO, CRUZAMENTO E MUTAÇÃO"}
-    post = (f"1 ponto verde entre 29 IAs: em 30 segundos, {inf0} já tinham mudado de cor. O que elas fizeram depois? 🟢\n"
-            f"IA aprendendo sozinha por seleção natural (rede neural + algoritmo genético). Simulação real: {n} IAs por cidade, {G} gerações, "
+    post = (f"1 ponto verde entre 29 IAs: em 30 segundos, {inf0} já tinham mudado de cor. 🟢\n"
+            f"IA aprendendo sozinha por seleção natural. Simulação real: {n} IAs por cidade, {G} gerações, "
             "números medidos no treino.\n"
-            "Manda pra quem sempre foge quando alguém espirra 👇\n\n"
-            "#inteligenciaartificial #ia #aprendizadodemaquina #simulacao #pacientezero")
+            "Marca o amigo que foge até de quem só pigarreou 👇\n\n"
+            "#inteligenciaartificial #ia #simulacao #selecaonatural #pacientezero")
     ev["teste"] = {"um": s_um, "fin": s_fin, "dist": (d0, d1), "viz": (v0, v1), "inf0": inf0}
     return cenas, info, post, ev

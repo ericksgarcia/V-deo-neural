@@ -1,0 +1,5 @@
+1 ponto verde entre 29 IAs: em 30 segundos, 12 já tinham mudado de cor. 🟢
+IA aprendendo sozinha por seleção natural. Simulação real: 30 IAs por cidade, 100 gerações, números medidos no treino.
+Marca o amigo que foge até de quem só pigarreou 👇
+
+#inteligenciaartificial #ia #simulacao #selecaonatural #pacientezero
