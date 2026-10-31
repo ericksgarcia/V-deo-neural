@@ -90,18 +90,18 @@ def monta(hist, A):
          fala=f"Soltei um cão IA numa fazenda. <short pause> Em {zero} de 100 tentativas, nenhuma ovelha entrou no curral.")
     # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA + GERAÇÃO 1 (o campeão passeia)
     cena(tipo="replay", ger=C, foco=0, grupo="g1b", log=[("CAMPEÃO DA GER 001 · PASSEANDO", LARANJA), ("QUEM LEVA MAIS AO CURRAL VIRA PAI DA TURMA", VERDE)],
-         fala="É tipo treinar cachorro: acertou, vira pai. No fim, tem teste. E o campeão inicial? <long pause>")
+         fala="É tipo treinar cachorro: quem leva ao curral vira pai. No fim, tem teste. E o campeão? <long pause>")
     # ------------------------------------------------------------ DESCOBERTA 1: por trás (achar o rebanho vai na fala)
     cena(tipo="replay", ger=C + g2, foco=0,
          cartao={"numero": 1, "rotulo": "CÃO", "nome": "POR TRÁS", "cor": AMARELO, "stat": f"ATRÁS DO REBANHO {a0}% → {a1}% DO TEMPO"},
          log=[(f"GER {g2 + 1:03d} · ATRÁS {a0}% → {a1}%", AMARELO), (f"DISTÂNCIA DO REBANHO {d0:.0f} → {d1:.0f} m", LARANJA)],
-         fala="Só passeava. Até achar as ovelhas, que fugiram. <short pause> Aí foi para trás delas. <long pause> Ninguém ensinou isso.")
+         fala="Só passeava. Até achar as ovelhas. <short pause> Elas fugiam; ele foi para trás. <long pause> Ninguém ensinou isso.")
     marcos.append((g2, "1", AMARELO))
     # ------------------------------------------------------------ RE-GANCHO + DESCOBERTA 2: juntar
     cena(tipo="replay", ger=C + g3, foco=0,
-         cartao={"numero": 2, "rotulo": "CÃO", "nome": "REBANHO JUNTO", "cor": VERDE, "stat": f"ESPALHAMENTO {e0:.1f} → {e1:.1f}"},
-         log=[(f"GER {g3 + 1:03d} · NO CURRAL {pc}% → {p3}%", VERDE)],
-         fala=f"Só que elas pararam de entrar. <short pause> Será que acabou? <long pause> Ele juntou o rebanho sozinho. {p3} em cada 100.")
+         cartao={"numero": 2, "rotulo": "CÃO", "nome": "REBANHO JUNTO", "cor": VERDE, "stat": f"NO CURRAL {pc}% → {p3}% DAS OVELHAS"},
+         log=[(f"GER {g3 + 1:03d} · NO CURRAL {pc}% → {p3}%", VERDE), (f"REBANHO MAIS JUNTO: ESPALHAMENTO {e0:.1f} → {e1:.1f}", VERDE)],
+         fala=f"Mas elas quase pararam de entrar. <short pause> Será que acabou? <long pause> Ele juntou o rebanho sozinho. {p3} em cada 100.")
     marcos.append((g3, "2", VERDE))
     # ------------------------------------------------------------ TESTE
     itens = [("CAMPEÃO 1", s_um, LARANJA), (f"CAMPEÃO {G}", s_fin, VERDE)]
@@ -109,8 +109,8 @@ def monta(hist, A):
               sub="fazendas novas · ovelhas que entram", destaque=1, cor_destaque="verde", rotulo_destaque="",
               log=[("TESTE: FAZENDAS NOVAS", AMARELO), (f"NO CURRAL {pct(s_um)}% → {pct(s_fin)}%", AMARELO)])
     cena(teste=True, **kw,
-         fala=f"Só faltava o teste. <short pause> O campeão da geração 1 levava {pct(s_um)}. Chuta aí: e o final? <long pause>")
-    cena(**dict(kw, sub="ovelhas que entram no curral"), fala=f"{pct(s_fin)} em 100. <short pause> Coitadas das ovelhas.")
+         fala=f"Faltava o teste: fazendas novas. <short pause> O campeão inicial levava {pct(s_um)} em 100. Chuta aí: e o final? <long pause>")
+    cena(**dict(kw, sub="ovelhas que entram no curral"), fala=f"{pct(s_fin)} em 100 entraram. <short pause> Coitadas das ovelhas.")
     # ------------------------------------------------------------ CTA + LAÇO
     cena(tipo="replay", ger=C + G - 1, foco=0, grupo="fim", destaques={"campeão": AMARELO, "cão": LARANJA},
          fala="Ele cuida das ovelhas ou só manda nelas? <short pause> Porque tudo começou quando eu…")
@@ -118,9 +118,9 @@ def monta(hist, A):
     info = {"marca": "VÍDEO NEURAL", "serie": suave(hist["m_pen"], 5), "serie_rotulo": "% OVELHAS NO CURRAL",
             "marcos": marcos, "rotulo_vivo": f"{n} OVELHAS", "nome_teste": "TESTE FINAL",
             "rodape": f"1 CÃO · {n} OVELHAS E CURRAL PROGRAMADOS: SÓ O CÃO EVOLUI · {G} GERAÇÕES · NOTA = OVELHAS NO CURRAL + REBANHO MAIS PERTO DA ENTRADA"}
-    post = (f"15 ovelhas, 1 cão IA e {zero} de 100 cidades sem nenhuma ovelha no curral. Depois de {G} gerações… 🐑\n"
-            f"IA aprendendo sozinha por seleção natural. Simulação real: 1 cão e {n} ovelhas por cidade, {G} gerações, números medidos no treino.\n"
-            "Manda pra quem acha que o cachorro é que manda no rebanho 👇\n\n"
+    post = (f"{zero} de 100 tentativas sem uma ovelha no curral. Aí o cão fez algo que ninguém ensinou 🐑\n"
+            f"IA aprendendo sozinha por seleção natural. Simulação real de um cão pastor: {n} ovelhas por fazenda, {G} gerações, números medidos no treino.\n"
+            "Marca quem acha que o cachorro só manda no rebanho 👇\n\n"
             "#inteligenciaartificial #ia #aprendizadodemaquina #simulacao #caopastor")
     ev["teste"] = {"um": s_um, "fin": s_fin, "dist": (d0, d1), "atras": (a0, a1), "esp": (e0, e1), "pen": (p0, p2, pc, p3), "zero": zero}
     return cenas, info, post, ev
