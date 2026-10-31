@@ -164,13 +164,13 @@ class Queimada(Adaptador):
             return
         p = rod.reg["pa" if tm == 0 else "pb"][k, i, j]
         if not nitido:
-            h.circulo((float(p[0]), float(p[1])), Q.R, cor, 0.22, 1.6, 0.4)
+            h.circulo((float(p[0]), float(p[1])), Q.R * 1.1, cor, 0.16, 1.6, 0.3)
             return
         ant = rod.reg["pa" if tm == 0 else "pb"][k, max(i - 1, 0), j]
         v = p - ant
         ang = math.atan2(v[1], v[0]) if np.hypot(*v) > 1e-3 else (math.pi / 2 if tm == 0 else -math.pi / 2)
         R.avatar(h, (float(p[0]), float(p[1])), ang, cor, t, alfa=1.0, passo=(t * 2.4 if np.hypot(*v) > 1e-3 else None),
-                 escala=1.45, base=False)
+                 escala=1.9, base=False)
 
     def _bola(self, h, rod, k, i, t):
         b = rod.reg["bp"][k, i]
@@ -178,9 +178,9 @@ class Queimada(Adaptador):
         if est == Q.VOO:
             tr = rod.reg["bp"][k, max(0, i - 6): i + 1]
             if len(tr) > 1:
-                h.rastro([tuple(q) for q in tr], BOLA, 7, 0.9)
-        h.ponto_luz((float(b[0]), float(b[1])), 34 if est == Q.VOO else 26, BOLA, 0.7)
-        h.circulo((float(b[0]), float(b[1])), Q.RB * 1.15, BOLA, 1.0, 3.0, 0.9)
+                h.rastro([tuple(q) for q in tr], BOLA, 11, 0.9)
+        h.ponto_luz((float(b[0]), float(b[1])), 52 if est == Q.VOO else 40, BOLA, 0.8)
+        h.circulo((float(b[0]), float(b[1])), Q.RB * 1.6, BOLA, 1.0, 4.0, 0.95)
 
     def _jogo(self, h, rod, k, i, t, nitido, replay):
         for tm in (1, 0):
@@ -204,7 +204,7 @@ class Queimada(Adaptador):
         for k in fantasmas:
             self._jogo(h, rod, k, i, t, False, False)
             b = rod.reg["bp"][k, i]
-            h.circulo((float(b[0]), float(b[1])), Q.RB, BOLA, 0.35, 1.5, 0.5)
+            h.circulo((float(b[0]), float(b[1])), Q.RB * 1.1, BOLA, 0.3, 1.5, 0.5)
         self._jogo(h, rod, rod.lider, i, t, True, False)
 
     def ponto(self, rod, foco, nome, t):
