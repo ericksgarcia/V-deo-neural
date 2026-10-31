@@ -74,7 +74,9 @@ def monta(hist, A):
         raise RuntimeError("Esta semente não tem a história completa (desvio, ciranda, coladas): troque a semente.")
     g1, g2, g3, gc = ev["desvio"], ev["ciranda"], ev["colada"], ev["calma"]
     n, c = K.N, K.C
-    ch0 = int(round(c * float(hist["m_cheias"][:3].mean())))
+    ch0_f = c * float(hist["m_cheias"][:3].mean())
+    ch0 = int(round(ch0_f))
+    ch0_txt = f"{ch0_f:.1f}".replace(".", ",")
     t0, t1 = int(round(100 * float(hist["m_toque"][:3].mean()))), int(round(100 * float(ev["toque"][g1])))
     s0, s1 = int(round(100 * float(ev["same"][:3].mean()))), int(round(100 * float(ev["same"][g2])))
     p_c, p_3 = int(round(100 * float(ev["perfeita"][gc]))), int(round(100 * float(ev["perfeita"][g3])))
@@ -92,8 +94,8 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.0,
          titulo_gancho=[("12 IAs x 11 CADEIRAS", BRANCO), (f"SÓ {ch0} CADEIRA OCUPADA", AMARELO)],
          log=[(f"{n} IAs · {c} CADEIRAS", CIANO), ("NINGUÉM SABE O JOGO", AMARELO)],
-         carimbo={"texto": f"{ch0} DE {c}", "cor": AMARELO, "em": 0.5, "sub": "CADEIRAS OCUPADAS EM MÉDIA · GERAÇÃO 1"},
-         fala=f"Soltei {n} IAs numa dança das cadeiras. <short pause> Na geração 1, em média, só {ch0} sentava.")
+         carimbo={"texto": f"{ch0_txt} DE {c}", "cor": AMARELO, "em": 0.5, "sub": "CADEIRAS OCUPADAS EM MÉDIA · GERAÇÃO 1"},
+         fala=f"Soltei {n} IAs numa dança das cadeiras. <short pause> Na geração 1, em média, só {ch0_txt} sentavam.")
     # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA (o campeão da geração 1 falha)
     cena(tipo="replay", ger=C, foco=0, grupo="g1b", log=[("CAMPEÃO DA GER 001", CIANO), ("QUEM SENTA MAIS VIRA PAI DA TURMA", VERDE)],
          fala="É tipo festa de criança: a música para, senta quem chega primeiro. <short pause> Sempre falta uma.")
@@ -103,7 +105,7 @@ def monta(hist, A):
     cena(tipo="replay", ger=C + g1, foco=0,
          cartao={"numero": 1, "rotulo": "IAs", "nome": "O DESVIO", "cor": AMARELO, "stat": f"ESBARRÕES {t0}% → {t1}% DAS IAs"},
          log=[(f"GER {g1 + 1:03d} · ESBARRÕES {t0}% → {t1}%", AMARELO), ("NINGUÉM MANDOU DESVIAR", CIANO)],
-         fala=f"Pior: elas se esbarravam. <short pause> Até aprenderem a desviar: os esbarrões caíram mais da metade. <short pause> Educadas.")
+         fala=f"Pior: elas se esbarravam. <short pause> Até aprenderem a desviar: quem esbarrava caiu mais da metade. <short pause> Educadas.")
     marcos.append((g1, "1", AMARELO))
     # ------------------------------------------------------------ DESCOBERTA 2: a ciranda
     cena(tipo="replay", ger=C + g2, foco=0,
@@ -127,11 +129,11 @@ def monta(hist, A):
               sub="rodadas novas", destaque=1, cor_destaque="verde", rotulo_destaque="",
               log=[("TESTE: RODADAS NOVAS", AMARELO), (f"COMPLETAS {pct(um[0])}% → {pct(fin[0])}%", AMARELO)])
     cena(teste=True, **kw,
-         fala=f"Agora, rodadas novas: o campeão inicial enchia tudo em {pct(um[0])} de 100. Chuta aí: e o final? <long pause>")
+         fala=f"Agora, rodadas novas: o campeão inicial enchia tudo em {pct(um[0])} de 100. Chuta aí: e o campeão final? <long pause>")
     cena(**dict(kw, sub="rodadas com as 11 cadeiras cheias"), fala=f"{pct(fin[0])} em 100. <short pause> Coitada da que sobrou.")
     # ------------------------------------------------------------ CTA + LAÇO
     cena(tipo="replay", ger=C + G - 1, foco=0, grupo="fim", destaques={"campeão": AMARELO, "IAs": CIANO},
-         fala="A ciranda foi trabalho em equipe ou só o mesmo cérebro copiado? <short pause> Porque tudo começou quando eu…")
+         fala="A ciranda do campeão foi equipe ou só o mesmo cérebro copiado? <short pause> Porque tudo começou quando eu…")
 
     info = {"marca": "VÍDEO NEURAL", "serie": suave(hist["m_cheias"], 5), "serie_rotulo": "% CADEIRAS OCUPADAS",
             "marcos": marcos, "rotulo_vivo": f"{n} IAs · {c} CADEIRAS", "nome_teste": "TESTE FINAL",
