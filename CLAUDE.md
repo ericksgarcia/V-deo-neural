@@ -10,8 +10,13 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
    tabela) e implemente direto. Avise em uma linha qual tema foi escolhido e siga.
 3. **Só se não houver item pendente:** proponha 3 a 5 temas NOVOS (gancho, vista 2D, dois lados?, descoberta,
    esforço; confirme na web que são inéditos; recomende um) e use `AskUserQuestion`. Depois implemente.
+3b. **TRIAGEM DO TEMA (sempre, também para item da fila; antes de escrever código):** chame `analista-tema` (tabela e prompt em
+   `docs/ROTEIRO.md` §16.1/§11). Só implemente com **GO** (≥ 14/20). Se vier AJUSTAR, aplique o ângulo sugerido; se vier NO-GO, avise o dono em
+   uma linha, pegue o próximo pendente da fila e repita a triagem. Registre a nota em `docs/IDEIAS.md`.
 4. **Leia `docs/ROTEIRO.md` INTEIRO antes de escrever uma linha de roteiro** (inclusive a **seção 13, retenção v3**: promessa do
    teste final no começo, números em ALGARISMOS na fala, 2-4 `<long pause>` antes das revelações, cenas ≤ 18 palavras, arena em pé;
+   a **seção 15, receita v5: fluidez + leigos + assombro** (cenas costuradas por conectivos e pontes, zero jargão, comparação do dia a dia, 1 frase
+   "ninguém ensinou isso", suspense amigável e NUNCA de terror) e a **seção 16** (triagem do tema e curadoria do treino);
    e a **seção 14, receita v4 diversão + suspense**: tensão → revelação → riso → nova tensão, piada só nas falhas e DEPOIS dos
    números, **o CHUTE** "Chuta aí… <long pause>" antes do número final com a resposta na cena seguinte, resposta do teste a 70-88%). É o guia v2 do canal (vídeo curto,
    gancho com número da geração 1, poucos números, herói "o campeão", re-gancho no meio, laço falado, CTA sem votação,
@@ -23,7 +28,7 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
    2. `python gerar.py <tema> --so-roteiro > .cache/roteiro_<tema>.txt` (treino fica em `.cache/`, reutilize).
    3. `python ferramentas/confere_roteiro.py .cache/roteiro_<tema>.txt`. **Corrija até zero `FALHA`** (os `AVISO`
       devem ser resolvidos ou justificados). Repita 2-3 a cada ajuste de texto.
-   4. Chame `analista-roteiro` e `analista-engajamento` (prompts prontos em `docs/ROTEIRO.md`, seção 11). Aplique o
+   4. Chame `analista-roteiro` e `analista-engajamento` (este agora mede se o vídeo é visto ATÉ O FINAL: duas notas, conclusão e engajamento) (prompts prontos em `docs/ROTEIRO.md`, seção 11). Aplique o
       que melhora mantendo os números reais; rode o conferidor de novo. Só avance com notas >= 8.
    5. **Uma** narração: `python gerar.py <tema> --so-voz` (1 requisição TTS, depois cache). Confira o relatório de
       ritmo/pronúncia e a duração prevista (**<= 60 s**; se passar, corte cenas do roteiro ANTES de gastar voz nova;
@@ -83,8 +88,14 @@ integre ao tronco do mesmo jeito. Os prefixos `epNN` dos arquivos podem repetir;
   em loop para apontar alguém. Destacar só de forma INDIVIDUAL e que siga o agente o tempo todo:
   `h.destaque(...)` (brilho + seta ▼ acima da cabeça), recalculado da posição daquele agente a cada quadro; numa equipe, um em
   cada membro. Ficam só círculos que SÃO o mundo (corpo do agente, arena, cofre) e o flash curto de um evento no ponto exato.
+- **Curadoria do treino AUTORIZADA (31/out/2026):** pode manipular o treinamento para a história ficar melhor (sementes, população, mutação,
+  currículo, recompensas, física/arena, escolha dos lances e da montagem). Limites: todo número vem da simulação que aparece no vídeo (nunca
+  editar/inventar número), o replay mostra lance que aconteceu, não afirmar o que o treino não mostrou (rodapé exato se a recompensa guiou muito),
+  e registrar o ajuste em `docs/EPISODIOS.md`. Detalhes: `docs/ROTEIRO.md` §16.2.
 - Honestidade: todo número falado vem do treino real (checagens em `roteiros/`). Nada inventado.
-- Narração: **Gemini TTS 3.8** (`gemini-3.8-flash-tts`), **UMA requisição por vídeo**. Limite de 10
+- Narração: **SEMPRE a voz Achird no Gemini TTS 3.8** (`gemini-3.8-flash-tts`), travado em `neuralab/audio.py` (o log precisa mostrar
+  "[voz] confirmado: Achird · gemini-3.8-flash-tts"; outra voz/modelo dá erro). Tom: humano, caloroso, assombro de quem descobriu algo
+  muito legal e explica para leigos; suspense amigável, nunca de terror (`docs/NARRACAO.md`). **UMA requisição por vídeo**. Limite de 10
   requisições por voz a cada 24 h (ledger em `.cache/tts/uso.json`). Ajuste de ritmo/pausas é local
   (Whisper + ffmpeg), sem nova requisição. Mudar texto, estilo ou voz = nova requisição (peça licença).
 - Do Gemini só o TTS (a menos que seja gratuito). Transcrição = Whisper local.

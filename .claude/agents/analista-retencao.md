@@ -20,3 +20,6 @@ Entregue:
 3. "Interruptores de padrão": a cada quantos segundos acontece algo novo? Onde falta?
 4. O final faz laço com o começo (rewatch)? A duração está certa para o conteúdo (corte o que não paga o próprio tempo)?
 5. Lista de cortes/trocas concretas, em ordem de impacto, cada uma com a estimativa de ganho.
+6. Conclusão do vídeo (assistir até o fim): liste a pergunta aberta em cada trecho de 3 s e marque onde NÃO há nenhuma. Verifique fluidez (§15): cenas
+   que começam "do nada" e trechos em que um leigo se perde (jargão, regra sem comparação). Estime a % que chega ao último segundo e proponha as 3 mudanças
+   que mais a aumentam.

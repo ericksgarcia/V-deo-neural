@@ -27,7 +27,7 @@ fala ficou rápida demais, refazendo a narração até 3 vezes se precisar. Escr
 mais naturais e dão respiro à legenda.
 
 Opções úteis: `--rascunho` (meia resolução, rápido), `--sem-voz` (só legenda), `--so-roteiro`,
-`--sementes 3,5,7` (treina várias e escolhe a melhor história), `--voz Achird` (padrão; veja `docs/NARRACAO.md`).
+`--sementes 3,5,7` (treina várias e escolhe a melhor história), `--voz Achird` (a voz do canal é SEMPRE Achird no Gemini TTS 3.8; travado em `audio.py`, veja `docs/NARRACAO.md`).
 
 Saída em `saida/`: o vídeo, `*_legenda.txt` (texto do post) e `*_analise/` (roteiro com tempos,
 checagem da voz, quadros-chave e mosaico, que são o material dos analistas).
@@ -109,11 +109,12 @@ Ficam em `.claude/agents/` e rodam com o seu plano do Claude (sem API extra):
 
 | analista | quando | olha |
 |---|---|---|
+| `analista-tema` | ANTES de implementar | triagem do tema (nota ≥ 14/20, ineditismo na web, potencial no nicho) |
 | `analista-roteiro` | antes de renderizar | gancho, loops abertos, viradas, clareza, honestidade dos números |
 | `analista-narracao` | depois do áudio | voz x roteiro (Whisper), ritmo, pausas, pronúncia |
 | `analista-visual` | rascunho | legibilidade, zonas seguras do TikTok, clareza da ação, acabamento |
 | `analista-retencao` | rascunho | curva de retenção estimada, pontos de deslize, cortes |
-| `analista-engajamento` | antes de publicar | motivo para comentar/compartilhar/seguir, legenda e hashtags |
+| `analista-engajamento` | antes da voz e de publicar | se o vídeo é visto ATÉ O FINAL (mapa de loops abertos), comentar/compartilhar, legenda e hashtags |
 | `diretor` | tudo | orquestra os cinco e só aprova com todas as notas >= 8 |
 
 No Claude Code: *"use o diretor para revisar o episódio do pênalti"*.

@@ -152,7 +152,9 @@ O `post` é montado em `monta()` do roteiro (retorno `cenas, info, post, ev`); e
 - [ ] legenda no formato da seção 9
 - [ ] seção 13: promessa do teste nas 3 primeiras cenas, números em algarismos, 2-4 `<long pause>`, nenhuma cena > 18 palavras
 - [ ] seção 14: 1 chute no teste, resposta a 70-88% do vídeo, 2-3 momentos de humor, ≥ 2 pontes
-- [ ] analistas sem nota < 8 (roteiro, engajamento antes; retenção, visual no rascunho; diretor no fim)
+- [ ] analistas sem nota < 8 (tema antes de tudo; roteiro, engajamento antes; retenção, visual no rascunho; diretor no fim)
+- [ ] seção 15 (fluidez/leigos/assombro) e seção 16 (triagem do tema GO; ajustes do treino registrados em `docs/EPISODIOS.md`)
+- [ ] log da voz mostra "[voz] confirmado: Achird · gemini-3.8-flash-tts"
 
 ---------------------------------------------------------------------------------------------------------------
 
@@ -160,6 +162,14 @@ O `post` é montado em `monta()` do roteiro (retorno `cenas, info, post, ev`); e
 
 Passe SEMPRE só texto: o roteiro (saída de `--so-roteiro`) + os fatos (números do treino/medidas). Nunca o código.
 Peça resposta curta. Cada prompt já inclui as regras do guia v2.
+
+**analista-tema** (ANTES de implementar; passe a linha da fila + ficha):
+```
+Faça a triagem do tema "<tema>" para o canal (IA aprendendo sozinha, simulações 2D reais, público geral brasileiro). Siga a tabela de `docs/ROTEIRO.md` §16.1
+(10 critérios, 0-2 cada), pesquise na web se já existe vídeo igual com muita audiência (use WebSearch) e dê o veredito GO / AJUSTAR / NO-GO com o gancho
+candidato e a pergunta de CTA candidata. Lembre: o dono autorizou curar o treino (§16.2).
+FICHA: <cole a linha da fila e a ficha>
+```
 
 **analista-roteiro** (antes da voz):
 ```
@@ -174,6 +184,8 @@ SEM voto e SEM promessa de próximo vídeo; sugira 2 perguntas melhores tiradas 
 (9) HONESTIDADE: cada número bate com os FATOS abaixo? Aponte qualquer exagero. (10) DIVERSÃO + SUSPENSE (§14): há 2-3 momentos
 de humor, nas falhas ou logo DEPOIS de uma revelação (nunca entre pergunta e resposta)? o teste final tem o CHUTE ("Chuta aí… <long pause>")
 e a cena seguinte começa pelo número? as cenas do meio terminam abrindo a próxima dúvida? Sugira 2 piadas curtas (≤ 6 palavras) e verdadeiras.
+(11) FLUIDEZ + LEIGOS (§15): as cenas se costuram em UMA história (conectivos e pontes, nenhuma cena começa "do nada")? zero jargão? há comparação do dia a dia
+nas 3 primeiras cenas e 1 frase de assombro verdadeiro ("ninguém ensinou isso") depois da melhor descoberta? suspense amigável, nunca de terror?
 Responda em português: nota 0-10 por critério e geral; os 3 maiores problemas; reescrita linha a linha só do que melhora
 (formato `cena N: "antiga" -> "nova"`, mantendo exatamente os mesmos números e fatos); veredito APROVADO (todas as notas ≥ 8) ou REPROVADO.
 ROTEIRO:
@@ -184,7 +196,8 @@ FATOS REAIS DO TREINO:
 
 **analista-engajamento** (antes da voz e de novo antes de publicar):
 ```
-Avalie o potencial de comentários, compartilhamentos e seguidores do vídeo "<tema>" segundo o guia v2. Regras: o CTA NÃO pode pedir voto
+Garanta que o vídeo "<tema>" seja visto ATÉ O FINAL e avalie comentários, compartilhamentos e seguidores segundo o guia (mapa de conclusão: pergunta aberta em
+cada trecho, escada de curiosidade, pagamento do teste a 70-88%, fim curto que abre discussão e dá vontade de rever, fluidez §15). Duas notas (conclusão e engajamento), ambas >= 8. Regras: o CTA NÃO pode pedir voto
 nem prometer próximo vídeo/tema; deve ser UMA pergunta sobre o que se passou, com dois lados defensáveis tirados dos dados.
 Legenda do post: linha 1 = curiosidade (≤ 120 caracteres, sem resumo e sem entregar o final), linha 2 = o que é com termos pesquisáveis em português
 ("IA aprendendo sozinha"), linha 3 = gatilho de compartilhar (diferente da pergunta do vídeo), 3 a 5 hashtags. Avalie: (1) qual comentário a maioria
@@ -361,3 +374,91 @@ No chute, além disso, a contagem 3-2-1 e o coração.
 - [ ] resposta do teste a 70-88% do vídeo; ≤ 8 s depois dela
 - [ ] 2-3 momentos de humor (falha, alívio depois do número, comparação), nenhum entre pergunta e resposta
 - [ ] ≥ 2 cenas do meio terminando em ponte (pergunta, "Mas…", `<long pause>`)
+
+
+## 15. Receita v5: fluidez, leigos e assombro (vale para todo vídeo novo)
+
+Decisão do dono (31/out/2026): o roteiro continua no mesmo esquema (v2 + v3 + v4: gancho, regra, 3 descobertas, chute, CTA, laço,
+mesmos limites de palavras e números), mas precisa **soar como UMA história contada de uma vez**, para quem nunca ouviu falar de
+IA, e a pessoa precisa sentir que está vendo algo **muito top**. O que muda é o COMO se escreve, não o tamanho.
+
+### 15.1 Fluidez: nenhuma cena começa "do nada"
+- Cada cena **puxa o fio da anterior** nas 2-3 primeiras palavras: "Aí…", "Só que…", "E sabe o que ela fez?", "Até que…",
+  "Dessa vez…", "Então…". Quem ouve só o áudio tem que achar que é uma frase longa respirando, não uma lista de anúncios.
+- A cena anterior **deixa a ponte**: termina em dúvida pequena ("Mas tem um problema.", "E agora?", `<long pause>`) que a seguinte
+  paga. Cada cena é pergunta para a próxima ou resposta da anterior, nunca os dois vazios.
+- **Proibido corte seco de assunto** (ex.: cena de regra → cena "Geração 47." sem ligação). Entre dois blocos grandes (premissa →
+  geração 1; descoberta → re-gancho; re-gancho → teste) use uma frase-ponte de 3-6 palavras ("Então eu deixei rodar.", "E ela
+  continuou aprendendo.", "Faltava o teste."). Se estourar o orçamento, corte número, não ponte.
+- Mantenha o mesmo sujeito/tempo verbal em sequência (eu → a IA → o campeão). Não pule do "eu" para o "narrador" e para o "você" sem
+  motivo; o "você" só aparece no chute e no CTA.
+- Mudança de clima só depois de um respiro: tensão → (`<short pause>`) → alívio, nunca tensão → piada na mesma frase.
+
+### 15.2 Para leigos: tradutor em cada ideia
+- **Zero jargão.** Não falar: algoritmo, fitness, mutação, rede neural, parâmetro, população, otimização, gradiente. Falar: "cérebro de
+  mentira", "turma", "geração", "nota", "deu errado e eu sorteei uma mudança", "o que ela tentou".
+- **Uma comparação do dia a dia** nas 3 primeiras cenas para a regra do jogo ("É tipo cachorro aprendendo truque: acertou, ganha
+  petisco; errou, tenta de novo.", "Igual escolher o time que melhor jogou para o próximo campeonato."). Uma imagem, não duas.
+- **Cada conceito com apelido curto** e usado igual até o fim (o cartão já tem o nome da descoberta; a fala o repete).
+- **Explique o "por que isso importa"** em 1 frase: não "o campeão aprendeu a virar", mas "ninguém ensinou ela a virar; ela
+  descobriu porque virar salva a pele".
+- Teste do leigo: leia cada cena em voz alta para alguém imaginário de 12 anos. Se tem palavra que ele pararia para perguntar, troque.
+
+### 15.3 Assombro: por que isto é top (o "uau" honesto)
+- **1 frase de assombro verdadeiro** depois da melhor descoberta (a mais surpreendente, não a última por obrigação):
+  "Ninguém programou isso." / "Ela inventou isso sozinha." / "Eu só deixei rodar." Só pode ser dita se for **verdade no treino**.
+- O assombro vem do CONTRASTE medido (da geração 1 para a final), dito simples, e da reação humana depois ("Eu fiquei olhando.").
+  Nunca adjetivo vazio ("incrível", "inacreditável", "chocante").
+- A emoção é de **descoberta e carinho** pelos bichinhos, não de medo nem de espanto sombrio.
+
+### 15.4 Tom do suspense: amigável, nunca terror
+Suspense = "espera, a parte boa vem agora", com sorriso na voz. Proibido: voz grave de trailer, sussurro de filme de terror, frases
+sinistras ("algo estava errado", "ninguém sabia o que vinha", "a escuridão", "para sempre"), mortes dramatizadas, silêncio
+pesado. Use: curiosidade ("Olha o que aconteceu."), cumplicidade ("Chuta aí."), pausas curtas antes do número, riso depois.
+A direção de voz oficial está em `neuralab/audio.py` (`ESTILO_PADRAO`); roteiro novo NÃO precisa de `estilo_voz` próprio.
+
+### 15.5 Exemplo (antes → depois)
+Antes (quebrado): "Regra: quem vai melhor vira pai da próxima turma. <cena> Geração 12. O campeão descobre o farol. <long pause> De 14 para 68."
+Depois (fluido): "Quem vai melhor vira pai da próxima turma, igual escolher o time para o próximo jogo. <short pause> Então eu deixei rodar."
+→ "Aí, na geração 12, o campeão fez algo que ninguém ensinou: ficou girando a lanterna. <long pause> De 14 para 68 em cada 100."
+
+### 15.6 Checklist v5 (soma ao da seção 10)
+- [ ] nenhuma cena começa sem conectivo ou ponte (o conferidor lista as soltas)
+- [ ] zero jargão; 1 comparação do dia a dia nas 3 primeiras cenas
+- [ ] 1 frase de assombro verdadeiro depois da melhor descoberta
+- [ ] tom de suspense amigável (nenhuma frase sinistra); mesmo orçamento de palavras e números
+
+
+## 16. Triagem de tema + curadoria do treino (antes de gastar render)
+
+### 16.1 Triagem do tema (OBRIGATÓRIA antes de implementar; fila também)
+Rode o agente `analista-tema` (ou aplique a tabela abaixo) com a ficha do tema. Pontue 0-2 em cada item; **só avança com ≥ 14/20 e
+nenhum zero em "gancho em 1 s" ou "explica em 1 frase"**. Abaixo disso: ajuste o ângulo ou troque o tema (e avise o dono em 1 linha).
+
+| # | critério | 2 pontos quando… |
+|---|---|---|
+| 1 | gancho visual em 1 s, sem som | a ação principal é óbvia no celular e a geração 1 já é engraçada/caótica |
+| 2 | explica em 1 frase para leigo | "carros aprendendo a estacionar sem ninguém ensinar" (sem jargão) |
+| 3 | desastre engraçado na geração 1 | existe falha que dá riso (batida, queda, fuga boba) |
+| 4 | descoberta com nome fofo | pelo menos 2 truques que rendem apelido (O Farol, O Carona) |
+| 5 | virada/ironia | o final tem um twist verdadeiro (o preguiçoso vence, o rival se adapta) |
+| 6 | pergunta com dois lados | o CTA rende debate de verdade, não "sim/não" |
+| 7 | torcida | dá para torcer por "o campeão" (e rir do rival) |
+| 8 | compartilhável | "olha o que a IA fez" gera marcação de amigo, sem precisar de contexto |
+| 9 | inédito no nicho | busca na web (TikTok/YouTube: "AI learns to X", "IA aprende a X") não mostra o mesmo conceito com milhões de views, ou há ângulo novo |
+| 10 | encaixe técnico | cabe na base (2D, ≤ 1 dia de esforço, treino converge em minutos) e a arena fica em pé |
+Nicho do canal: **IA aprendendo sozinha em simulações 2D reais** (neon/holograma), curiosidade científica leve para o público geral
+brasileiro de 16-45 anos, humor com carinho, nada de política, violência gráfica ou sofrimento realista (ex.: "queimar" vira "lava neon").
+Registre a nota em `docs/IDEIAS.md` (coluna "Ideia") e a justificativa em 3 linhas no começo da conversa.
+
+### 16.2 Curadoria do treino (autorizada pelo dono em 31/out/2026)
+O dono autorizou **manipular os treinamentos para a história ficar melhor**. Pode, e deve quando render história:
+- escolher a melhor entre várias **sementes**; aumentar/diminuir população, gerações, taxa de mutação, elitismo;
+- **currículo** (começar fácil e subir a dificuldade), ajustar **recompensas/punições**, **física, velocidade e tamanho da arena** para
+  o conflito ficar legível, e "ensaiar" o treino até a curva ter começo ruim, 2-3 viradas claras e um final convincente;
+- escolher **quais lances/gerações mostrar** nos replays e em que ordem (montagem), desde que existam de verdade.
+Limites que continuam valendo (honestidade com o público): **(1)** todo número falado ou escrito é medido **na simulação que aparece no
+vídeo** (nunca editar um número, nem inventar medida); **(2)** o replay mostra um lance que aconteceu mesmo naquela geração;
+**(3)** não dizer o que o treino não mostrou ("ninguém programou" só se o comportamento surgiu de seleção, sem regra escrita à mão);
+se uma recompensa guiou muito o resultado, troque o rodapé por algo exato (`info["rodape"]`) e não use "sem ajuda";
+**(4)** registrar em `docs/EPISODIOS.md` o que foi ajustado (ex.: "recompensa X dobrada; semente 7 de 12; currículo em 2 fases") para o dono saber.

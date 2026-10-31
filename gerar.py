@@ -206,7 +206,7 @@ def main():
     ap.add_argument("desafio", choices=DESAFIOS)
     ap.add_argument("--geracoes", type=int)
     ap.add_argument("--sementes", default=None, help="ex.: 3,5,7 — testa várias e fica com a melhor história")
-    ap.add_argument("--voz", default="Achird", help="voz do Gemini TTS (padrão Achird; Charon, Fenrir, Orus, Kore...)")
+    ap.add_argument("--voz", default="Achird", help="NÃO MUDE: a voz do canal é sempre Achird (Gemini TTS 3.8); outra voz só com licença do dono")
     ap.add_argument("--sem-voz", action="store_true")
     ap.add_argument("--rascunho", action="store_true", help="metade da resolução, para revisar rápido")
     ap.add_argument("--so-roteiro", action="store_true")

@@ -18,4 +18,7 @@ Avalie cada cena e o todo:
    da cena) está legível e abre na hora certa? Cada revelação (`<long pause>`) tem impacto visível (zoom/clarão)? As barras do teste
    escondem o vencedor até a voz revelar? Números da legenda em algarismos? NÃO pode haver círculos/setas/rótulos soltos na cena
    (telestrador desligado); aponte qualquer marca que não esteja colada no agente certo.
+8. Visual v5 (`docs/ROTEIRO.md` §13 + moldura nova): o entorno da animação tem vida (fundo animado, bordas e cantos, partículas, brilho que reage às
+   revelações) SEM disputar atenção com a ação? A legenda e os números importantes estão fora da coluna de botões do TikTok (x > 940, y 800-1500) e acima da
+   descrição (y > 1460)? A ação ocupa o espaço (agentes grandes, rastro/brilho que mostram movimento, contraste do campeão)? Alguma área preta/vazia que desperdiça tela?
 Responda com nota 0–10, lista de problemas com o nome do arquivo do quadro e correção sugerida (específica: posição, tamanho, cor, câmera).

@@ -38,6 +38,14 @@ CENA = (30, 362, 1020, 1030)  # a cena termina em y=1392; a legenda fica DENTRO 
 LEGENDA_Y = 1290
 LEGENDA_X, LEGENDA_LARG = 500, 760   # um pouco à esquerda do centro: longe da coluna de botões
 RODAPE_Y = 1428
+# Zonas de interface do TikTok (1080x1920): o app desenha por cima do vídeo. Nada essencial (texto, números, rostos da ação)
+# pode ficar nelas; o fundo animado e a moldura podem (são só atmosfera).
+ZONAS_TIKTOK = {
+    "abas/busca": (0, 0, W, 130),                 # status bar, "Seguindo | Para você", lupa
+    "botões": (940, 760, 140, 740),
+    "descrição/música": (0, 1460, 900, 460),
+    "barra inferior": (0, 1780, W, 140),
+}
 
 
 def cor(ctx, c, a=1.0):
@@ -134,6 +142,11 @@ class Fundo:
                 ctx.rectangle(x, y, 1.5, 1.5)
                 ctx.fill()
         brilho(ctx, W / 2, 770, 900, "ciano2", 0.12)
+        # aurora colorida (magenta no alto à esquerda, azul embaixo à direita) e chão em perspectiva na área do app
+        brilho(ctx, 120, 260, 620, (0.55, 0.15, 0.75), 0.13)
+        brilho(ctx, 980, 1500, 700, (0.1, 0.35, 0.9), 0.16)
+        brilho(ctx, W / 2, 1750, 760, "ciano2", 0.14)
+        _chao(ctx, 0.0)
         v = cairo.RadialGradient(W / 2, H / 2, 500, W / 2, H / 2, 1250)
         v.add_color_stop_rgba(0, 0, 0, 0, 0)
         v.add_color_stop_rgba(1, 0, 0, 0, 0.7)
@@ -141,9 +154,92 @@ class Fundo:
         ctx.paint()
 
 
+def _chao(ctx, t, a=1.0):
+    """Chão neon em perspectiva (embaixo da cena, atrás da descrição do TikTok): linhas que correm na direção de quem vê."""
+    y0, y1 = 1396, H
+    hor = y0 + 8
+    ctx.save()
+    ctx.rectangle(0, y0, W, y1 - y0)
+    ctx.clip()
+    for k in range(-14, 15):   # fugas
+        xb = W / 2 + k * 150
+        g = cairo.LinearGradient(0, hor, 0, y1)
+        g.add_color_stop_rgba(0, *C["ciano"], 0)
+        g.add_color_stop_rgba(1, *C["ciano"], 0.20 * a)
+        ctx.set_source(g)
+        ctx.set_line_width(1.4)
+        ctx.move_to(W / 2 + k * 14, hor)
+        ctx.line_to(xb, y1)
+        ctx.stroke()
+    for k in range(9):   # linhas horizontais em movimento
+        f = ((k + (t * 0.35) % 1.0) / 9.0) ** 2.2
+        y = hor + f * (y1 - hor)
+        cor(ctx, "ciano", (0.05 + 0.25 * f) * a)
+        ctx.rectangle(0, y, W, 1.5)
+        ctx.fill()
+    ctx.restore()
+
+
+def ambiente(ctx, t, pulso=0.0, acento="ciano"):
+    """Atmosfera ANIMADA atrás de tudo (desenhada logo depois do fundo): partículas que sobem devagar, chão em
+    perspectiva correndo, feixes de luz nas laterais e respiração no ritmo da trilha (124 bpm). `pulso` (0-1) acende tudo
+    um pouco nas revelações. Só decoração: nunca leva texto nem informação."""
+    batida = 0.5 + 0.5 * math.cos(2 * math.pi * t * 124 / 60)
+    # chão correndo (por cima do estático)
+    cor(ctx, "fundo", 0.85)
+    ctx.rectangle(0, 1396, W, H - 1396)
+    ctx.fill()
+    _chao(ctx, t, 0.7 + 0.5 * pulso + 0.15 * batida)
+    # feixes laterais (nas margens estreitas e no alto)
+    for lado in (0, 1):
+        x = 12 if lado == 0 else W - 12
+        g = cairo.LinearGradient(0, 130, 0, 1400)
+        g.add_color_stop_rgba(0, *C[acento], 0)
+        g.add_color_stop_rgba(0.5 + 0.2 * math.sin(t * 0.8 + lado), *C[acento], 0.12 + 0.10 * pulso + 0.04 * batida)
+        g.add_color_stop_rgba(1, *C[acento], 0)
+        ctx.set_source(g)
+        ctx.rectangle(x - 6, 130, 12, 1270)
+        ctx.fill()
+    # partículas: posição determinística por índice, sobem em loop (sem aleatoriedade por quadro)
+    rng = np.random.default_rng(7)
+    xs, ys0, vs, rs, ph = (rng.random(70) for _ in range(5))
+    for k in range(70):
+        y = (ys0[k] - t * (0.012 + 0.03 * vs[k])) % 1.0
+        x = (xs[k] + 0.015 * math.sin(t * 0.7 + ph[k] * 6.28)) % 1.0
+        al = (0.10 + 0.22 * rs[k]) * (0.6 + 0.4 * math.sin(t * 1.5 + ph[k] * 6.28)) * (1 + 1.2 * pulso)
+        cor(ctx, acento if k % 4 else "branco", min(al, 0.6))
+        ctx.arc(x * W, 60 + y * (H - 120), 1.2 + 2.2 * rs[k], 0, 2 * math.pi)
+        ctx.fill()
+
+
+def halo_cena(ctx, t, pulso=0.0, acento="ciano", ret=CENA):
+    """Brilho que 'respira' em volta da moldura da cena (por baixo dela): a tela parece uma janela acesa.
+    Acende forte numa revelação (`pulso`)."""
+    x, y, w, h = ret
+    batida = 0.5 + 0.5 * math.cos(2 * math.pi * t * 124 / 60)
+    for i in range(7, 0, -1):
+        chanfro(ctx, x - i * 5, y - i * 5, w + i * 10, h + i * 10, 26 + i * 4)
+        cor(ctx, acento, (0.018 + 0.02 * batida + 0.05 * pulso) * (8 - i) / 7)
+        ctx.fill()
+
+
+def guia_zonas(ctx):
+    """Só para análise (`pacote`): desenha as zonas do TikTok em vermelho translúcido sobre um quadro."""
+    for nome, (x, y, w, h) in ZONAS_TIKTOK.items():
+        cor(ctx, "vermelho", 0.18)
+        ctx.rectangle(x, y, w, h)
+        ctx.fill()
+        cor(ctx, "vermelho", 0.8)
+        ctx.set_line_width(2)
+        ctx.rectangle(x, y, w, h)
+        ctx.stroke()
+        texto(ctx, nome, x + 8, y + 26, 20, "branco", 0.9, familia=MONO_B)
+
+
 def cabecalho(ctx, marca, experimento, titulo, t):
-    y = 92
-    # logotipo: hexágono com um nó
+    """Cabeçalho de marca. Fica logo abaixo das abas do TikTok (y > 100) e o título encolhe para nunca bater
+    no selo "SIMULAÇÃO REAL" (que termina antes da lupa do app, x <= 960)."""
+    y = 116
     cx, cy, r = 54, y - 10, 15
     ctx.move_to(cx + r, cy)
     for k in range(1, 7):
@@ -151,14 +247,21 @@ def cabecalho(ctx, marca, experimento, titulo, t):
     _neon(ctx, "ciano", 1, 2)
     brilho(ctx, cx, cy, 10, "ciano", 0.9)
     texto(ctx, marca, 80, y, 26, "texto", familia=MONO_B, espaco=2)
-    texto(ctx, f"// EXP {experimento} · {titulo}", 80 + larg(ctx, marca, 26, MONO_B) + 2 * len(marca) + 14, y, 22,
-          "sutil", familia=MONO)
+    x0 = 80 + larg(ctx, marca, 26, MONO_B) + 2 * len(marca) + 14
+    selo_w = larg(ctx, "SIMULAÇÃO REAL", 20, MONO_B)
+    fim_titulo = 960 - selo_w - 44
+    s = f"// EXP {experimento} · {titulo}"
+    tam = 22
+    while larg(ctx, s, tam, MONO) > fim_titulo - x0 and tam > 12:
+        tam -= 1
+    texto(ctx, s, x0, y, tam, "sutil", familia=MONO)
     pisca = 0.35 + 0.65 * (math.sin(t * 5) > -0.2)
-    brilho(ctx, 772, y - 9, 16, "vermelho", 0.6 * pisca)
+    xr = 960 - selo_w
+    brilho(ctx, xr - 22, y - 8, 16, "vermelho", 0.6 * pisca)
     cor(ctx, "vermelho", pisca)
-    ctx.arc(772, y - 9, 6, 0, 2 * math.pi)
+    ctx.arc(xr - 22, y - 8, 6, 0, 2 * math.pi)
     ctx.fill()
-    texto(ctx, "SIMULAÇÃO REAL", 1050, y, 22, "vermelho", familia=MONO_B, alinha="d")
+    texto(ctx, "SIMULAÇÃO REAL", 960, y, 20, "vermelho", familia=MONO_B, alinha="d")
 
 
 def painel(ctx, x, y, w, h, titulo, c="ciano", indice=None, a=1.0):

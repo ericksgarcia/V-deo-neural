@@ -34,6 +34,16 @@ HUMOR = re.compile(r"(?i)\bgente\b|\bjuro\b|\beu ri\b|\bri sozinho|coitad|tadinh
                    r"\bfeito doido\b|\bque nem doido\b|\bpasse[ia]|\bdeu ruim\b|\bfoi mal\b|\bsem querer\b|\bvexame\b|\bc[ôo]mico\b|\bpiada\b")
 PONTE = re.compile(r"(?i)(\?|…|\.\.\.|<long pause>)\s*$|(^|[.!?…]\s+)(mas|s[óo] que|at[ée] que|a[íi]|e a[íi]|s[óo] tem)\b[^.!?]*[.!?…]?\s*$")
 PAL_S = 2.6   # palavras por segundo (README/NARRACAO)
+# receita v5 (fluidez + leigos, docs/ROTEIRO.md §15)
+# conectivos que costuram uma cena na anterior (a abertura da cena "puxa" o fio da cena de antes)
+CONECTIVO = re.compile(r"(?i)^\s*(a[íi]|e a[íi]|s[óo] que|mas|ent[ãa]o|at[ée] que|depois|dessa vez|de novo|e sabe|olha s[óo]|"
+                       r"agora|por isso|j[áa]|e o|e a|e os|e as|foi a[íi]|logo|quando|na geração|geração)\b")
+JARGAO = re.compile(r"(?i)\b(algoritmo|fitness|muta[çc][ãa]o|muta[çc][õo]es|cruzamento gen[ée]tico|rede neural|redes neurais|"
+                    r"neur[ôo]nio|par[âa]metro|pesos|otimiza[çc][ãa]o|gradiente|aprendizado por refor[çc]o|popula[çc][ãa]o|"
+                    r"gen[ée]tico|epoch|[ée]poca|heur[íi]stic|sensor(es)?|vari[áa]vel|vetor)\b")
+TRADUCAO = re.compile(r"(?i)\b(ou seja|tipo|igual (a|um|uma)|como (um|uma|se)|parece|pense|imagina|quer dizer|em outras palavras)\b")
+UAU = re.compile(r"(?i)ningu[ée]m (ensinou|programou|mandou|falou)|sozinh[oa]|por conta pr[óo]pri|sem (ningu[ée]m|ajuda)|"
+                 r"inventou|descobriu|aprendeu|ningu[ée]m pediu")
 
 
 def le(arq):
@@ -195,6 +205,26 @@ def main():
     if len(graca) < 2:
         r("AVISO", f"pouca diversão na fala ({', '.join(graca) or 'nenhuma marca de humor'}): pelo menos 2-3 momentos leves "
                    "(falha zoada com carinho, comparação do dia a dia, bastidor), sempre DEPOIS de uma revelação ou numa falha (§14)")
+
+    # ---- fluidez e linguagem para leigos (§15)
+    soltas = [k for k in range(2, len(cenas) - 1)
+              if not CONECTIVO.match(limpa(cenas[k]["fala"])) and not PONTE.search(cenas[k - 1]["fala"].strip())]
+    if len(soltas) > max(2, (len(cenas) - 3) // 3):
+        r("AVISO", f"{len(soltas)} cenas começam do nada e a anterior não deixou ponte (cenas {soltas[:8]}): costure com 'Aí…', "
+                   "'Só que…', 'E sabe o que ela fez?' ou termine a cena anterior abrindo a próxima dúvida (§15.1)")
+    jarg = sorted({m.group(0).lower() for c in cenas for m in JARGAO.finditer(limpa(c["fala"]))})
+    if jarg:
+        r("AVISO", f"jargão na fala ({', '.join(jarg)}): troque por palavra do dia a dia ou explique com uma comparação na mesma "
+                   "frase (§15.2)")
+    if not any(TRADUCAO.search(limpa(c["fala"])) for c in cenas[:3]):
+        r("AVISO", "nenhuma explicação por comparação nas 3 primeiras cenas ('é tipo…', 'igual a…'): quem não conhece IA precisa "
+                   "de uma imagem do dia a dia para entender a regra (§15.2)")
+    if not any(UAU.search(limpa(c["fala"])) for c in cenas[3:]):
+        r("AVISO", "nenhuma fala diz POR QUE aquilo é incrível para um leigo ('ninguém ensinou', 'sozinha', 'ela inventou'): "
+                   "uma frase de assombro verdadeiro depois da melhor descoberta (§15.3)")
+    secas = [k for k in range(1, len(cenas) - 1) if not re.search(r"[.?…!]", limpa(cenas[k]["fala"]).strip()[-1:] or ".")]
+    if secas:
+        r("AVISO", f"cenas {secas[:6]} terminam sem pontuação; a voz corta seco")
 
     # ---- herói
     n_fala = sum(bool(re.search(r"(?i)\bcampe[ãa]o\b|\bcampe[ãa]\b", c["fala"])) for c in cenas)

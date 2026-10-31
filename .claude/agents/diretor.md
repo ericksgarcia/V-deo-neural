@@ -9,9 +9,10 @@ Leia `docs/ROTEIRO.md` e use `python ferramentas/confere_roteiro.py <saida de --
 conferidor, duração final <= 60 s e o checklist da seção 10 completo. CTA com voto ou promessa de próximo vídeo = reprovado.
 
 Fluxo:
+0. TEMA: antes de qualquer código, chame `analista-tema` (triagem de potencial para o nicho, `docs/ROTEIRO.md` §16.1). Só siga com GO.
 1. ROTEIRO: chame `analista-roteiro` com o roteiro e os fatos. Aplique as reescritas que melhoram e que mantêm os números.
 2. RASCUNHO: gere o rascunho (`python gerar.py <desafio> --rascunho`). Chame `analista-visual` e `analista-retencao` em paralelo sobre a pasta `*_analise/`.
 3. NARRAÇÃO: chame `analista-narracao`.
-4. PUBLICAÇÃO: chame `analista-engajamento`.
+4. PUBLICAÇÃO: chame `analista-engajamento` (nota de conclusão e de engajamento; ambas >= 8). Confirme no log "[voz] confirmado: Achird · gemini-3.8-flash-tts".
 5. Consolide: tabela com a nota de cada analista, as mudanças aceitas (e por quê), as recusadas (e por quê). Um episódio só está pronto quando todas as notas forem >= 8.
 Mudanças que exigem alterar dados ou inventar números são sempre recusadas.

@@ -88,7 +88,20 @@ class CotaEsgotada(RuntimeError):
 
 
 LIMITE_REQUISICOES = 10          # por voz, a cada 24 h (cota da conta)
+# VOZ OFICIAL DO CANAL (decisão do dono, reafirmada em 31/out/2026): TODO vídeo usa a voz Achird no Gemini TTS 3.8.
+# `narra_lote` recusa qualquer outra combinação, a menos que o dono tenha autorizado (`autorizada=True`).
+VOZ_OFICIAL = "Achird"
+MODELO_OFICIAL = "gemini-3.8-flash-tts"
 VOZES_RESERVA = ["Charon", "Orus", "Fenrir", "Puck", "Iapetus", "Algenib", "Enceladus"]   # só com reserva=True
+
+
+def confirma_voz(voz, modelo, autorizada=False):
+    """Garante (e mostra no log) que a narração usa Achird + Gemini 3.8. Levanta erro se for outra coisa."""
+    if (voz, modelo) != (VOZ_OFICIAL, MODELO_OFICIAL) and not autorizada:
+        raise ValueError(f"voz/modelo fora do padrão do canal: {voz} / {modelo} "
+                         f"(o padrão é {VOZ_OFICIAL} / {MODELO_OFICIAL}; só mude com licença do dono)")
+    print(f"  [voz] confirmado: {voz} · {modelo}")
+    return voz, modelo
 
 
 def _uso_arq(cache):
@@ -166,23 +179,30 @@ def _silencios(x, minimo=0.25, limiar=0.02):
 
 
 ESTILO_PADRAO = (
-    "Voice: Achird. You are a curious, warm Brazilian (pt-BR) friend watching an experiment with the listener, "
-    "on the phone, not an announcer and not a YouTuber. Speak softly and close to the microphone, like telling "
-    "something you can't believe you just saw. Natural spoken Brazilian Portuguese, relaxed, with small human "
-    "reactions: a short breath, a half-smile, a quiet laugh at the funny failures, playful teasing of the "
-    "little AIs as if they were clumsy pets, and the occasional 'ai, ai, ai' of someone watching a disaster "
-    "in slow motion. Be fun and expressive, like a friend telling a story at a barbecue. Never shout, never use a "
-    "'trailer' voice, never rush. Pace: calm and clear, about 2.6 words per second, with real silences. "
-    "Emotional shape: open intrigued and a little incredulous; explain the rules plainly, like to a smart "
-    "friend, with dry humor; go quiet and slow before a reveal, then say the number simply, letting it land; "
-    "when something finally works, sound genuinely moved and relieved, not hyped; right after a number lands, "
-    "a tiny amused reaction is welcome (the joke comes after the reveal, never before it); when you dare the listener "
-    "to guess ('Chuta aí'), say it low and teasing, like a friend making a bet, then stay silent; end light, playful and "
-    "direct, truly curious about the listener's answer.")
+    "Voice: Achird. You are a warm, curious Brazilian (pt-BR) friend sharing something you just watched and can't "
+    "stop thinking about, on the phone, close to the microphone. Not an announcer, not a YouTuber, not a movie-trailer "
+    "narrator. Speak natural, relaxed Brazilian Portuguese, with small human touches: a short breath, a half-smile, a "
+    "quiet laugh at the funny failures, affectionate teasing of the little AIs as if they were clumsy pets. "
+    "Your core feeling is wonder: you find this genuinely amazing and you want a friend who knows nothing about "
+    "artificial intelligence to feel that too. Explain every idea in plain everyday words, as if to a curious "
+    "grandmother or a smart ten-year-old, and let the amazement show in your voice when something works "
+    "('olha só o que ela fez sozinha'), never in shouting. "
+    "Suspense is gentle and friendly, the kind you feel when a friend says 'espera, a parte boa vem agora': lower "
+    "your voice a little, slow down, lean in, smile with the voice, then say the key number simply and let it land. "
+    "Never dark, never ominous, never whispery like a horror film, never a deep dramatic trailer voice, never "
+    "shouting or hype. Keep every sentence connected to the last, like one continuous story told in one breath "
+    "of curiosity, with no abrupt switches of mood between sentences; use soft bridges ('aí', 'só que', 'e sabe o "
+    "que ela fez?') in a natural, flowing rhythm. "
+    "Pace: calm and clear, about 2.6 words per second, with real silences. "
+    "Emotional shape: open intrigued and a little incredulous; explain the rules plainly with dry humor; go quiet "
+    "and slow before a reveal, then say the number simply; right after a number lands a tiny amused reaction is "
+    "welcome (the joke comes after the reveal, never before it); when you dare the listener to guess ('Chuta aí'), "
+    "say it low and teasing, like a friend making a bet, then stay silent; when something finally works, sound "
+    "genuinely moved and relieved, not hyped; end light, playful and truly curious about the listener's answer.")
 
 
-def narra_lote(falas, cache, voz="Achird", modelo="gemini-3.8-flash-tts", estilo=None, antes=None,
-               tts_textos=None, ritmo=4.0, faixa=(0.84, 1.1), reserva=False, forcar=False):
+def narra_lote(falas, cache, voz=VOZ_OFICIAL, modelo=MODELO_OFICIAL, estilo=None, antes=None,
+               tts_textos=None, ritmo=4.0, faixa=(0.84, 1.1), reserva=False, forcar=False, autorizada=False):
     """Narra todas as falas com UMA ÚNICA requisição (mesmo timbre do início ao fim) e molda tudo localmente.
 
     falas  : textos visíveis de cada cena (sem tags).
@@ -192,7 +212,10 @@ def narra_lote(falas, cache, voz="Achird", modelo="gemini-3.8-flash-tts", estilo
     (palavras do Whisper), ritmo de cada fala para ~`ritmo` palavras/s (limitado a `faixa` de velocidade, sem
     deixar a voz artificial) e volume igualado. Devolve áudios mono float32 a 48 kHz, ou None sem TTS."""
     os.makedirs(cache, exist_ok=True)
+    confirma_voz(voz, modelo, autorizada)
     estilo = estilo or ESTILO_PADRAO
+    if not estilo.lstrip().startswith(f"Voice: {voz}"):   # a direção de voz sempre nomeia a voz do canal
+        estilo = f"Voice: {voz}. " + estilo
     textos = [falavel(f) for f in falas]
     antes = antes or [""] * len(falas)
     enviados = [falavel(f, tags=True) for f in (tts_textos or falas)]

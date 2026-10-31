@@ -1,4 +1,12 @@
-# Tom da narração (decidido em out/2026, voz **Achird**)
+# Tom da narração (decidido em out/2026, voz **Achird**; atualizado em 31/out/2026)
+
+**Voz oficial, sempre: Achird no Gemini TTS 3.8 (`gemini-3.8-flash-tts`).** `neuralab/audio.py` trava isso (`VOZ_OFICIAL`,
+`MODELO_OFICIAL`, `confirma_voz`): o log mostra "[voz] confirmado: Achird · gemini-3.8-flash-tts" em toda narração, o
+`*_analise/roteiro.md` registra a voz, e qualquer outra voz/modelo levanta erro (só com licença do dono).
+
+**Tom v5 (31/out/2026):** humano e caloroso, com **assombro de quem descobriu algo muito legal e quer que um leigo sinta o mesmo**;
+suspense **amigável** ("espera, a parte boa vem agora"), nunca de filme de terror nem de trailer. Frases ligadas umas às outras
+(§15 do `docs/ROTEIRO.md`), explicações do dia a dia sem jargão.
 
 Recomeçamos do zero. Antes a voz era de "locutor de trailer" (Charon, ritmo de 3 palavras/s, suspense
 anunciado). Agora é **um amigo curioso assistindo ao experimento junto com você**.
@@ -17,6 +25,10 @@ anunciado). Agora é **um amigo curioso assistindo ao experimento junto com voc�
   é dito baixinho, como quem desafia um amigo; a resposta vem seca, na cena seguinte.
 - Sem exagero: a piada nunca esconde o número nem a regra do jogo. Os limites do guia v2 (palavras, números, duração) continuam.
 - A voz padrão é **Achird** (`--voz` só se o dono pedir outra).
+
+## Suspense sem terror
+Baixar um pouco a voz, desacelerar, sorrir com a voz, pausa curta, número simples. Não sussurrar, não engrossar a voz, não usar
+palavras sombrias. A tensão é curiosidade e cumplicidade; o alívio é riso afetuoso.
 
 ## Regras do texto
 1. **Frases curtas** (até ~9 palavras), uma ideia por frase. Contraste em vez de adjetivo.

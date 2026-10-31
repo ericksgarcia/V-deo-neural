@@ -47,7 +47,7 @@ LENTO_SUSPENSE = 0.35   # velocidade da simulação durante o silêncio de suspe
 
 
 class Video:
-    def __init__(self, adaptador, cenas, info, voz="Achird", escala=1.0, narrar=True, cache=".cache/tts",
+    def __init__(self, adaptador, cenas, info, voz=audio.VOZ_OFICIAL, escala=1.0, narrar=True, cache=".cache/tts",
                  log=print, estilo=None, ritmo=4.0):
         self.A, self.cenas, self.info = adaptador, cenas, info
         self.voz, self.escala, self.narrar, self.cache, self.log = voz, escala, narrar, cache, log
@@ -132,6 +132,16 @@ class Video:
         if teste is not None and pts:
             pts.append((teste["ini"], self.info.get("nome_teste", "TESTE FINAL"), "verde", True))
         self.pontos_trilha = pts
+
+    def _pulso(self, t):
+        """0-1: quão perto estamos de uma revelação (acende a atmosfera por ~0,7 s depois dela e sobe um pouco antes)."""
+        p = 0.0
+        for t0, t1 in getattr(self, "revelacoes", []):
+            if t0 <= t < t1:
+                p = max(p, 0.25 * (t - t0) / max(t1 - t0, 0.1))
+            elif 0 <= t - t1 < 0.7:
+                p = max(p, 1.0 - (t - t1) / 0.7)
+        return p
 
     def _zoom(self, c, t, tl):
         """Zoom da cena: lento e contínuo nas cenas ao vivo (nunca fica parada) + soco curto em cada revelação."""
@@ -255,6 +265,10 @@ class Video:
         c = self.cena_em(t)
         tl = t - c["ini"]
         info = self.info
+        pulso = self._pulso(t)
+        acento = "amarelo" if c["tipo"] == "replay" else "ciano"
+        K.ambiente(ctx, t, pulso, acento)      # atmosfera animada atrás de tudo (partículas, chão, feixes)
+        K.halo_cena(ctx, t, pulso, acento)     # a janela da cena respira e acende nas revelações
         K.cabecalho(ctx, info["marca"], self.A.experimento, self.A.titulo, t)
         rod, ts, modo, foco = self._estado(c, tl)
         sim = modo in ("ao_vivo", "replay")
@@ -279,7 +293,7 @@ class Video:
             cam = self.A.camera(rod, ts, modo, foco)
             h = Holo(w0, h0, cam)
             self.A.desenha(h, rod, ts, modo, foco)
-            cena_sup = h.finaliza(bloom=0.8)
+            cena_sup = h.finaliza(bloom=1.0)
             R.cromatica(cena_sup)
             R.varredura(h, t)
             z = self._zoom(c, t, tl)
@@ -288,6 +302,9 @@ class Video:
             ctx.translate(cx, cy)
             ctx.scale(z, z)
             ctx.translate(-cx, -cy)
+            tr = max((1 - (t - t1) / 0.3 for _, t1 in getattr(self, "revelacoes", []) if 0 <= t - t1 < 0.3), default=0.0)
+            if tr > 0:   # tremida curta de câmera no impacto da revelação
+                ctx.translate(7 * tr * math.sin(t * 90), 5 * tr * math.cos(t * 77))
             ctx.set_source_surface(cena_sup, x0, y0)
             ctx.paint()
             ctx.restore()
@@ -464,7 +481,7 @@ class Video:
         for velho in os.listdir(pasta):      # nada de quadros de renders anteriores no mosaico
             if velho.endswith((".png", ".jpg", ".md", ".json")):
                 os.remove(os.path.join(pasta, velho))
-        linhas = ["# Pacote de análise", "", f"duração: {self.dur:.1f}s · {len(self.cenas)} cenas", "",
+        linhas = ["# Pacote de análise", "", f"duração: {self.dur:.1f}s · {len(self.cenas)} cenas", f"voz: {self.voz} · {audio.MODELO_OFICIAL}", "",
                   "| # | início | dur | tipo | ger | fala |", "|---|---|---|---|---|---|"]
         for k, c in enumerate(self.cenas):
             linhas.append(f"| {k} | {c['ini']:.1f}s | {c['dur']:.1f}s | {c['tipo']} | {c.get('ger', '-')} | "
@@ -488,6 +505,12 @@ class Video:
                 sup = self.quadro(tt)
                 sup.write_to_png(arq)
                 qs.append(arq)
+        meio = self.cenas[len(self.cenas) // 2]
+        sz = self.quadro(meio["ini"] + meio["dur"] * 0.5)     # um quadro com as zonas do TikTok marcadas (analista-visual)
+        cz = cairo.Context(sz)
+        cz.scale(self.escala, self.escala)
+        K.guia_zonas(cz)
+        sz.write_to_png(os.path.join(pasta, "zonas_tiktok.png"))
         cols = 6
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-pattern_type", "glob", "-i", os.path.join(pasta, "cena*.png"),
                         "-filter_complex", f"scale=300:-1,tile={cols}x{math.ceil(len(qs) / cols)}:padding=4",

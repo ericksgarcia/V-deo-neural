@@ -26,6 +26,12 @@ Avalie com rigor, como quem decide se o vídeo vai reter:
    DEPOIS de um número, nunca entre a pergunta e a resposta? o teste final tem o CHUTE ("Chuta aí… <long pause>" no fim da fala e o número no
    começo da cena seguinte)? a resposta do teste cai entre 70% e 88% do vídeo?
 
+9. FLUIDEZ (`docs/ROTEIRO.md` §15.1): lendo as falas em sequência, parece UMA história contada de uma vez? Aponte cada cena que começa "do nada" ou
+   troca de assunto sem ponte; reescreva com conectivo ("Aí…", "Só que…", "E sabe o que ela fez?") e feche a cena anterior abrindo a próxima dúvida.
+10. LEIGOS + ASSOMBRO (§15.2-15.4): zero jargão? uma comparação do dia a dia nas 3 primeiras cenas? existe 1 frase de assombro VERDADEIRO ("ninguém
+   ensinou isso") depois da melhor descoberta? o suspense é amigável (curiosidade e cumplicidade), nunca sombrio/de terror? O leitor sente que isso é "muito top"?
+Obs.: o dono autorizou curar o treino (§16.2); você só checa se cada número é medido na simulação mostrada.
+
 Responda em português com:
 - Nota 0–10 para cada critério e uma nota geral.
 - Os 3 maiores problemas, em ordem.
