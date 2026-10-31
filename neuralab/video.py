@@ -12,6 +12,7 @@ Uma cena é um dicionário. Campos comuns:
   cartao    {"numero", "rotulo", "nome", "stat", "cor"}
   log       linhas para o console: [(texto, cor)]
   destaques {palavra: cor} para colorir palavras da legenda
+  fundo_escuro/fundo_vivo/fundo_vel  telas de dados com `ger=`: escuridão (0.66), opacidade da simulação (0.7) e velocidade (1.0) do fundo
   teste     True na cena do teste final (casa "TESTE" da trilha); sem ele, vale a 1ª cena "barras"
   chute     True (ou automático: fala com "Chuta…" que TERMINA em <long pause>): o silêncio vira a aposta do
             espectador: contagem 3-2-1 na tela, coração batendo, simulação em câmera lenta; a resposta vem no
@@ -408,12 +409,12 @@ class Video:
         x, y, w, h = K.CENA
         if c.get("ger") is not None:   # a simulação continua viva ao fundo (tela de dados nunca é tela parada)
             rod = self.A.rodada(c["ger"])
-            ts = (tl * 1.0) % max(rod.duracao, 0.1)
+            ts = (tl * c.get("fundo_vel", 1.0)) % max(rod.duracao, 0.1)
             hb = Holo(w, h, self.A.camera(rod, ts, "ao_vivo", None))
             self.A.desenha(hb, rod, ts, "ao_vivo", None)
             ctx.set_source_surface(hb.finaliza(bloom=0.5), x, y)
-            ctx.paint_with_alpha(0.7)
-            ctx.set_source_rgba(0.01, 0.02, 0.035, 0.66)
+            ctx.paint_with_alpha(c.get("fundo_vivo", 0.7))
+            ctx.set_source_rgba(0.01, 0.02, 0.035, c.get("fundo_escuro", 0.66))
         else:
             ctx.set_source_rgba(0.01, 0.02, 0.035, 0.94)
         ctx.paint()

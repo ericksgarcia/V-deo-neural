@@ -82,7 +82,7 @@ def monta(hist, A):
     cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.0,
          titulo_gancho=[("1 TORRETA x 12 IAs", BRANCO), (f"NINGUÉM PASSOU EM {zero} DE 100", AMARELO)],
          log=[(f"{n} IAs · 1 TORRETA", VERMELHO), ("NINGUÉM SABE O QUE FAZER", AMARELO)],
-         carimbo={"texto": f"{zero} DE 100", "cor": AMARELO, "em": 1.4, "sub": "CIDADES ONDE NINGUÉM CHEGOU · GERAÇÃO 1"},
+         carimbo={"texto": f"{zero} DE 100", "cor": AMARELO, "em": 0.5, "sub": "CIDADES ONDE NINGUÉM CHEGOU · GERAÇÃO 1"},
          fala=f"Coloquei uma torreta atirando em IAs. <short pause> Em {zero} de 100 cidades, ninguém passou.")
     # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA (sem números)
     cena(tipo="ao_vivo", ger=min(3, G - 1), grupo="g1b",
@@ -111,7 +111,7 @@ def monta(hist, A):
     marcos.append((ge, "2", VERDE))
     # ------------------------------------------------------------ TESTE (a turma inteira)
     itens = [("TURMA 1", s_um, CIANO), (f"TURMA {G}", s_fin, VERDE)]
-    kw = dict(tipo="barras", grupo="teste", ger=G - 1, itens=itens, titulo="TURMA AZUL x TORRETA",
+    kw = dict(tipo="barras", grupo="teste", ger=G - 1, fundo_escuro=0.35, fundo_vivo=0.9, fundo_vel=2.0, itens=itens, titulo="TURMA AZUL x TORRETA",
               sub="cidades novas · azuis que chegam", destaque=1, cor_destaque="verde", rotulo_destaque="",
               log=[("TESTE: CIDADES NOVAS", AMARELO), (f"CHEGAM {pct(s_um)}% → {pct(s_fin)}%", AMARELO)])
     cena(teste=True, **kw,
@@ -121,7 +121,6 @@ def monta(hist, A):
     rf = A.rodada(C + G - 1)
     kf = A.busca(rf, "chegou")
     cena(tipo="replay", ger=C + G - 1, foco=kf, grupo="fim",
-         escolha={"pergunta": "CORAGEM OU BURRICE?", "opcoes": [("CORAGEM", CIANO), ("BURRICE", AMARELO)], "em": 0.2},
          destaques={"reto": CIANO, "campeão": AMARELO},
          fala="Correr reto é coragem ou burrice? <short pause> Porque tudo começou quando eu…")
 
