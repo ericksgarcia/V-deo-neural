@@ -96,30 +96,30 @@ def monta(hist, A):
          fala=f"Soltei {n} IAs numa dança das cadeiras. <short pause> Na geração 1, só {ch0} cadeira foi ocupada.")
     # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA (o campeão da geração 1 falha)
     cena(tipo="replay", ger=C, foco=0, grupo="g1b", log=[("CAMPEÃO DA GER 001", CIANO), ("QUEM SENTA MAIS VIRA PAI DA TURMA", VERDE)],
-         fala="É tipo festa de criança: quem senta vira pai da turma. <short pause> No fim, tem teste.")
+         fala="É tipo festa de criança: a música para, a cadeira é de quem chega primeiro.")
     cena(tipo="replay", ger=C, foco=0, grupo="g1b", log=[("CAMPEÃO DA GER 001 · SEM CADEIRA", ROSA), ("ELE CORRE E MESMO ASSIM FICA DE PÉ", AMARELO)],
-         fala="Mas o campeão da geração 1 ficava sem cadeira. <short pause> De novo.")
+         fala="Mas o campeão, o cérebro de todas, ficava sem cadeira. <short pause> De novo. No fim, tem teste.")
     # ------------------------------------------------------------ DESCOBERTA 1: o desvio
     cena(tipo="replay", ger=C + g1, foco=0,
          cartao={"numero": 1, "rotulo": "IAs", "nome": "O DESVIO", "cor": AMARELO, "stat": f"ESBARRÕES {t0}% → {t1}% DAS IAs"},
          log=[(f"GER {g1 + 1:03d} · ESBARRÕES {t0}% → {t1}%", AMARELO), ("NINGUÉM MANDOU DESVIAR", CIANO)],
-         fala=f"Aí elas se esbarravam. <short pause> Até aprenderem a se desviar. De {t0} para {t1}. <short pause> Educadas.")
+         fala=f"Aí elas se esbarravam. <short pause> Até aprenderem a desviar: de {t0} para {t1} a cada cem. <short pause> Educadas.")
     marcos.append((g1, "1", AMARELO))
     # ------------------------------------------------------------ DESCOBERTA 2: a ciranda
     cena(tipo="replay", ger=C + g2, foco=0,
          cartao={"numero": 2, "rotulo": "IAs", "nome": "A CIRANDA", "cor": CIANO, "stat": f"MESMO SENTIDO {s0}% → {s1}% DO MOVIMENTO"},
          log=[(f"GER {g2 + 1:03d} · MESMO SENTIDO {s0}% → {s1}%", CIANO), ("ELAS RODAM JUNTAS, SEM COMBINAR", VERDE)],
-         fala=f"Então elas formaram uma ciranda, sem ninguém mandar. <long pause> De {s0} para {s1}.")
+         fala=f"Então formaram uma ciranda, sem ninguém mandar. <long pause> Pro mesmo lado: de {s0} para {s1} a cada cem.")
     marcos.append((g2, "2", CIANO))
     # ------------------------------------------------------------ RE-GANCHO: o placar trava
     cena(tipo="ao_vivo", ger=gc, grupo="calma", vel=1.0,
          log=[(f"GER {gc + 1:03d} · RODADAS COMPLETAS {p_c}%", ROSA), ("O PLACAR TRAVOU", AMARELO)],
-         fala="Só que o placar travou. <short pause> Será que acabou? <long pause>")
+         fala="Só que travou. <short pause> Acabou? <long pause>")
     # ------------------------------------------------------------ DESCOBERTA 3: coladas na cadeira
     cena(tipo="replay", ger=C + g3, foco=0,
          cartao={"numero": 3, "rotulo": "IAs", "nome": "COLADAS", "cor": VERDE, "stat": f"RODADAS COMPLETAS {p_c}% → {p_3}%"},
          log=[(f"GER {g3 + 1:03d} · COMPLETAS {p_c}% → {p_3}%", VERDE), (f"PERTO DE UMA CADEIRA: {c_c}% → {c_3}% DO TEMPO", CIANO)],
-         fala=f"Mas não. Elas esperaram coladas nas cadeiras. <long pause> Rodadas completas: de {p_c} para {p_3}.")
+         fala=f"Mas não. Elas esperaram coladas nas cadeiras. <long pause> Todas sentadas: de {p_c} para {p_3} rodadas a cada cem.")
     marcos.append((g3, "3", VERDE))
     # ------------------------------------------------------------ TESTE (chute)
     itens = [("CAMPEÃO 1", um[0], CIANO), (f"CAMPEÃO {G}", fin[0], VERDE)]
@@ -131,7 +131,7 @@ def monta(hist, A):
     cena(**dict(kw, sub="rodadas com as 11 cadeiras cheias"), fala=f"{pct(fin[0])} em 100. <short pause> Coitada da que sobrou.")
     # ------------------------------------------------------------ CTA + LAÇO
     cena(tipo="replay", ger=C + G - 1, foco=0, grupo="fim", destaques={"campeão": AMARELO, "IAs": CIANO},
-         fala="Elas combinaram a ciranda ou é só o mesmo cérebro repetido? <short pause> Porque tudo começou quando eu…")
+         fala="Combinaram a ciranda? Ou são cópias do mesmo cérebro? <short pause> Porque tudo começou quando eu…")
 
     info = {"marca": "VÍDEO NEURAL", "serie": suave(hist["m_cheias"], 5), "serie_rotulo": "% CADEIRAS OCUPADAS",
             "marcos": marcos, "rotulo_vivo": f"{n} IAs · {c} CADEIRAS", "nome_teste": "TESTE FINAL",
