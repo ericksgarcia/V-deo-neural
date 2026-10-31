@@ -87,27 +87,27 @@ def monta(hist, A):
     # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA (sem números)
     cena(tipo="ao_vivo", ger=min(3, G - 1), grupo="g1b",
          log=[("A TORRETA ATIRA E OS BLOCOS DESLIZAM", VERMELHO), ("QUEM PASSA VIRA PAI DA PRÓXIMA TURMA", VERDE)],
-         fala="Quem passa vira pai da próxima turma.")
+         fala="Aí quem passa vira pai da próxima turma, igual escolher o time.")
     # ------------------------------------------------------------ GERAÇÃO 1: o campeão cai
     r0 = A.rodada(C)
     k0 = A.busca(r0, "caiu")
     cena(tipo="replay", ger=C, foco=k0, grupo="g1c", log=[("CAMPEÃO DA GER 001 · ATINGIDO", VERMELHO)],
-         fala="É tipo atravessar um campo cheio de bolas. <short pause> O campeão da geração 1 foi atingido. No fim, tem teste.")
+         fala="É tipo atravessar um campo cheio de bolas. <short pause> O campeão levou bolada. No fim, testo em cidades novas.")
     # ------------------------------------------------------------ DESCOBERTA 1: correr reto
     r1 = A.rodada(C + gr)
     k1 = A.busca(r1, "chegou")
     cena(tipo="replay", ger=C + gr, foco=k1,
          cartao={"numero": 1, "rotulo": "AZUIS", "nome": "CORRER RETO", "cor": CIANO,
-                 "stat": f"CHEGARAM {c0}% → {c1}%"},
-         log=[(f"GER {gr + 1:03d} · CHEGARAM {c0}% → {c1}%", CIANO)],
-         fala=f"Aí o campeão parou de zigue-zaguear. <long pause> A turma foi de {c0} para {c1} em 100. <short pause> Mas ficou estranho.")
+                 "stat": f"PASSAM {c0}% → {c1}%"},
+         log=[(f"GER {gr + 1:03d} · PASSAM {c0}% → {c1}%", CIANO)],
+         fala=f"Aí o campeão foi parando de zigue-zaguear. <long pause> A turma passou de {c0} para {c1} em 100. <short pause> Só que ficou estranho.")
     marcos.append((gr, "1", CIANO))
     # ------------------------------------------------------------ RE-GANCHO + DESCOBERTA 2 numa cena só (o número fica no cartão)
     cena(tipo="ao_vivo", ger=ge,
          cartao={"numero": 2, "rotulo": "AZUIS", "nome": "SE ESCONDER MENOS", "cor": VERDE,
                  "stat": f"ESCONDIDOS {a0}% → {a1}% DO TEMPO"},
          log=[(f"GER {ge + 1:03d} · ATRÁS DO BLOCO {a0}% → {a1}%", VERDE)],
-         fala="Mas olha os esconderijos. <long pause> Ficaram menos tempo escondidos. <short pause> Eu achava que esconder era o truque.")
+         fala="Aí olhei os esconderijos. <long pause> Ficaram menos tempo escondidos. <short pause> Será que esconder atrapalhava?")
     marcos.append((ge, "2", VERDE))
     # ------------------------------------------------------------ TESTE (a turma inteira)
     itens = [("TURMA 1", s_um, CIANO), (f"TURMA {G}", s_fin, VERDE)]
@@ -115,8 +115,8 @@ def monta(hist, A):
               sub="cidades novas · azuis que chegam", destaque=1, cor_destaque="verde", rotulo_destaque="",
               log=[("TESTE: CIDADES NOVAS", AMARELO), (f"CHEGAM {pct(s_um)}% → {pct(s_fin)}%", AMARELO)])
     cena(teste=True, **kw,
-         fala="Faltava o teste. <short pause> Cidades novas, turma final. Chuta aí: quantos passam? <long pause>")
-    cena(**dict(kw, sub=f"azuis que chegam · {reacao_vis}"), fala=f"{pct(s_fin)} em 100. <short pause> Juro, ninguém ensinou isso.")
+         fala=f"Só que faltava o teste. <short pause> A turma da geração 1 passava {pct(s_um)}. Chuta aí: e a final? <long pause>")
+    cena(**dict(kw, sub=f"azuis que chegam · {reacao_vis}"), fala=f"{pct(s_fin)} em 100. <short pause> Juro, ninguém ensinou ela a correr reto.")
     # ------------------------------------------------------------ CTA + LAÇO
     rf = A.rodada(C + G - 1)
     kf = A.busca(rf, "chegou")
@@ -129,9 +129,9 @@ def monta(hist, A):
             "marcos": marcos, "rotulo_vivo": f"{n} IAs", "nome_teste": "TESTE FINAL",
             "rodape": f"{n} IAs · TORRETA E BLOCOS PROGRAMADOS: SÓ OS AZUIS EVOLUEM · {G} GERAÇÕES · "
                       "NINGUÉM PROGRAMOU CORRER: SÓ SELEÇÃO, CRUZAMENTO E MUTAÇÃO"}
-    post = (f"Uma torreta, 12 IAs e {zero} de 100 cidades onde ninguém passou. O que mudou depois? 🎯\n"
+    post = (f"{zero} de 100 cidades, e ninguém passou pela torreta. Aí as IAs mudaram de plano... 🎯\n"
             f"IA aprendendo sozinha por seleção natural. Simulação real: {n} IAs por cidade, {G} gerações, números medidos no treino.\n"
-            "Marca o amigo que atravessa a rua correndo 👇\n\n"
-            "#inteligenciaartificial #ia #simulacao #selecaonatural #torreta")
+            "Marca quem acha que esconder é sempre o plano mais seguro 👇\n\n"
+            "#inteligenciaartificial #ia #aprendizadodemaquina #simulacao #selecaonatural")
     ev["teste"] = {"um": s_um, "fin": s_fin, "ch": (c0, c1), "atras": (a0, a1), "lat": (l0, l1), "zero": zero}
     return cenas, info, post, ev
