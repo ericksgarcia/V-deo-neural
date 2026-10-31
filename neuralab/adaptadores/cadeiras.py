@@ -67,10 +67,10 @@ class Cadeiras(Adaptador):
         return 0
 
     def camera(self, rod, t, modo, foco):
-        geral = Camera2D(centro=(K.CX, K.CY), escala=82, t=t)
+        geral = Camera2D(centro=(K.CX, K.CY), escala=70, t=t)
         if modo != "replay" or foco is None:
             return geral
-        return geral.mistura(Camera2D(centro=(K.CX, K.CY), escala=104, t=t), min(t / 0.8, 1.0))
+        return geral.mistura(Camera2D(centro=(K.CX, K.CY), escala=90, t=t), min(t / 0.8, 1.0))
 
     def cenario(self, h, t):
         h.fundo(brilho_centro=(0.03, 0.05, 0.08))
@@ -107,9 +107,9 @@ class Cadeiras(Adaptador):
         # música: nota piscando enquanto toca; "PAROU!" logo depois
         if musica:
             pisca = 0.65 + 0.35 * math.sin(t * 9.0)
-            h.texto("♪ MÚSICA ♪", (K.CX, K.ALT - 1.0), 40, ROSA, pisca)
+            h.texto("♪", (K.CX, K.CY - 0.2), 90, ROSA, 0.35 * pisca)
         elif i - K.KM < 14:
-            h.texto("PAROU!", (K.CX, K.ALT - 1.0), 48, AMARELO, 1.0)
+            h.texto("PAROU!", (K.CX, K.CY - 0.2), 56, AMARELO, 0.9)
         # rastro curto de cada IA em pé
         em_pe = sen < 0
         for a in np.where(em_pe)[0]:
