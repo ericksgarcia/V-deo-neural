@@ -222,6 +222,10 @@ def main():
     if not any(UAU.search(limpa(c["fala"])) for c in cenas[3:]):
         r("AVISO", "nenhuma fala diz POR QUE aquilo é incrível para um leigo ('ninguém ensinou', 'sozinha', 'ela inventou'): "
                    "uma frase de assombro verdadeiro depois da melhor descoberta (§15.3)")
+    unid = [k for k, c in enumerate(cenas) if re.search(r"(?i)\d[\d.,]*\s*(metros?|m/s|km|graus)\b", limpa(c["fala"]))]
+    if unid:
+        r("AVISO", f"cenas {unid}: número com unidade técnica ('metros', 'm/s'): o leigo não sente isso; troque por 'X em 100', 'o dobro', "
+                   "'mais perto' e deixe a medida no cartão (§17)")
     secas = [k for k in range(1, len(cenas) - 1) if not re.search(r"[.?…!]", limpa(cenas[k]["fala"]).strip()[-1:] or ".")]
     if secas:
         r("AVISO", f"cenas {secas[:6]} terminam sem pontuação; a voz corta seco")

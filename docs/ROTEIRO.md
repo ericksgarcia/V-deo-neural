@@ -155,6 +155,7 @@ O `post` é montado em `monta()` do roteiro (retorno `cenas, info, post, ev`); e
 - [ ] analistas sem nota < 8 (tema antes de tudo; roteiro, engajamento antes; retenção, visual no rascunho; diretor no fim)
 - [ ] seção 15 (fluidez/leigos/assombro) e seção 16 (triagem do tema GO; ajustes do treino registrados em `docs/EPISODIOS.md`)
 - [ ] log da voz mostra "[voz] confirmado: Achird · gemini-3.8-flash-tts"
+- [ ] §17: retenção estimada até o fim >= 50% (texto e rascunho)
 
 ---------------------------------------------------------------------------------------------------------------
 
@@ -462,3 +463,12 @@ vídeo** (nunca editar um número, nem inventar medida); **(2)** o replay mostra
 **(3)** não dizer o que o treino não mostrou ("ninguém programou" só se o comportamento surgiu de seleção, sem regra escrita à mão);
 se uma recompensa guiou muito o resultado, troque o rodapé por algo exato (`info["rodape"]`) e não use "sem ajuda";
 **(4)** registrar em `docs/EPISODIOS.md` o que foi ajustado (ex.: "recompensa X dobrada; semente 7 de 12; currículo em 2 fases") para o dono saber.
+
+
+## 17. Trava de retenção (dono, 31/out/2026)
+O vídeo só avança com **retenção estimada até o fim >= 50% e >= 75% aos 3 s**, medida por `analista-retencao`:
+- **no TEXTO, antes da voz** (modo A: só roteiro e fatos); reescreva e repita até `-> PASSA`; só então gaste a requisição de voz;
+- **de novo no RASCUNHO** (modo B), junto com o `analista-visual` (>= 8). Se o rascunho não passar, corrija o que NÃO exige voz nova;
+  se só texto resolve, peça licença ao dono para regerar a voz (diga o ganho esperado).
+Lições do EP10 (26% estimado): sem "metros"/unidades técnicas na fala (use "X em 100", "mais perto", "o dobro"); cenas <= 6 s; todas as cenas
+abrem com conectivo; a descoberta não pode ser entregue pela imagem antes da fala; replay com câmera no grupo (nunca canto vazio); 1 número por cena.

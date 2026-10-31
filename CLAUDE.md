@@ -28,13 +28,16 @@ Canal de TikTok de vídeos verticais de **IA aprendendo sozinha** (simulações 
    2. `python gerar.py <tema> --so-roteiro > .cache/roteiro_<tema>.txt` (treino fica em `.cache/`, reutilize).
    3. `python ferramentas/confere_roteiro.py .cache/roteiro_<tema>.txt`. **Corrija até zero `FALHA`** (os `AVISO`
       devem ser resolvidos ou justificados). Repita 2-3 a cada ajuste de texto.
+   3b. **TRAVA DE RETENÇÃO (dono, 31/out/2026):** chame `analista-retencao` em **modo TEXTO** (antes da voz). Só avance com
+      **retenção estimada até o fim >= 50% e >= 75% aos 3 s** (linha `-> PASSA`). Se `NÃO PASSA`, reescreva as falas/cortes que ele indicar, rode o
+      conferidor e peça de novo, até passar. NUNCA gaste a requisição de voz antes de passar (regerar voz exige licença do dono).
    4. Chame `analista-roteiro` e `analista-engajamento` (este agora mede se o vídeo é visto ATÉ O FINAL: duas notas, conclusão e engajamento) (prompts prontos em `docs/ROTEIRO.md`, seção 11). Aplique o
       que melhora mantendo os números reais; rode o conferidor de novo. Só avance com notas >= 8.
    5. **Uma** narração: `python gerar.py <tema> --so-voz` (1 requisição TTS, depois cache). Confira o relatório de
       ritmo/pronúncia e a duração prevista (**<= 60 s**; se passar, corte cenas do roteiro ANTES de gastar voz nova;
       lembre: mudar texto depois = nova requisição, peça licença).
    6. Rascunho `python gerar.py <tema> --rascunho --sem-voz` só para conferir o visual; `analista-visual` e
-      `analista-retencao` (prompts na seção 11). Um único rascunho por rodada de correções.
+      `analista-retencao` (modo RASCUNHO; a trava >= 50% vale de novo, e visual >= 8) (prompts na seção 11). Um único rascunho por rodada de correções.
    7. Render final em segundo plano; depois `analista-narracao` e `diretor` UMA vez (todas as notas >= 8).
    Nunca renderize o final antes de aprovar o roteiro.
 6. Receita técnica de um tema novo: ver `README.md` (simulação, adaptador, roteiro e uma linha em `CFG` no `gerar.py`).
