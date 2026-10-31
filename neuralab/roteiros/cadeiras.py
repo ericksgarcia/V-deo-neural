@@ -93,28 +93,28 @@ def monta(hist, A):
          titulo_gancho=[("12 IAs x 11 CADEIRAS", BRANCO), (f"SÓ {ch0} CADEIRA OCUPADA", AMARELO)],
          log=[(f"{n} IAs · {c} CADEIRAS", CIANO), ("NINGUÉM SABE O JOGO", AMARELO)],
          carimbo={"texto": f"{ch0} DE {c}", "cor": AMARELO, "em": 0.5, "sub": "CADEIRAS OCUPADAS EM MÉDIA · GERAÇÃO 1"},
-         fala=f"Soltei {n} IAs numa dança das cadeiras. <short pause> Na geração 1, só {ch0} cadeira foi ocupada.")
+         fala=f"Soltei {n} IAs numa dança das cadeiras. <short pause> Na geração 1, em média, só {ch0} sentava.")
     # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA (o campeão da geração 1 falha)
     cena(tipo="replay", ger=C, foco=0, grupo="g1b", log=[("CAMPEÃO DA GER 001", CIANO), ("QUEM SENTA MAIS VIRA PAI DA TURMA", VERDE)],
-         fala="É tipo festa de criança: a música para e a cadeira é de quem chega primeiro.")
+         fala="É tipo festa de criança: a música para, senta quem chega primeiro. <short pause> Sempre falta uma.")
     cena(tipo="replay", ger=C, foco=0, grupo="g1b", log=[("CAMPEÃO DA GER 001 · SEM CADEIRA", ROSA), ("ELE CORRE E MESMO ASSIM FICA DE PÉ", AMARELO)],
-         fala="Mas o campeão, o cérebro de todas, ficava sem cadeira. <short pause> De novo. No fim, tem teste.")
+         fala="Mas o campeão, o cérebro de todas, deixava metade de pé. <short pause> No fim, tem teste.")
     # ------------------------------------------------------------ DESCOBERTA 1: o desvio
     cena(tipo="replay", ger=C + g1, foco=0,
          cartao={"numero": 1, "rotulo": "IAs", "nome": "O DESVIO", "cor": AMARELO, "stat": f"ESBARRÕES {t0}% → {t1}% DAS IAs"},
          log=[(f"GER {g1 + 1:03d} · ESBARRÕES {t0}% → {t1}%", AMARELO), ("NINGUÉM MANDOU DESVIAR", CIANO)],
-         fala=f"Aí elas se esbarravam. <short pause> Até aprenderem a desviar: mais da metade dos esbarrões sumiu. <short pause> Educadas.")
+         fala=f"Pior: elas se esbarravam. <short pause> Até aprenderem a desviar: os esbarrões caíram mais da metade. <short pause> Educadas.")
     marcos.append((g1, "1", AMARELO))
     # ------------------------------------------------------------ DESCOBERTA 2: a ciranda
     cena(tipo="replay", ger=C + g2, foco=0,
          cartao={"numero": 2, "rotulo": "IAs", "nome": "A CIRANDA", "cor": CIANO, "stat": f"MESMO SENTIDO {s0}% → {s1}% DO MOVIMENTO"},
          log=[(f"GER {g2 + 1:03d} · MESMO SENTIDO {s0}% → {s1}%", CIANO), ("ELAS RODAM JUNTAS, SEM COMBINAR", VERDE)],
-         fala=f"Então formaram uma ciranda, sem ninguém mandar. <long pause> Quase todas rodando pro mesmo lado.")
+         fala=f"Então a ciranda se arrumou. <short pause> Ninguém ensinou isso. <long pause> Quase tudo girando pro mesmo lado.")
     marcos.append((g2, "2", CIANO))
     # ------------------------------------------------------------ RE-GANCHO: o placar trava
     cena(tipo="ao_vivo", ger=gc, grupo="calma", vel=1.0,
          log=[(f"GER {gc + 1:03d} · RODADAS COMPLETAS {p_c}%", ROSA), ("O PLACAR TRAVOU", AMARELO)],
-         fala="Só que travou. <short pause> Acabou? <long pause>")
+         fala="Só que travou. <short pause> Será que acabou? <long pause>")
     # ------------------------------------------------------------ DESCOBERTA 3: coladas na cadeira
     cena(tipo="replay", ger=C + g3, foco=0,
          cartao={"numero": 3, "rotulo": "IAs", "nome": "COLADAS", "cor": VERDE, "stat": f"RODADAS COMPLETAS {p_c}% → {p_3}%"},
@@ -127,18 +127,18 @@ def monta(hist, A):
               sub="rodadas novas", destaque=1, cor_destaque="verde", rotulo_destaque="",
               log=[("TESTE: RODADAS NOVAS", AMARELO), (f"COMPLETAS {pct(um[0])}% → {pct(fin[0])}%", AMARELO)])
     cena(teste=True, **kw,
-         fala=f"Hora do teste. <short pause> O campeão inicial enchia tudo em {pct(um[0])} de 100. Chuta aí: e o final? <long pause>")
+         fala=f"Agora, rodadas novas: o campeão inicial enchia tudo em {pct(um[0])} de 100. Chuta aí: e o final? <long pause>")
     cena(**dict(kw, sub="rodadas com as 11 cadeiras cheias"), fala=f"{pct(fin[0])} em 100. <short pause> Coitada da que sobrou.")
     # ------------------------------------------------------------ CTA + LAÇO
     cena(tipo="replay", ger=C + G - 1, foco=0, grupo="fim", destaques={"campeão": AMARELO, "IAs": CIANO},
-         fala="Combinaram a ciranda? Ou são cópias do mesmo cérebro? <short pause> Porque tudo começou quando eu…")
+         fala="A ciranda foi trabalho em equipe ou só o mesmo cérebro copiado? <short pause> Porque tudo começou quando eu…")
 
     info = {"marca": "VÍDEO NEURAL", "serie": suave(hist["m_cheias"], 5), "serie_rotulo": "% CADEIRAS OCUPADAS",
             "marcos": marcos, "rotulo_vivo": f"{n} IAs · {c} CADEIRAS", "nome_teste": "TESTE FINAL",
             "rodape": f"{n} IAs COM O MESMO CÉREBRO · {c} CADEIRAS · REGRAS PROGRAMADAS, SÓ O CÉREBRO EVOLUI · {G} GERAÇÕES · NOTA = CADEIRAS OCUPADAS"}
-    post = (f"12 IAs, 11 cadeiras e só {ch0} ocupada na geração 1. Aí elas inventaram uma ciranda 🪑\n"
-            f"IA aprendendo sozinha por seleção natural. Simulação real de uma dança das cadeiras: {n} IAs, {c} cadeiras, {G} gerações, números medidos no treino.\n"
-            "Marca quem sempre empurra na dança das cadeiras 👇\n\n"
+    post = (f"12 IAs, 11 cadeiras e só {ch0} ocupada na geração 1. O que veio depois eu não esperava 🪑\n"
+            f"IA aprendendo sozinha por seleção natural. Simulação real de uma dança das cadeiras: {n} IAs com o mesmo cérebro, {c} cadeiras, {G} gerações, números medidos no treino.\n"
+            "Manda pra aquele amigo que sempre fica sem cadeira 👇\n\n"
             "#inteligenciaartificial #ia #aprendizadodemaquina #simulacao #dancadascadeiras")
     ev["teste"] = {"um": um, "fin": fin, "toque": (t0, t1), "same": (s0, s1), "perf": (p_c, p_3), "colado": (c_c, c_3), "ch0": ch0}
     return cenas, info, post, ev
