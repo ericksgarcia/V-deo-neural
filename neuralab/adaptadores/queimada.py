@@ -200,7 +200,7 @@ class Queimada(Adaptador):
         if modo == "replay" and foco is not None:
             self._jogo(h, rod, foco, i, t, True, True)
             return
-        fantasmas = [k for k in range(0, rod.n, max(1, rod.n // 10)) if k != rod.lider][:10]
+        fantasmas = [k for k in range(0, rod.n, max(1, rod.n // 5)) if k != rod.lider][:5]
         for k in fantasmas:
             self._jogo(h, rod, k, i, t, False, False)
             b = rod.reg["bp"][k, i]

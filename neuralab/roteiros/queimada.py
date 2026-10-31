@@ -86,7 +86,7 @@ def monta(hist, A):
         return kw
 
     # ------------------------------------------------------------ GANCHO
-    cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.0,
+    cena(tipo="ao_vivo", ger=0, grupo="g1", vel=1.7,
          titulo_gancho=[("DUAS TURMAS DE IA NA QUEIMADA", BRANCO), (f"NINGUÉM ATINGIDO EM {zero} DE 100", AMARELO)],
          log=[(f"{n} IAs · QUEIMADA", BRANCO), ("AZUIS x VERMELHAS · 0 REGRAS DE COMO JOGAR", CIANO)],
          carimbo={"texto": f"{zero} DE 100", "cor": AMARELO, "em": 0.8, "sub": "JOGOS SEM NINGUÉM ATINGIDO · GERAÇÃO 1"},
