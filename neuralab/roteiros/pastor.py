@@ -88,24 +88,20 @@ def monta(hist, A):
          log=[(f"1 CÃO · {n} OVELHAS", LARANJA), ("NINGUÉM SABE PASTOREAR", AMARELO)],
          carimbo={"texto": f"{zero} DE 100", "cor": AMARELO, "em": 0.5, "sub": "CIDADES SEM NENHUMA OVELHA NO CURRAL · GERAÇÃO 1"},
          fala=f"Soltei um cão IA numa fazenda. <short pause> Em {zero} de 100 tentativas, nenhuma ovelha entrou no curral.")
-    # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA
-    cena(tipo="ao_vivo", ger=min(3, G - 1), grupo="g1b",
-         log=[("AS OVELHAS FOGEM DO CÃO", BRANCO), ("QUEM LEVA MAIS AO CURRAL VIRA PAI DA TURMA", VERDE)],
-         fala="É tipo treinar cachorro: quem acerta vira pai da turma. No fim, tem teste novo.")
-    # ------------------------------------------------------------ GERAÇÃO 1
-    cena(tipo="replay", ger=C, foco=0, grupo="g1c", log=[("CAMPEÃO DA GER 001 · PASSEANDO", LARANJA)],
-         fala="Aí o campeão da geração 1. <short pause> Ficou só passeando.")
+    # ------------------------------------------------------------ PREMISSA + REGRA + PROMESSA + GERAÇÃO 1 (o campeão passeia)
+    cena(tipo="replay", ger=C, foco=0, grupo="g1b", log=[("CAMPEÃO DA GER 001 · PASSEANDO", LARANJA), ("QUEM LEVA MAIS AO CURRAL VIRA PAI DA TURMA", VERDE)],
+         fala="É tipo treinar cachorro: acertou, vira pai. No fim, tem teste. E o campeão inicial? <long pause>")
     # ------------------------------------------------------------ DESCOBERTA 1: por trás (achar o rebanho vai na fala)
     cena(tipo="replay", ger=C + g2, foco=0,
          cartao={"numero": 1, "rotulo": "CÃO", "nome": "POR TRÁS", "cor": AMARELO, "stat": f"ATRÁS DO REBANHO {a0}% → {a1}% DO TEMPO"},
          log=[(f"GER {g2 + 1:03d} · ATRÁS {a0}% → {a1}%", AMARELO), (f"DISTÂNCIA DO REBANHO {d0:.0f} → {d1:.0f} m", LARANJA)],
-         fala="Ele achou as ovelhas, mas elas fugiram. <short pause> Até ir para trás delas. <long pause> Ninguém ensinou isso. <short pause> Mas e agora?")
+         fala="Só passeava. Até achar as ovelhas, que fugiram. <short pause> Aí foi para trás delas. <long pause> Ninguém ensinou isso.")
     marcos.append((g2, "1", AMARELO))
     # ------------------------------------------------------------ RE-GANCHO + DESCOBERTA 2: juntar
     cena(tipo="replay", ger=C + g3, foco=0,
          cartao={"numero": 2, "rotulo": "CÃO", "nome": "REBANHO JUNTO", "cor": VERDE, "stat": f"ESPALHAMENTO {e0:.1f} → {e1:.1f}"},
          log=[(f"GER {g3 + 1:03d} · NO CURRAL {pc}% → {p3}%", VERDE)],
-         fala=f"Só que elas pararam de entrar. <short pause> Será que acabou? <long pause> Ele juntou o rebanho. {p3} em cada 100.")
+         fala=f"Só que elas pararam de entrar. <short pause> Será que acabou? <long pause> Ele juntou o rebanho sozinho. {p3} em cada 100.")
     marcos.append((g3, "2", VERDE))
     # ------------------------------------------------------------ TESTE
     itens = [("CAMPEÃO 1", s_um, LARANJA), (f"CAMPEÃO {G}", s_fin, VERDE)]
