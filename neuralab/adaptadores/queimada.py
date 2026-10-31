@@ -15,7 +15,7 @@ from ..palco.holo import AMARELO, BRANCO, CIANO, MAGENTA, VERDE, VERMELHO, Camer
 from .base import Adaptador, Rodada
 
 AZUL, ROSA = CIANO, MAGENTA
-BOLA = (1.0, 0.92, 0.45)
+BOLA = (1.0, 0.97, 0.7)
 
 
 def campeao_da_geracao(hist, g, rodadas=4):
@@ -152,6 +152,27 @@ class Queimada(Adaptador):
         h.linha([(0, meio), (Q.LARG, meio)], BRANCO, 3.0, 0.6, tracejado=[14, 10], halo=False)
 
     # ------------------------------------------------------------ jogadores
+    def _pos(self, rod, k, tm, i):
+        """Posições desenhadas de um time: afasta só no desenho os corpos que se sobrepõem (a simulação não muda)."""
+        ch = ("pos", k, tm, i)
+        if ch not in rod.__dict__:
+            P = rod.reg["pa" if tm == 0 else "pb"][k, i].astype(float).copy()
+            vivo = [not (rod.t_cai[k, tm, j] >= 0 and i >= rod.t_cai[k, tm, j]) for j in range(Q.NS)]
+            for _ in range(4):
+                for a in range(Q.NS):
+                    for b in range(a + 1, Q.NS):
+                        if vivo[a] and vivo[b]:
+                            d = P[b] - P[a]
+                            n = max(float(np.hypot(*d)), 1e-6)
+                            if n < 1.3:
+                                if n < 1e-3:
+                                    d, n = np.array([1.0, 0.0]), 1.0
+                                push = d / n * (1.3 - n) / 2
+                                P[a] -= push
+                                P[b] += push
+            rod.__dict__[ch] = P
+        return rod.__dict__[ch]
+
     def _jogador(self, h, rod, k, tm, j, i, t, nitido):
         cor = AZUL if tm == 0 else ROSA
         m = rod.t_cai[k, tm, j]
@@ -162,11 +183,11 @@ class Queimada(Adaptador):
                 h.pulso((float(p[0]), float(p[1])), idade, BRANCO, 1.8, 0.8, 3)
                 h.particulas((float(p[0]), float(p[1])), idade, cor, n=8, alcance=1.6, dur=0.9, semente=int(k * 7 + j))
             return
-        p = rod.reg["pa" if tm == 0 else "pb"][k, i, j]
+        p = self._pos(rod, k, tm, i)[j]
         if not nitido:
-            h.circulo((float(p[0]), float(p[1])), Q.R * 1.1, cor, 0.16, 1.6, 0.3)
+            h.circulo((float(p[0]), float(p[1])), Q.R * 1.1, cor, 0.10, 1.4, 0.2)
             return
-        ant = rod.reg["pa" if tm == 0 else "pb"][k, max(i - 1, 0), j]
+        ant = self._pos(rod, k, tm, max(i - 1, 0))[j]
         v = p - ant
         ang = math.atan2(v[1], v[0]) if np.hypot(*v) > 1e-3 else (math.pi / 2 if tm == 0 else -math.pi / 2)
         R.avatar(h, (float(p[0]), float(p[1])), ang, cor, t, alfa=1.0, passo=(t * 2.4 if np.hypot(*v) > 1e-3 else None),
@@ -191,7 +212,7 @@ class Queimada(Adaptador):
             if replay:
                 for j in range(Q.NS):
                     if rod.t_cai[k, 0, j] < 0 or i < rod.t_cai[k, 0, j]:
-                        p = rod.reg["pa"][k, i, j]
+                        p = self._pos(rod, k, 0, i)[j]
                         h.destaque((float(p[0]), float(p[1])), AMARELO, t, raio=0.45)
 
     def desenha(self, h, rod, t, modo, foco):
