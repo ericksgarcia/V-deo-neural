@@ -44,3 +44,6 @@ Vídeo: `saida/jesus_v4.mp4` (17,5 s). Rodar: `mesh/bin/python poc2/make_rigs.py
 - Agora o manto da malha do perfil tem pesos por difusão com restrições também nas cápsulas da coxa/canela (esquerda segue o pé da frente, direita o de trás), mas com influência parcial (25% acima do joelho -> 55% na barra, função `robe_follow` em `poc2/make_rigs.py`), para a barra se dobrar em vez de esticar entre os pés.
 - Pele da perna sobe até y=1650 escondida atrás do manto, então a perna nunca aparece cortada.
 - Limites conhecidos: pé de trás é cópia do da frente; soles retangulares; franja fina na barra; arte original não tem coxa/joelho (se o crédito do Replicate voltar, pedir ao Recraft uma folha só da parte de baixo com pernas e pés separados).
+
+### v8: pés redesenhados
+Os fragmentos de sandália do SVG do Recraft (peças separadas, antepé escondido atrás do outro pé) foram descartados; `poc2/foot_art.py` desenha a sandália de perfil em vetor (sola, pé, dedos, tiras) e a mesma peça serve aos dois pés (o de trás mais escuro). Verificado em escala 4x em 4 instantes do ciclo.

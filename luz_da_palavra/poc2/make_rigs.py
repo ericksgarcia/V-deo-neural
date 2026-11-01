@@ -33,11 +33,10 @@ for ii,(c,d) in enumerate(P):
     x0,y0,x1,y1=M.bbox(d)
     if ii in TUBE_F: tF.append((c,d));continue
     if ii in TUBE_B: tB.append((c,d));continue
-    if ii in IDX_F: fF.append((c,d));continue
-    if ii in IDX_B: fB.append((c,d));continue
+    if ii in IDX_F or ii in IDX_B: continue                       # fragmentos de sandália da arte original: substituídos pelo pé redesenhado
     if y1-y0>1500: body.append((c,d,'clip-path="url(#c)"'))
     elif x0>985 and x1<1340 and y0>450 and y1<1400 and not isred(c): arm.append((c,d))
-    elif y0>=1800 and y1>1860: (fF if (x0+x1)/2<1075 else fB).append((c,d))
+    elif y0>=1800 and y1>1860: continue
     else: body.append((c,d))
 def shift(d,dx):
     k=[0]
@@ -46,8 +45,8 @@ def shift(d,dx):
         return ('%.3f'%(v+dx)) if i%2==0 else m.group(0)
     return re.sub(r'-?\d+\.?\d*',f,d)
 def dark(c,f=0.9): return '#%02x%02x%02x'%tuple(int(int(c[i:i+2],16)*f) for i in (1,3,5))
-fB=[(c,d) for c,d in fB if not d.startswith('M 1012 1991')]          # sola unida original sai (o pé de trás ganha cópia do pé da frente)
-fB=[(dark(c),shift(d,100)) for c,d in fF]+fB                          # forefoot que a arte escondia atrás do pé da frente
+import foot_art as FA
+fF=FA.foot(0,1.0);fB=FA.foot(100,0.86)                                # pés redesenhados em vetor (pé de trás um pouco mais escuro)
 tF.insert(0,('#d87f4b','M 985 1650 L 1075 1650 L 1075 1830 L 985 1830 z'));tB.insert(0,('#d87f4b','M 1085 1650 L 1176 1650 L 1176 1830 L 1085 1830 z'))   # pele da perna sobe escondida atrás do manto
 body.insert(1,('#fae4ca','M 985 1060 L 1185 1060 L 1185 1430 L 985 1430 z'))
 import numpy as np
