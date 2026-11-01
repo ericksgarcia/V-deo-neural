@@ -13,3 +13,8 @@ Vídeo de teste: `saida/jesus_v3.mp4` (17,3 s). Interativo: `saida/anim5.html` (
 - Contorno gigante (silhueta do corpo) e mangas fundidas ao torso são paths únicos: precisam de classificação por região/cor para não rasgar.
 - Pernas giratórias sob túnica longa rasgam: pés como peças rígidas que deslizam e levantam sob a barra funcionam.
 - Mão do desenho original tem dedos fundidos (não dá para abrir um a um); módulos de mão separados foram gerados mas ficaram fora do teste.
+
+## POC: malha densa + DragonBones (poc/)
+`poc/make_mesh.py` (PNG do SVG -> ~3000 vértices, pesos por difusão tipo BBW -> JSON DragonBones 5.5) + `poc/build_poc.py` (Pixi 4.8.9 + runtime DragonBones MIT) + `poc/frames.js`.
+Resultado: `saida/poc_dragonbones.mp4`, comparativo `saida/poc_comparativo.mp4` (esq. rig por path, dir. malha).
+Achados: manga dobra de forma contínua (antebraço em 3 ossos), sem rasgos nem fragmentos soltos. Pendências: entalhes claros na silhueta, textura é raster, uma malha só (sem camadas), virada de frente->costas ainda é troca de vista.
