@@ -52,3 +52,28 @@ python ferramentas/rig2d/demo.py saida/rig_demo/teste.mp4 --seg 9 --ss 2
 1. Folha de **rosto** (olhos abertos/fechados/olhando para os lados, sobrancelhas, 8 bocas) e **mãos** (aberta, apontando, palma para cima).
 2. Rigs das vistas **frente (imagem 4)**, **costas 3/4 (imagem 5)** e **lado (imagens 1 e 3)** com o mesmo esqueleto.
 3. Biblioteca de animações (andar, parar, apontar, rezar, sentar) e uma função `cena(personagem, roteiro)` que liga o personagem ao roteiro/voz.
+
+
+## Camada de animação v2 (nov/2026): o melhor de cada referência
+
+Arquivos novos em `ferramentas/rig2d/`: `animacao.py` (genérico), `acoes.py` (ações do herói), `bvh.py` (mocap), `gerar_bvh.py` (+ `mocap/*.bvh`),
+`demo2.py`, `teste_acoes.py`. Tudo reimplementado do zero (sem copiar código de terceiros; ver `docs/PESQUISA_ANIMACAO_2D.md`).
+
+| Ideia | Origem | Onde |
+|---|---|---|
+| Parâmetros 1D/2D aditivos (`virar`, `inclinar`, `olhar_x/olhar_y`, `respirar_fundo`); `virar` também deforma a malha do rosto | Inochi2D / Live2D | `animacao.Parametro`, `acoes.PARAMETROS`, `heroi.virar_cabeca` |
+| Máquina de estados com **camadas** (base = corpo todo, cima = braços/cabeça com máscara), transições com mistura e easing, regras automáticas | Rive, Spine tracks | `animacao.Maquina/Camada` |
+| Curvas Bézier por segmento, antecipação e sobra (overshoot), "vida parada" (ruído) | Harmony / Spine / Moho | `animacao.Facil`, `ClipeChaves`, `com_antecipacao` |
+| Follow-through (mola de 2ª ordem em cabeça, antebraços e mãos) | overlap do Harmony | `animacao.Seguidor` |
+| Mocap BVH -> ossos 2D (orientação dos segmentos + IK dos pés com chão fixo, suavização) | Meta AnimatedDrawings | `bvh.ClipeBVH` |
+| Rosto: viraria de olhar por parâmetro; bocas/expressões desenhadas ficam para a folha de rosto (abaixo) | Mesh Avatar Studio | pendente (arte) |
+
+Usar: `m = acoes.criar_maquina(); m.entradas["vel"]=1; m.ir("cima","acenar"); pose=m.passo(1/30); heroi.aplicar(ch, pose)`.
+Para variar a cada vídeo basta um roteiro de eventos (ver `demo2.ROTEIRO`) e/ou novos BVHs em `mocap/` (mesmos nomes de junta,
+ou um `MAPA` próprio em `bvh.py`). Rode `python ferramentas/rig2d/gerar_bvh.py` para recriar a biblioteca procedural.
+
+### Limites conhecidos (honesto)
+- Continua **uma vista** (3/4 andando). Frente/costas/lado exigem o mesmo recorte de peças (`partes.py`) para as imagens 1, 3, 4 e 5.
+- Mocap em vista lateral achata o que vai para a câmera; segmentos quase de frente seguram o ângulo anterior.
+- Braço levantado acima de ~2,5 rad ou tronco muito inclinado mostram o remendo do inpaint; mantenha as ações dentro do que o desenho aguenta.
+- Os BVHs de `mocap/` são procedurais (simples). Para movimento realista use mocap real (CMU, Mixamo-BVH); verifique a licença de cada um.

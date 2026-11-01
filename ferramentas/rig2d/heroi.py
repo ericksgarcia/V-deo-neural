@@ -61,13 +61,23 @@ def onda_barra(V, P):
     dy = 0.25 * amp * k * np.cos(ph * 2 - V[:, 0] / 120.0)
     return np.c_[dx, dy]
 
+ROSTO_C = (955.0, 235.0)
+
+def virar_cabeca(V, P):
+    """Parâmetro 'virar' (-1..1): desliza o rosto lateralmente (estilo Live2D 'ângulo X'); o cabelo acompanha menos, dando volume."""
+    a = P.get("virar", 0.0)
+    if abs(a) < 1e-4: return np.zeros_like(V)
+    d = np.hypot((V[:, 0] - ROSTO_C[0]) / 190.0, (V[:, 1] - ROSTO_C[1]) / 230.0)
+    k = np.clip(1.0 - d * d, 0.0, 1.0)
+    return np.c_[a * 26.0 * k + a * 5.0 * np.clip(1 - d / 1.5, 0, 1), -abs(a) * 2.0 * k]
+
 def construir(esp_scale=1.0):
     info = json.load(open(os.path.join(DIR, "partes.json")))
     esq = esqueleto()
     pecas = {}
     for n in info["ordem"]:
         ossos, esp, juntas = PECAS[n]
-        deform = [onda_barra] if n == "tunica" else []
+        deform = [onda_barra] if n == "tunica" else ([virar_cabeca] if n == "cabeca" else [])
         pecas[n] = Peca(n, os.path.join(DIR, n + ".png"), info["partes"][n]["bbox"], ossos, esq, int(esp * esp_scale), juntas, deform)
     ch = Personagem(esq, pecas, info["ordem"])
     ch.cadeias = [
@@ -97,11 +107,16 @@ BOCA = (952, 283)
 
 def _pt(e, cam, off, pts):
     M = e["cabeca"].skin
-    p = np.c_[np.asarray(pts, float), np.ones(len(pts))] @ M.T
+    pts = np.asarray(pts, float)
+    if P_ATUAL: pts = pts + virar_cabeca(pts, P_ATUAL)
+    p = np.c_[pts, np.ones(len(pts))] @ M.T
     q = cam(p[:, :2]) - np.array(off)
     return np.round(q * 16).astype(np.int32)
 
+P_ATUAL = {}
+
 def _rosto(buf, off, cam, e, P, pele):
+    P_ATUAL.clear(); P_ATUAL.update(P)
     ss = cam.ss; s = cam.s * ss
     # --- olhos: pálpebra (pele) cobre de cima para baixo
     aberto = P.get("olho", 1.0)
@@ -186,3 +201,26 @@ def piscar(t, intervalo=3.4):
         x = ph / d
         return abs(2 * x - 1) ** 1.5 if x < 1 else 1.0
     return 1.0
+
+
+# ------------------------------------------------------------------ aplica uma `Pose` (animacao.py) no esqueleto
+def aplicar(ch, pose, dt=1 / 30):
+    """Pose -> ossos: ângulos, pés por IK com alvo no mundo, física dos tecidos e parâmetros de rosto."""
+    e = ch.esq; P = ch.params
+    e.zerar()
+    for b, r in pose.rot.items(): e[b].rot = r
+    for b, (dx, dy) in pose.pos.items(): e[b].pos = np.array([dx, dy], float)
+    for b, k in pose.esc.items(): e[b].esc = k
+    e.fk()
+    for lado in ("lb", "lf"):
+        if lado in pose.pes:
+            e.ik2(lado + "_coxa", lado + "_canela", pose.pes[lado], dobra=-1)
+    e.fk()
+    for lado in ("lb", "lf"):
+        if lado in pose.tilt:
+            e[lado + "_pe"].rot = pose.tilt[lado] - e.rot_total(e[lado + "_canela"])
+    e.fk()
+    P.update(pose.par)
+    for c in ch.cadeias:
+        c.passo(dt, sub=4, vento=pose.par.get("vento", 0.0))
+    e.fk()
