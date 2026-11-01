@@ -1,21 +1,25 @@
 {
   "slug": "ep01_fogo",
   "ref": "JOÃO 21:9",
-  "titulo": ["JESUS ACENDEU", "O MESMO FOGO", "DA TRAIÇÃO"],
+  "titulo": [
+    "JESUS ACENDEU",
+    "O MESMO FOGO",
+    "DA TRAIÇÃO"
+  ],
   "fatos": [
     "Joao 18:18 e 21:9 usam a mesma palavra grega, anthrakia (braseiro / fogo de brasas).",
     "anthrakia aparece so nessas duas passagens em todo o Novo Testamento.",
     "Pedro negou Jesus tres vezes (Jo 18:17, 25, 27); Jesus pergunta 'tu me amas?' tres vezes (Jo 21:15-17)."
   ],
   "imagens": [
-    "cinematic night scene, a single glowing charcoal fire of embers in a dark ancient Jerusalem courtyard, stone walls, orange sparks rising, deep teal shadows, volumetric light, epic biblical atmosphere, no text, vertical composition",
-    "silhouette of a bearded man in an ancient robe warming his hands over a charcoal fire at night, seen from behind, ancient courtyard, rooster on a wall in the distance, moody cinematic lighting, orange and teal, no face visible, no text",
-    "an ancient scroll with greek handwriting lit by candlelight, dust particles floating in golden light, dark background, cinematic macro photography, mysterious, no readable text",
-    "dramatic sunrise over the sea of galilee, calm water, mist, golden rays breaking through dark clouds, small wooden fishing boat in the distance, epic cinematic landscape, no text",
-    "a small charcoal fire with embers and grilled fish and bread on a quiet beach at dawn, sea of galilee, soft golden light, smoke rising, cinematic, peaceful and emotional, no people, no text",
-    "two silhouettes sitting by a small fire on the shore at dawn, seen from far behind, sea and golden sky, god rays, cinematic, emotional, faces not visible, no text",
-    "majestic heavenly light breaking through storm clouds over dark cliffs and ocean, divine rays, epic cinematic sky, hope, no text",
-    "glowing sunrise sky with golden clouds above mountains, rays of light, peaceful and majestic, cinematic, no text"
+    "a small fire of glowing charcoal embers on a mossy rocky riverbank in a vivid mountain valley at dusk, sparks rising",
+    "ancient olive trees under a vivid starry night sky with the milky way, a tiny campfire glowing among them, a lone robed silhouette far away, face not visible",
+    "a hidden path through an emerald forest with luminous ferns and golden rays of light breaking through the trees",
+    "crystal turquoise lake shore at dawn surrounded by towering mountains, a small wooden fishing boat resting on the water",
+    "a small fire of glowing red embers on a pebble shore of a turquoise mountain lake, thin smoke rising, no people",
+    "two tiny silhouettes sitting together by a small fire on a lakeshore under towering mountains and a vivid sky, seen from far behind, faces not visible",
+    "majestic waterfall in a lush green canyon with a rainbow in the mist and rays of light",
+    "sweeping view from a mountain summit above a sea of clouds, radiant light, colorful wildflowers in the foreground"
   ],
   "cenas": [
     {"img": 0, "fala": "Jesus acendeu o mesmo *fogo* onde Pedro o negou.", "titulo": true},
@@ -35,5 +39,6 @@
     {"img": 7, "fala": "*Curte* e comenta amém.", "cta": "Comente: AMÉM"},
     {"img": 7, "fala": "Porque Deus te leva de volta ao lugar da queda… pra te *levantar* ali."}
   ],
+  "velocidade": 1.04,
   "legenda": "Jesus acendeu o MESMO fogo onde Pedro o negou 🔥 e quase ninguém percebe.\nManda pra alguém que ainda carrega um erro antigo. 🙏\nComenta AMÉM se isso falou com você.\n\n#jesus #biblia #fe #deus #evangelho"
 }

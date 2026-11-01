@@ -31,21 +31,35 @@ RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AQUI = os.path.dirname(os.path.abspath(__file__))
 FONTES = os.path.join(AQUI, "fontes")
 W, H, FPS, SR = 1080, 1920, 30, 48000
-OURO = (246, 196, 84)
+OURO = (255, 208, 92)
 CREME = (238, 232, 220)
 
-VOZ = "Charon"
+# Identidade do canal (dono, nov/2026): voz Achird no Gemini TTS, UMA requisição por vídeo (trava em narracao()).
+VOZ = "Achird"
 MODELO_TTS = "gemini-3.8-flash-tts"
-MODELO_IMG = "black-forest-labs/flux-1.1-pro"
+MODELO_IMG = "black-forest-labs/flux-1.1-pro-ultra"
+# Estilo visual fixo de TODAS as imagens (dono, nov/2026): natureza variada com cores hipersaturadas que prendem o olho.
+ESTILO_IMG = (
+    "breathtaking hyper-saturated nature photography, vivid rich colors, glowing dramatic light, deep electric blues "
+    "and teals contrasted with fiery oranges, golds and magentas, lush saturated greens, ultra wide-angle low camera "
+    "with strong depth and leading lines, HDR, high contrast, crisp detail, cinematic, awe-inspiring, vertical 9:16, "
+    "no text, no watermark"
+)
 ESTILO_VOZ = (
-    "Voice: Charon. You are a Brazilian (pt-BR) Christian storyteller revealing a hidden detail of the Bible to one "
-    "friend, close to the microphone. Warm, deep, reverent and gripping, like someone who just discovered something "
-    "that gave them chills and can't wait to share it. Not a preacher shouting, not a movie trailer. "
-    "Open with urgency and intrigue, as if stopping the listener mid-scroll. Every few seconds create a little "
-    "suspense: slow down and lower the voice before each reveal, hold the silence, then say the reveal clearly. "
-    "When the text says 'Mas presta atenção' or 'vai te arrepiar', lean in and almost whisper with wonder. "
-    "At the end, become tender and hopeful, full of faith. Natural Brazilian Portuguese, never robotic. "
-    "Pace: brisk and clear, about 2.8 words per second, with real pauses before reveals."
+    "Voice: Achird. Channel 'Luz da Palavra': a warm Brazilian (pt-BR) Christian friend revealing a hidden detail "
+    "of the Bible to one person, close to the microphone, at golden hour. Intimate, reverent and full of wonder, "
+    "like someone who just noticed something in Scripture that gave them goosebumps and needs to share it now. "
+    "Gentle faith and hope; never a shouting preacher, never a movie-trailer voice, never dark, scary or ominous, "
+    "never robotic. "
+    "First sentence: urgent and intriguing, slightly faster, a voice that makes someone stop scrolling. "
+    "Every few seconds build friendly suspense: before each '…' slow down, lower the voice a little, lean in, hold "
+    "a real silence, then say the reveal clearly with quiet amazement. 'Mas presta atenção' and 'vai te arrepiar' "
+    "sound like a secret being shared. "
+    "'Não uma vez. Três.' lands slowly, word by word. "
+    "From 'Ele não voltou ao fogo pra acusar' to the end: tender, compassionate, a smile in the voice, full of hope, "
+    "like speaking to someone who is hurting. 'Curte e comenta amém' is light and warm, not salesy. The last "
+    "sentence is soft and confident, ending in peace. "
+    "Natural Brazilian Portuguese, connected sentences, pace about 2.8 words per second with real pauses before reveals."
 )
 
 
@@ -101,8 +115,8 @@ def gera_imagem(prompt, destino, semente):
     token = os.environ.get("REPLICATE_API_TOKEN")
     if not token:
         raise RuntimeError("falta REPLICATE_API_TOKEN (.cache/luz.env)")
-    entrada = {"prompt": prompt + ", ultra detailed, photorealistic, 8k, film grain",
-               "aspect_ratio": "9:16", "output_format": "png", "seed": semente, "safety_tolerance": 2}
+    entrada = {"prompt": prompt + ". Style: " + ESTILO_IMG, "aspect_ratio": "9:16", "output_format": "png",
+               "seed": semente, "safety_tolerance": 2, "raw": False}
     p = _http_json(f"https://api.replicate.com/v1/models/{MODELO_IMG}/predictions", {"input": entrada}, token,
                    timeout=180)
     while p.get("status") not in ("succeeded", "failed", "canceled"):
@@ -137,7 +151,7 @@ def fundo_provisorio(i, destino):
 def imagens(rot, pasta, provisorio):
     arqs = []
     for i, prompt in enumerate(rot["imagens"]):
-        h = hashlib.sha1((MODELO_IMG + prompt).encode()).hexdigest()[:8]
+        h = hashlib.sha1((MODELO_IMG + ESTILO_IMG + prompt).encode()).hexdigest()[:8]
         arq = os.path.join(pasta, f"img{i}_{h}.png")
         if not os.path.exists(arq):
             if provisorio:
@@ -159,16 +173,23 @@ def _le_wav(dados):
     return x, sr
 
 
-def narracao(rot, pasta):
+def narracao(rot, pasta, autoriza_nova=False):
     texto = texto_tts(rot["cenas"])
     chave = hashlib.sha1((VOZ + MODELO_TTS + ESTILO_VOZ + texto).encode()).hexdigest()[:10]
     arq = os.path.join(pasta, f"voz_{chave}.npy")
     if os.path.exists(arq):
-        print("[voz] cache (nenhuma requisição)")
+        print(f"[voz] cache (nenhuma requisição) · {VOZ} · {MODELO_TTS}")
         return np.load(arq)
     if not os.environ.get("GEMINI_API_KEY"):
         raise RuntimeError("falta GEMINI_API_KEY (.cache/luz.env)")
+    livro = os.path.join(pasta, "uso_voz.json")
+    usos = json.load(open(livro)) if os.path.exists(livro) else []
+    if usos and not autoriza_nova:
+        raise SystemExit(f"[voz] TRAVA: este vídeo já usou {len(usos)} requisição(ões) de voz ({usos[-1]['voz']}). "
+                         "Regra do canal: 1 por vídeo. Só com licença do dono: --autorizo-nova-voz")
     print(f"[voz] 1 requisição: {VOZ} · {MODELO_TTS}", flush=True)
+    usos.append({"voz": VOZ, "modelo": MODELO_TTS, "quando": time.strftime("%Y-%m-%d %H:%M"), "chave": chave})
+    json.dump(usos, open(livro, "w"), indent=1)
     corpo = {"contents": [{"parts": [{"text": texto, "speechMetadata": {"style": ESTILO_VOZ}}]}],
              "generationConfig": {"responseModalities": ["AUDIO"],
                                   "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": VOZ}}}}}
@@ -346,11 +367,17 @@ def texto_brilho(txt, f, cor, brilho=None, sombra=True, espaco=0):
             xx += f.getlength(ch) + espaco
     else:
         dm.text((m - bb[0], m - bb[1]), txt, font=f, fill=255)
-    if sombra:
-        s = mask.filter(ImageFilter.GaussianBlur(10)).point(lambda p: int(p * 0.85))
-        img.paste((0, 0, 0, 255), (0, 4), s)
+    if sombra:   # céu muito colorido: halo escuro largo + sombra + contorno fino, para ler em qualquer fundo
+        escuro = Image.new("RGBA", img.size, (8, 6, 14, 0))
+        halo = mask.filter(ImageFilter.MaxFilter(9)).filter(ImageFilter.GaussianBlur(22)).point(lambda p: int(p * 0.8))
+        escuro.putalpha(halo)
+        img = Image.alpha_composite(img, escuro)
+        borda = mask.filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(1.2))
+        contorno = Image.new("RGBA", img.size, (10, 6, 12, 0))
+        contorno.putalpha(borda.point(lambda p: int(p * 0.92)))
+        img = Image.alpha_composite(img, contorno)
     if brilho:
-        g = mask.filter(ImageFilter.GaussianBlur(14)).point(lambda p: int(p * 0.55))
+        g = mask.filter(ImageFilter.GaussianBlur(14)).point(lambda p: int(p * 0.35))
         camada = Image.new("RGBA", img.size, brilho + (0,))
         camada.putalpha(g)
         img = Image.alpha_composite(img, camada)
@@ -477,9 +504,9 @@ def sobreposicao():
     """Escurecimento em cima/embaixo + vinheta, para a letra sempre ler bem."""
     yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
     v = ((xx - W / 2) / (W * 0.75)) ** 2 + ((yy - H / 2) / (H * 0.62)) ** 2
-    a = np.clip(v, 0, 1) * 150
-    meio = np.exp(-((yy - 1040) / 300) ** 2) * 90            # faixa mais escura atrás da legenda
-    topo = np.clip((420 - yy) / 420, 0, 1) * 110
+    a = np.clip(v - 0.25, 0, 1) * 110
+    meio = np.exp(-((yy - 1040) / 260) ** 2) * 75            # faixa mais escura atrás da legenda
+    topo = np.clip((330 - yy) / 330, 0, 1) * 80
     alfa = np.clip(a + meio + topo, 0, 230).astype(np.uint8)
     img = Image.new("RGBA", (W, H), (4, 4, 8, 0))
     img.putalpha(Image.fromarray(alfa))
@@ -499,7 +526,7 @@ class Fundo:
     def _quadro(self, i, t, t0, t1):
         im = self.imgs[i]
         k = np.clip((t - t0) / max(0.1, t1 - t0), 0, 1.2)
-        zoom = 1.0 + 0.10 * k if i % 2 == 0 else 1.10 - 0.10 * k
+        zoom = 1.0 + 0.15 * k if i % 2 == 0 else 1.15 - 0.15 * k
         cw, ch = W * 1.18 / zoom * im.width / (W * 1.18), H * 1.18 / zoom * im.height / (H * 1.18)
         cw, ch = im.width / 1.18 / zoom * 1.0, im.height / 1.18 / zoom
         dx = (im.width - cw) * (0.5 + 0.35 * (k - 0.5) * (1 if i % 3 else -1))
@@ -592,6 +619,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("roteiro")
     ap.add_argument("--so-texto", action="store_true")
+    ap.add_argument("--autorizo-nova-voz", action="store_true", help="só com licença do dono (regra: 1 voz por vídeo)")
     ap.add_argument("--sem-imagens", action="store_true", help="rascunho com fundo provisório (não chama Replicate)")
     a = ap.parse_args()
     carrega_chaves()
@@ -604,7 +632,7 @@ def main():
     pasta = os.path.join(RAIZ, ".cache", "luz", rot["slug"])
     os.makedirs(pasta, exist_ok=True)
     arqs = imagens(rot, pasta, a.sem_imagens)
-    voz = ajusta_ritmo(narracao(rot, pasta), rot.get("teto_pausa", 0.3), rot.get("velocidade", 1.08))
+    voz = ajusta_ritmo(narracao(rot, pasta, a.autorizo_nova_voz), rot.get("teto_pausa", 0.3), rot.get("velocidade", 1.08))
     tempos = tempos_cenas(voz, rot["cenas"])
     for c, (x, y, fa, fb) in zip(rot["cenas"], tempos):
         print(f"  {x:5.2f}-{y:5.2f}  {limpa(c['fala'])}")

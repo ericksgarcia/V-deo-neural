@@ -1,7 +1,7 @@
 # Luz da Palavra
 
-Canal separado do de IA. Formato: vídeo vertical 1080x1920, **imagem de fundo gerada no Replicate** (flux-1.1-pro,
-9:16) com zoom lento, **narração no Gemini TTS** (`gemini-3.8-flash-tts`, voz Charon), referência bíblica no topo,
+Canal separado do de IA. Formato: vídeo vertical 1080x1920, **imagem de fundo gerada no Replicate**
+(flux-1.1-pro-ultra, 9:16) com zoom lento, **narração no Gemini TTS** (`gemini-3.8-flash-tts`, **voz Achird**), referência bíblica no topo,
 legenda em serifa creme com palavra-chave dourada, cartões de re-gancho e botão "Comente: AMÉM".
 
 ```bash
@@ -20,6 +20,17 @@ Saída: `saida/luz/<slug>.mp4` e `saida/luz/<slug>_legenda.txt`.
   `legenda`, `velocidade` ou `teto_pausa` NÃO gasta nada.
 - **Ritmo:** ajustado localmente (pausas cortadas para `teto_pausa`, pausa de suspense = o dobro; `velocidade`
   via atempo, sem mudar o tom). Alvo 40-55 s.
+
+## Regras do dono (nov/2026)
+
+- **Voz: SEMPRE Achird.** **UMA requisição de voz por vídeo**: o gerador trava (`.cache/luz/<slug>/uso_voz.json`);
+  outra só com licença do dono (`--autorizo-nova-voz`).
+- **Tom (identidade do canal):** amigo cristão caloroso revelando um detalhe escondido da Bíblia; reverente, cheio de
+  assombro; suspense amigável antes de cada revelação; final terno e esperançoso. Nunca pregador gritando, trailer,
+  sombrio ou robótico (`ESTILO_VOZ` em `gerar.py`).
+- **Imagens:** natureza variada (montanhas, florestas, lagos, cachoeiras, céu estrelado, mar), não só pôr do sol, mas
+  sempre com cores hipersaturadas, luz dramática e grande-angular (`ESTILO_IMG` é anexado a todo prompt). Sem rosto de
+  Jesus, sem texto na imagem. Letra com halo escuro + contorno para ler em qualquer fundo.
 
 ## Roteiro (`roteiros/<slug>.json`)
 
@@ -47,4 +58,4 @@ Saída: `saida/luz/<slug>.mp4` e `saida/luz/<slug>_legenda.txt`.
 
 | Ep | Tema | Ref | Duração | Linha 1 da legenda | Estado |
 |----|------|-----|---------|--------------------|--------|
-| 01 | O mesmo fogo (anthrakia: Jo 18:18 e 21:9) | JOÃO 21:9 | 53 s | Jesus acendeu o MESMO fogo onde Pedro o negou 🔥 | voz pronta; falta gerar as imagens no Replicate |
+| 01 | O mesmo fogo (anthrakia: Jo 18:18 e 21:9) | JOÃO 21:9 | 53 s | Jesus acendeu o MESMO fogo onde Pedro o negou 🔥 | pronto (Achird; 2 requisições: 1ª Charon descartada a pedido do dono) |
