@@ -31,8 +31,8 @@ const sp={head:new Spring(120,11),skirt:new Spring(60,5),hair:new Spring(90,8)};
 let lastT=-1;
 
 // ---------- linha do tempo ----------
-const st={x:-220,view:0,sq:1,rF:0,wF:0,rB:0,wB:0};
-const VEL=150,X0=-220,X1=560,X2=640;
+const st={x:-120,view:0,sq:1,rF:0,wF:0,rB:0,wB:0};
+const VEL=100,X0=-120,X1=560,X2=640;
 const tl=gsap.timeline({paused:true});let t0=0;
 tl.to(st,{x:X1,duration:(X1-X0)/VEL,ease:'none'},0);t0=(X1-X0)/VEL;
 tl.to(st,{x:X2,duration:1.0,ease:'power2.out'},t0);t0+=1.25;
@@ -65,7 +65,7 @@ function poseT(v,t,r,w,dt){
   const sk=sp.skirt.step(0.9*osc*w-0.8*ch,dt);setB(v,'skirt',sk);
 }
 function poseSide(t,walking,dist,dt){
-  const ph=dist*0.0315,s=Math.sin(ph),c=Math.cos(ph),A=172,LIFT=38;
+  const ph=dist*0.045,s=Math.sin(ph),c=Math.cos(ph),A=120,LIFT=30;
   if(walking){
     setB('side','ankF',-10*Math.max(0,c)+0*s,-A*s,-LIFT*Math.max(0,c));setB('side','ankB',-10*Math.max(0,-c),A*s,-LIFT*Math.max(0,-c));
     setB('side','pelvis',0,0,-16*(Math.cos(2*ph)+1)/2);setB('side','chest',1.1*Math.sin(2*ph));

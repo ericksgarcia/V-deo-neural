@@ -65,10 +65,19 @@ def make_mesh(png,dense_pts=(),h_base=34,h_fine=15,fine_r=150):
         if len(c)<12: continue
         d=np.r_[0,np.cumsum(np.linalg.norm(np.diff(c,axis=0),axis=1))];n=max(4,int(d[-1]/11));s=np.linspace(0,d[-1],n,endpoint=False)
         pts+=list(np.c_[np.interp(s,d,c[:,0]),np.interp(s,d,c[:,1])])
+    # anéis internos (8 px e 20 px abaixo da borda): triângulos de contorno pequenos, sem fendas
+    for r,step in ((8,13),(20,19)):
+        mi=cv2.erode(m_in,cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(2*r+1,2*r+1)))
+        for c in cv2.findContours(mi,cv2.RETR_LIST,cv2.CHAIN_APPROX_NONE)[0]:
+            c=c[:,0,:].astype(float)
+            if len(c)<8: continue
+            d=np.r_[0,np.cumsum(np.linalg.norm(np.diff(c,axis=0),axis=1))];n=max(3,int(d[-1]/step));sa=np.linspace(0,d[-1],n,endpoint=False)
+            pts+=list(np.c_[np.interp(sa,d,c[:,0]),np.interp(sa,d,c[:,1])])
     pts=np.array(pts);er=cv2.erode(m_in,np.ones((9,9),np.uint8))
+    dt=cv2.distanceTransform(m_in,cv2.DIST_L2,5)
     def grid(h,sel=None):
         g=np.mgrid[0:H:h,0:W:h].reshape(2,-1).T[:,::-1].astype(float)+h/2
-        g=g[er[g[:,1].astype(int).clip(0,H-1),g[:,0].astype(int).clip(0,W-1)]>0]
+        g=g[dt[g[:,1].astype(int).clip(0,H-1),g[:,0].astype(int).clip(0,W-1)]>26]
         return g[sel(g)] if sel is not None else g
     def dense(g):
         ok=np.zeros(len(g),bool)
@@ -77,7 +86,7 @@ def make_mesh(png,dense_pts=(),h_base=34,h_fine=15,fine_r=150):
     parts=[pts,grid(h_base)]
     if dense_pts: parts.append(grid(h_fine,dense))
     allp=np.vstack(parts);keep=np.ones(len(allp),bool);tr=cKDTree(allp[:len(pts)])
-    for i in range(len(pts),len(allp)): keep[i]=tr.query(allp[i])[0]>7
+    for i in range(len(pts),len(allp)): keep[i]=tr.query(allp[i])[0]>9
     allp=allp[keep];sel=np.ones(len(allp),bool);tr=cKDTree(allp)
     for i in range(len(pts),len(allp)):
         if not sel[i]: continue

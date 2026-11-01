@@ -26,3 +26,9 @@ Vídeo: `saida/jesus_v4.mp4` (17,5 s). Rodar: `mesh/bin/python poc2/make_rigs.py
 - Aceno: o BVH `wave_hello` do AnimatedDrawings é um gesto para a frente (cotovelo no plano lateral) e projeta mal no plano frontal; não há caminhada nos dados. Animação autoral com GSAP (antecipação, overshoot, curvas) + molas (cabeça, saia).
 - Correções de textura: halos da arte removidos (cores #f8f5f0/#f5f3ee), alfa binário, cor de borda propagada.
 - Pendências: virada ainda é achatamento; entalhes minúsculos em poucos pontos do contorno; sem balanço de cabelo/manto além da saia e da cabeça.
+
+### Correção dos pés (v5)
+- Cada path dos pés agora é atribuído ao pé de trás ou da frente por índice (a divisão por posição separava peças do mesmo pé).
+- Camadas do perfil: pé de trás, pé da frente, corpo, braço (o manto fica por cima das pernas; pele da perna estendida para cima, escondida sob a barra).
+- Passada menor (±120) e velocidade 100 px/s para os pés não saírem do manto.
+- Malha: anéis internos de pontos junto à borda eliminam as fendas brancas (triângulos longos removidos em concavidades).
