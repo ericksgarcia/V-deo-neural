@@ -2,8 +2,11 @@
 import numpy as np
 from PIL import Image
 from scipy import ndimage
-SRC={'back':'base/raw3.png','side':'base/raw4.png','front':'base/raw5.png'}
+import sys
+SRC={'back':'base/raw3.png','side':'base/raw4.png','front':'base/raw5.png','walk':'base/raw6.png'}
+ONLY=sys.argv[1:] or list(SRC)
 for n,p in SRC.items():
+    if n not in ONLY: continue
     im=Image.open(p).convert('RGB');a=np.array(im).astype(int)
     mx,mn=a.max(2),a.min(2)
     bgc=(mn>=180)&((mx-mn)<=14)

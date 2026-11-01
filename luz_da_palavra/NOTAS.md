@@ -54,3 +54,9 @@ Os fragmentos de sandália do SVG do Recraft (peças separadas, antepé escondid
 - O perfil novo olha para a DIREITA: o personagem entra pela esquerda andando para a direita (sem espelhar).
 - Spine/Harmony/Moho avaliados: Moho e Harmony são editores GUI pagos (não rodam aqui). O runtime do Spine exige licença do Spine Editor por usuário (LICENSE do pacote @esotericsoftware/spine-webgl), então NÃO foi usado.
 - Limite atual: no perfil o braço vem aberto (T) e fundido ao tronco; a emenda do ombro aparece ao baixar o braço. Melhor correção: regenerar o perfil com braços para baixo (mesma identidade).
+
+### v10: caminhante novo (pose de passo) + palmas na T-pose — `poc5/`
+- `base/raw6.png` (Jesus andando): `poc5/make_walk5.py` separa braço da frente, braço de trás, perna de trás, perna da frente e corpo por polígonos/cores; IK de 2 ossos nas pernas, pés por rolagem, braços alternados (`poc5/page.js`, `poseSide`). Anda para a direita sem espelhar.
+- Frente (T-pose): `poc5/make_front5.py` separa os braços em camadas e dá aos dois a mesma cadeia (ombro/cotovelo/mão). `poseFront`: tchau e PALMAS (alvo das pontas das mãos em x=1012±gap; o antebraço é escalado 0,8-1,05 para as mãos se encontrarem).
+- Limite do runtime DragonBones: os dados das malhas de UMA armature ficam em arrays de 16 bits; passar de ~6-7 mil vértices somados faz a ÚLTIMA malha ler lixo (vértices na casa dos milhões). Frente: corpo 4.139 + braços 1.983/1.904 funciona; 5.478+... não.
+- Palmas: leitura é "mãos juntas ao peito"; as mangas bufam (compressão do antebraço). Mãos são palmas abertas, sem dedos separados.
