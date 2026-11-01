@@ -27,23 +27,36 @@ for i,(c,d) in enumerate(P):
         P[i:i+1]=[(c,'M 891 1991 L 1108 1991 L 1108 2027 L 891 2027 z'),(c,'M 1012 1991 L 1223 1991 L 1223 2027 L 1012 2027 z')];break
 IDX_F={86,89,90,91,92,93,94,111,112,113,114,120,121,122,123,124,125,126,127,128,129,130,132,141,142,145,146,151,152,154}
 IDX_B={83,84,85,87,88,117,118,119,133,134,136,137,138,143,153,158}
-body=[];arm=[];fF=[];fB=[]
+TUBE_F={89,90};TUBE_B={83,84,85}
+body=[];arm=[];fF=[];fB=[];tF=[];tB=[]
 for ii,(c,d) in enumerate(P):
     x0,y0,x1,y1=M.bbox(d)
+    if ii in TUBE_F: tF.append((c,d));continue
+    if ii in TUBE_B: tB.append((c,d));continue
     if ii in IDX_F: fF.append((c,d));continue
     if ii in IDX_B: fB.append((c,d));continue
     if y1-y0>1500: body.append((c,d,'clip-path="url(#c)"'))
     elif x0>985 and x1<1340 and y0>450 and y1<1400 and not isred(c): arm.append((c,d))
     elif y0>=1800 and y1>1860: (fF if (x0+x1)/2<1075 else fB).append((c,d))
     else: body.append((c,d))
-fF.insert(0,('#d87f4b','M 985 1780 L 1075 1780 L 1075 1830 L 985 1830 z'));fB.insert(0,('#d87f4b','M 1085 1780 L 1176 1780 L 1176 1830 L 1085 1830 z'))
+def shift(d,dx):
+    k=[0]
+    def f(m):
+        v=float(m.group(0));i=k[0];k[0]+=1
+        return ('%.3f'%(v+dx)) if i%2==0 else m.group(0)
+    return re.sub(r'-?\d+\.?\d*',f,d)
+def dark(c,f=0.9): return '#%02x%02x%02x'%tuple(int(int(c[i:i+2],16)*f) for i in (1,3,5))
+fB=[(c,d) for c,d in fB if not d.startswith('M 1012 1991')]          # sola unida original sai (o pé de trás ganha cópia do pé da frente)
+fB=[(dark(c),shift(d,100)) for c,d in fF]+fB                          # forefoot que a arte escondia atrás do pé da frente
+tF.insert(0,('#d87f4b','M 985 1780 L 1075 1780 L 1075 1830 L 985 1830 z'));tB.insert(0,('#d87f4b','M 1085 1780 L 1176 1780 L 1176 1830 L 1085 1830 z'))
 body.insert(1,('#fae4ca','M 985 1060 L 1185 1060 L 1185 1430 L 985 1430 z'))
 PB=[('root',None,0,0),('pelvis','root',1060,1090),('skirt','pelvis',1060,1100),('chest','pelvis',1055,800),('neck','chest',1010,470),('head','neck',1010,470),
- ('sho','chest',1130,540),('elb','sho',1115,830),('fore1','elb',1105,950),('hand','fore1',1090,1100),('ankF','root',1030,1925),('ankB','root',1130,1925)]
+ ('sho','chest',1130,540),('elb','sho',1115,830),('fore1','elb',1105,950),('hand','fore1',1090,1100),
+ ('thighF','pelvis',1040,1100),('shinF','thighF',1010,1500),('footF','shinF',1030,1925),('thighB','pelvis',1090,1100),('shinB','thighB',1070,1500),('footB','shinB',1130,1925)]
 PC=[('root',(1015,1160),(1015,1660),250),('skirt',(1015,1730),(1015,1830),250),('pelvis',(1060,1100),(1055,800),95),('chest',(1055,800),(1040,520),95),
  ('neck',(1010,520),(1010,440),40),('head',(1010,440),(1010,110),135)]
 AC=[('sho',(1130,540),(1115,830),38),('elb',(1115,830),(1105,950),38),('fore1',(1105,950),(1090,1100),38),('hand',(1090,1100),(1075,1370),45)]
 st['side']=M.build_view('jesus_side',PB,[
- {'name':'footB','paths':fB,'rigid':'ankB'},{'name':'footF','paths':fF,'rigid':'ankF'},{'name':'body','paths':body,'caps':PC},
+ {'name':'legB','paths':tB,'grad':('shinB','footB',1850,1920)},{'name':'footB','paths':fB,'rigid':'footB'},{'name':'legF','paths':tF,'grad':('shinF','footF',1850,1920)},{'name':'footF','paths':fF,'rigid':'footF'},{'name':'body','paths':body,'caps':PC},
  {'name':'arm','paths':arm,'caps':AC,'dense':[(1130,540,150),(1115,830,160),(1085,1200,170)]}],OUT)
 print(json.dumps(st))

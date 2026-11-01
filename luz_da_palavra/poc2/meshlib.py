@@ -55,7 +55,7 @@ def dseg(p,a,b):
     a=np.array(a,float);b=np.array(b,float);ab=b-a;t=np.clip(((p-a)@ab)/(ab@ab),0,1);return np.linalg.norm(p-(a+t[:,None]*ab),axis=1)
 
 # ---------- malha ----------
-def make_mesh(png,dense_pts=(),h_base=34,h_fine=15,fine_r=150):
+def make_mesh(png,dense_pts=(),h_base=20,h_fine=9,fine_r=150):
     rgba=np.array(Image.open(png));m=(rgba[...,3]>40).astype(np.uint8)
     m=cv2.morphologyEx(m,cv2.MORPH_CLOSE,np.ones((5,5),np.uint8));m_in=m.copy()
     m=cv2.dilate(m,cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(13,13)))     # borda 6 px além do desenho
@@ -63,10 +63,10 @@ def make_mesh(png,dense_pts=(),h_base=34,h_fine=15,fine_r=150):
     for c in cs:
         c=c[:,0,:].astype(float)
         if len(c)<12: continue
-        d=np.r_[0,np.cumsum(np.linalg.norm(np.diff(c,axis=0),axis=1))];n=max(4,int(d[-1]/11));s=np.linspace(0,d[-1],n,endpoint=False)
+        d=np.r_[0,np.cumsum(np.linalg.norm(np.diff(c,axis=0),axis=1))];n=max(4,int(d[-1]/6.5));s=np.linspace(0,d[-1],n,endpoint=False)
         pts+=list(np.c_[np.interp(s,d,c[:,0]),np.interp(s,d,c[:,1])])
     # anéis internos (8 px e 20 px abaixo da borda): triângulos de contorno pequenos, sem fendas
-    for r,step in ((8,13),(20,19)):
+    for r,step in ((6,8),(14,11),(24,15)):
         mi=cv2.erode(m_in,cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(2*r+1,2*r+1)))
         for c in cv2.findContours(mi,cv2.RETR_LIST,cv2.CHAIN_APPROX_NONE)[0]:
             c=c[:,0,:].astype(float)
@@ -77,7 +77,7 @@ def make_mesh(png,dense_pts=(),h_base=34,h_fine=15,fine_r=150):
     dt=cv2.distanceTransform(m_in,cv2.DIST_L2,5)
     def grid(h,sel=None):
         g=np.mgrid[0:H:h,0:W:h].reshape(2,-1).T[:,::-1].astype(float)+h/2
-        g=g[dt[g[:,1].astype(int).clip(0,H-1),g[:,0].astype(int).clip(0,W-1)]>26]
+        g=g[dt[g[:,1].astype(int).clip(0,H-1),g[:,0].astype(int).clip(0,W-1)]>17]
         return g[sel(g)] if sel is not None else g
     def dense(g):
         ok=np.zeros(len(g),bool)
@@ -86,11 +86,11 @@ def make_mesh(png,dense_pts=(),h_base=34,h_fine=15,fine_r=150):
     parts=[pts,grid(h_base)]
     if dense_pts: parts.append(grid(h_fine,dense))
     allp=np.vstack(parts);keep=np.ones(len(allp),bool);tr=cKDTree(allp[:len(pts)])
-    for i in range(len(pts),len(allp)): keep[i]=tr.query(allp[i])[0]>9
+    for i in range(len(pts),len(allp)): keep[i]=tr.query(allp[i])[0]>5.5
     allp=allp[keep];sel=np.ones(len(allp),bool);tr=cKDTree(allp)
     for i in range(len(pts),len(allp)):
         if not sel[i]: continue
-        for j in tr.query_ball_point(allp[i],10.0):
+        for j in tr.query_ball_point(allp[i],6.5):
             if j>i: sel[j]=False
     allp=allp[sel];T=Delaunay(allp).simplices
     def inm(q): return m[q[:,1].round().astype(int).clip(0,H-1),q[:,0].round().astype(int).clip(0,W-1)]>0
@@ -145,7 +145,10 @@ def build_view(dbname,bones,layers,outdir,fps=60):
     names=[b[0] for b in bones];slots=[];skin=[];atlases=[];stats={}
     for L in layers:
         png=f"{outdir}/{dbname}_{L['name']}.png";rasterize(L['paths'],png)
-        V,T=make_mesh(png,L.get('dense',()));Wt=diffuse_weights(V,T,names,L.get('caps',[]),L.get('rigid'))
+        V,T=make_mesh(png,L.get('dense',()))
+        if L.get('grad'):
+            a,b,y0,y1=L['grad'];Wt=np.zeros((len(V),len(names)));w=np.clip((V[:,1]-y0)/(y1-y0),0,1);Wt[:,names.index(a)]=1-w;Wt[:,names.index(b)]=w
+        else: Wt=diffuse_weights(V,T,names,L.get('caps',[]),L.get('rigid'))
         slots.append({'name':L['name'],'parent':'root'});skin.append({'name':L['name'],'display':[display(L['name'],V,T,Wt,bones)]})
         atlases.append({'name':dbname,'imagePath':f"{dbname}_{L['name']}.png",'width':W,'height':H,'SubTexture':[{'name':L['name'],'x':0,'y':0,'width':W,'height':H}]})
         stats[L['name']]=(len(V),len(T))

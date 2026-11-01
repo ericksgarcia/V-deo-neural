@@ -32,3 +32,9 @@ Vídeo: `saida/jesus_v4.mp4` (17,5 s). Rodar: `mesh/bin/python poc2/make_rigs.py
 - Camadas do perfil: pé de trás, pé da frente, corpo, braço (o manto fica por cima das pernas; pele da perna estendida para cima, escondida sob a barra).
 - Passada menor (±120) e velocidade 100 px/s para os pés não saírem do manto.
 - Malha: anéis internos de pontos junto à borda eliminam as fendas brancas (triângulos longos removidos em concavidades).
+
+### v6: malha 3x + andar refeito no DragonBones
+- Densidade ~3x (frente 9.064 vértices, costas 8.826; perfil em 6 camadas: perna/pé de trás, perna/pé da frente, corpo, braço).
+- Andar: ciclo único (pé plantado, rolagem calcanhar->ponta, pélvis, braço), IK analítico de 2 ossos (coxa/canela/pé) em `poc2/page.js`; fase ligada à distância percorrida (o pé não desliza ao frear); canela com pesos em gradiente (canela->pé).
+- Pé de trás reconstruído (a arte escondia o antepé atrás do pé da frente): cópia do pé da frente deslocada e mais escura.
+- Teste paralelo (poc3/): Blender (bpy 5.2.3, Cycles CPU ~0,8 s/quadro) montou a mesma malha com armadura+IK e confirmou o ciclo; o Inox2D (Inochi2D) compilou para WASM (poc3/inox_wasm). Comparação interrompida a pedido; ficou como referência.

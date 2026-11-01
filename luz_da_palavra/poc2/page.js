@@ -32,7 +32,7 @@ let lastT=-1;
 
 // ---------- linha do tempo ----------
 const st={x:-120,view:0,sq:1,rF:0,wF:0,rB:0,wB:0};
-const VEL=100,X0=-120,X1=560,X2=640;
+const VEL=2*120/(0.6*1.2)*0.29,X0=-120,X1=560,X2=640;
 const tl=gsap.timeline({paused:true});let t0=0;
 tl.to(st,{x:X1,duration:(X1-X0)/VEL,ease:'none'},0);t0=(X1-X0)/VEL;
 tl.to(st,{x:X2,duration:1.0,ease:'power2.out'},t0);t0+=1.25;
@@ -64,24 +64,45 @@ function poseT(v,t,r,w,dt){
   const hd=sp.head.step(-0.9*ch+0.8*osc*w,dt);setB(v,'head',hd);
   const sk=sp.skirt.step(0.9*osc*w-0.8*ch,dt);setB(v,'skirt',sk);
 }
-function poseSide(t,walking,dist,dt){
-  const ph=dist*0.045,s=Math.sin(ph),c=Math.cos(ph),A=120,LIFT=30;
-  if(walking){
-    setB('side','ankF',-10*Math.max(0,c)+0*s,-A*s,-LIFT*Math.max(0,c));setB('side','ankB',-10*Math.max(0,-c),A*s,-LIFT*Math.max(0,-c));
-    setB('side','pelvis',0,0,-16*(Math.cos(2*ph)+1)/2);setB('side','chest',1.1*Math.sin(2*ph));
-    setB('side','sho',-11*s);setB('side','elb',-3*Math.max(0,-s));setB('side','fore1',-4*Math.max(0,-s));setB('side','hand',2*s);
-    setB('side','neck',-1.1*Math.sin(2*ph));
-    const hd=sp.head.step(1.2*Math.sin(2*ph+0.6),dt);setB('side','head',hd);
-    setB('side','skirt',sp.skirt.step(-3.5*Math.sin(ph+0.6),dt));
-  }else{
-    setB('side','ankF',0,0,0);setB('side','ankB',0,0,0);setB('side','pelvis',0,0,Math.sin(t*1.7)*2);setB('side','chest',0.35*Math.sin(t*1.7));
-    setB('side','sho',sp.hair.step(0,dt));setB('side','elb',0);setB('side','fore1',0);setB('side','hand',0);setB('side','neck',0);
-    setB('side','head',sp.head.step(0,dt));setB('side','skirt',sp.skirt.step(0,dt));
+// ---------- caminhada: ciclo único (pés plantados, rolagem do pé, IK de 2 ossos) ----------
+const WA=120,WT=1.2,WST=0.6,WL=42,V_PX=2*WA/(WST*WT)*0.29;        // px/s de tela do corpo para o pé de apoio ficar parado no chão
+const wsm=u=>{u=clamp(u,0,1);return u*u*(3-2*u)};
+function wfoot(phi){const u=((phi%1)+1)%1;let dx,up,pitch;
+  if(u<WST){const s=u/WST;dx=-WA+2*WA*s;up=0;pitch=10*(1-wsm(s/0.18))+(-24*wsm((s-0.80)/0.20))}
+  else{const s=(u-WST)/(1-WST),e=wsm(s)*0.85+s*0.15;dx=WA-2*WA*e;up=WL*Math.pow(Math.sin(Math.PI*s),0.8);pitch=-24+34*wsm(s*1.2)}
+  return [dx,up,pitch]}
+function wbody(phi){const c=Math.cos(2*Math.PI*phi),c2=Math.sin(4*Math.PI*phi);
+  return {pelvis_up:-14*(1+Math.cos(4*Math.PI*phi))/2,chest:1.1*c2,neck:-1.1*c2,head:1.2*Math.sin(4*Math.PI*phi+0.6),sho:-11*c,elb:-3.5*Math.max(0,c),fore1:-4*Math.max(0,c),hand:2*c,skirt:-3.5*Math.sin(2*Math.PI*phi+0.6)}}
+const LEG={F:{H:[1040,1100],K:[1010,1500],A:[1030,1925]},B:{H:[1090,1100],K:[1070,1500],A:[1130,1925]}};
+function ik2(Hm,H,K0,A0,T){
+  const L1=Math.hypot(K0[0]-H[0],K0[1]-H[1]),L2=Math.hypot(A0[0]-K0[0],A0[1]-K0[1]);
+  const dx=T[0]-Hm[0],dy=T[1]-Hm[1];let d=Math.hypot(dx,dy);d=Math.min(d,L1+L2-1e-3);d=Math.max(d,Math.abs(L1-L2)+1e-3);
+  const a=Math.atan2(dy,dx),A=Math.acos(clamp((L1*L1+d*d-L2*L2)/(2*L1*d),-1,1));
+  const k1=[Hm[0]+L1*Math.cos(a-A),Hm[1]+L1*Math.sin(a-A)],k2=[Hm[0]+L1*Math.cos(a+A),Hm[1]+L1*Math.sin(a+A)];
+  const K=k1[0]<k2[0]?k1:k2;                                          // joelho dobra para a frente (-x)
+  const th0=Math.atan2(K0[1]-H[1],K0[0]-H[0]),sh0=Math.atan2(A0[1]-K0[1],A0[0]-K0[0]);
+  const th=Math.atan2(K[1]-Hm[1],K[0]-Hm[0]),sh=Math.atan2(T[1]-K[1],T[0]-K[0]);
+  return {thigh:th-th0,shinAbs:sh-sh0,shin:(sh-sh0)-(th-th0)};
+}
+let prevX=null;
+function poseSide(t,dt){
+  const dist=Math.max(0,st.x-X0),phi=dist/(V_PX*WT);                  // fase ligada à distância => pés plantados mesmo ao frear
+  const spd=prevX===null?0:Math.abs(st.x-prevX)/Math.max(dt,1e-6);prevX=st.x;
+  const G=clamp(spd/V_PX,0,1),I=1-G,w=wbody(phi),r=a=>a/RAD;
+  const bob=-w.pelvis_up*G+Math.sin(t*1.7)*2*I;setB('side','pelvis',0,0,bob);
+  for(const [s,off] of [['F',0],['B',0.5]]){
+    const L=LEG[s],f=wfoot(phi+off),T=[L.A[0]+f[0]*G,L.A[1]-f[1]*G],Hm=[L.H[0],L.H[1]+bob];
+    const k=ik2(Hm,L.H,L.K,L.A,T);
+    setB('side','thigh'+s,r(k.thigh));setB('side','shin'+s,r(k.shin));setB('side','foot'+s,f[2]*G-r(k.shinAbs));
   }
+  setB('side','chest',w.chest*G+0.35*Math.sin(t*1.7)*I);setB('side','neck',w.neck*G);
+  setB('side','sho',w.sho*G);setB('side','elb',w.elb*G);setB('side','fore1',w.fore1*G);setB('side','hand',w.hand*G);
+  setB('side','head',sp.head.step(w.head*G,dt));setB('side','skirt',sp.skirt.step(w.skirt*G,dt));
 }
 function seek(t){
   const dt=1/240;
   if(t<lastT){lastT=-1;for(const k in sp){sp[k].x=0;sp[k].v=0}}
+  if(lastT<0){prevX=null;tl.time(0);stepPose(0,1/240)}
   let cur=Math.max(0,lastT<0?0:lastT);
   // avança as molas em subpassos até t (sequencial)
   const names=['side','front','back'],nm=names[st.view];
@@ -89,11 +110,10 @@ function seek(t){
   lastT=t;tl.time(Math.min(t,tl.duration()));finish(t);
 }
 function stepPose(t,dt){const nm=['side','front','back'][st.view];
-  if(nm==='side')poseSide(t,st.x<X2-0.5,Math.max(0,st.x-X0),dt);else if(nm==='front')poseT('front',t,st.rF,st.wF,dt);else poseT('back',t,st.rB,st.wB,dt)}
+  if(nm==='side')poseSide(t,dt);else if(nm==='front')poseT('front',t,st.rF,st.wF,dt);else poseT('back',t,st.rB,st.wB,dt)}
 function finish(t){
   const idx=st.view,nm=['side','front','back'][idx];
   for(const k of ['front','back','side'])V[k].h.visible=(k===nm);
-  stepPose(t,0.0001);
   const v=V[nm];v.a.invalidUpdate(null,true);v.a.advanceTime(0);
   const dir=nm==='side'?-1:1;v.h.position.set(st.x,GROUND);v.h.scale.set(S*st.sq*dir,S);
   shadow.clear();shadow.beginFill(0x000000,0.1);shadow.drawEllipse(st.x,GROUND+6,Math.max(18,120*st.sq*(nm==='side'?0.9:1.25)),11);shadow.endFill();
