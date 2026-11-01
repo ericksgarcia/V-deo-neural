@@ -148,7 +148,9 @@ def build_view(dbname,bones,layers,outdir,fps=60):
         V,T=make_mesh(png,L.get('dense',()))
         if L.get('grad'):
             a,b,y0,y1=L['grad'];Wt=np.zeros((len(V),len(names)));w=np.clip((V[:,1]-y0)/(y1-y0),0,1);Wt[:,names.index(a)]=1-w;Wt[:,names.index(b)]=w
-        else: Wt=diffuse_weights(V,T,names,L.get('caps',[]),L.get('rigid'))
+        else:
+            Wt=diffuse_weights(V,T,names,L.get('caps',[]),L.get('rigid'))
+            if L.get('post'): Wt=L['post'](V,Wt,names)
         slots.append({'name':L['name'],'parent':'root'});skin.append({'name':L['name'],'display':[display(L['name'],V,T,Wt,bones)]})
         atlases.append({'name':dbname,'imagePath':f"{dbname}_{L['name']}.png",'width':W,'height':H,'SubTexture':[{'name':L['name'],'x':0,'y':0,'width':W,'height':H}]})
         stats[L['name']]=(len(V),len(T))

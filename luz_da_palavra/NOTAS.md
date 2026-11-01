@@ -38,3 +38,9 @@ Vídeo: `saida/jesus_v4.mp4` (17,5 s). Rodar: `mesh/bin/python poc2/make_rigs.py
 - Andar: ciclo único (pé plantado, rolagem calcanhar->ponta, pélvis, braço), IK analítico de 2 ossos (coxa/canela/pé) em `poc2/page.js`; fase ligada à distância percorrida (o pé não desliza ao frear); canela com pesos em gradiente (canela->pé).
 - Pé de trás reconstruído (a arte escondia o antepé atrás do pé da frente): cópia do pé da frente deslocada e mais escura.
 - Teste paralelo (poc3/): Blender (bpy 5.2.3, Cycles CPU ~0,8 s/quadro) montou a mesma malha com armadura+IK e confirmou o ciclo; o Inox2D (Inochi2D) compilou para WASM (poc3/inox_wasm). Comparação interrompida a pedido; ficou como referência.
+
+### v7: manto e pernas deformam juntos
+- Problema da v6: o manto tinha peso fixo na pelve e as pernas eram camadas rígidas; ao andar, a perna se movia e o tecido do joelho ficava parado (corte visível).
+- Agora o manto da malha do perfil tem pesos por difusão com restrições também nas cápsulas da coxa/canela (esquerda segue o pé da frente, direita o de trás), mas com influência parcial (25% acima do joelho -> 55% na barra, função `robe_follow` em `poc2/make_rigs.py`), para a barra se dobrar em vez de esticar entre os pés.
+- Pele da perna sobe até y=1650 escondida atrás do manto, então a perna nunca aparece cortada.
+- Limites conhecidos: pé de trás é cópia do da frente; soles retangulares; franja fina na barra; arte original não tem coxa/joelho (se o crédito do Replicate voltar, pedir ao Recraft uma folha só da parte de baixo com pernas e pés separados).

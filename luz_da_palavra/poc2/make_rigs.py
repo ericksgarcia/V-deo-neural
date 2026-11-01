@@ -48,15 +48,25 @@ def shift(d,dx):
 def dark(c,f=0.9): return '#%02x%02x%02x'%tuple(int(int(c[i:i+2],16)*f) for i in (1,3,5))
 fB=[(c,d) for c,d in fB if not d.startswith('M 1012 1991')]          # sola unida original sai (o pé de trás ganha cópia do pé da frente)
 fB=[(dark(c),shift(d,100)) for c,d in fF]+fB                          # forefoot que a arte escondia atrás do pé da frente
-tF.insert(0,('#d87f4b','M 985 1780 L 1075 1780 L 1075 1830 L 985 1830 z'));tB.insert(0,('#d87f4b','M 1085 1780 L 1176 1780 L 1176 1830 L 1085 1830 z'))
+tF.insert(0,('#d87f4b','M 985 1650 L 1075 1650 L 1075 1830 L 985 1830 z'));tB.insert(0,('#d87f4b','M 1085 1650 L 1176 1650 L 1176 1830 L 1085 1830 z'))   # pele da perna sobe escondida atrás do manto
 body.insert(1,('#fae4ca','M 985 1060 L 1185 1060 L 1185 1430 L 985 1430 z'))
+import numpy as np
+LEGB=['thighF','shinF','thighB','shinB']
+def robe_follow(V,Wt,names):
+    ix=[names.index(n) for n in LEGB];pel=names.index('pelvis')
+    y=V[:,1];f=0.25+0.30*np.clip((y-1500)/330.0,0,1)          # 25% acima do joelho -> 55% na barra
+    for j in ix:
+        mv=Wt[:,j]*(1-f);Wt[:,j]-=mv;Wt[:,pel]+=mv
+    return Wt
 PB=[('root',None,0,0),('pelvis','root',1060,1090),('skirt','pelvis',1060,1100),('chest','pelvis',1055,800),('neck','chest',1010,470),('head','neck',1010,470),
  ('sho','chest',1130,540),('elb','sho',1115,830),('fore1','elb',1105,950),('hand','fore1',1090,1100),
  ('thighF','pelvis',1040,1100),('shinF','thighF',1010,1500),('footF','shinF',1030,1925),('thighB','pelvis',1090,1100),('shinB','thighB',1070,1500),('footB','shinB',1130,1925)]
-PC=[('root',(1015,1160),(1015,1660),250),('skirt',(1015,1730),(1015,1830),250),('pelvis',(1060,1100),(1055,800),95),('chest',(1055,800),(1040,520),95),
+LEGC=[('thighF',(1040,1100),(1010,1500),32),('shinF',(1010,1500),(1018,1780),32),('thighB',(1090,1100),(1070,1500),32),('shinB',(1070,1500),(1108,1780),32)]
+PC=LEGC+[('pelvis',(1060,1100),(1055,800),95),('chest',(1055,800),(1040,520),95),
  ('neck',(1010,520),(1010,440),40),('head',(1010,440),(1010,110),135)]
 AC=[('sho',(1130,540),(1115,830),38),('elb',(1115,830),(1105,950),38),('fore1',(1105,950),(1090,1100),38),('hand',(1090,1100),(1075,1370),45)]
 st['side']=M.build_view('jesus_side',PB,[
- {'name':'legB','paths':tB,'grad':('shinB','footB',1850,1920)},{'name':'footB','paths':fB,'rigid':'footB'},{'name':'legF','paths':tF,'grad':('shinF','footF',1850,1920)},{'name':'footF','paths':fF,'rigid':'footF'},{'name':'body','paths':body,'caps':PC},
+ {'name':'legB','paths':tB,'grad':('shinB','footB',1850,1920)},{'name':'footB','paths':fB,'rigid':'footB'},{'name':'legF','paths':tF,'grad':('shinF','footF',1850,1920)},{'name':'footF','paths':fF,'rigid':'footF'},
+ {'name':'body','paths':body,'caps':PC,'post':robe_follow},
  {'name':'arm','paths':arm,'caps':AC,'dense':[(1130,540,150),(1115,830,160),(1085,1200,170)]}],OUT)
 print(json.dumps(st))
