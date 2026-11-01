@@ -1,0 +1,39 @@
+{
+  "slug": "ep01_fogo",
+  "ref": "JOÃO 21:9",
+  "titulo": ["JESUS ACENDEU", "O MESMO FOGO", "DA TRAIÇÃO"],
+  "fatos": [
+    "Joao 18:18 e 21:9 usam a mesma palavra grega, anthrakia (braseiro / fogo de brasas).",
+    "anthrakia aparece so nessas duas passagens em todo o Novo Testamento.",
+    "Pedro negou Jesus tres vezes (Jo 18:17, 25, 27); Jesus pergunta 'tu me amas?' tres vezes (Jo 21:15-17)."
+  ],
+  "imagens": [
+    "cinematic night scene, a single glowing charcoal fire of embers in a dark ancient Jerusalem courtyard, stone walls, orange sparks rising, deep teal shadows, volumetric light, epic biblical atmosphere, no text, vertical composition",
+    "silhouette of a bearded man in an ancient robe warming his hands over a charcoal fire at night, seen from behind, ancient courtyard, rooster on a wall in the distance, moody cinematic lighting, orange and teal, no face visible, no text",
+    "an ancient scroll with greek handwriting lit by candlelight, dust particles floating in golden light, dark background, cinematic macro photography, mysterious, no readable text",
+    "dramatic sunrise over the sea of galilee, calm water, mist, golden rays breaking through dark clouds, small wooden fishing boat in the distance, epic cinematic landscape, no text",
+    "a small charcoal fire with embers and grilled fish and bread on a quiet beach at dawn, sea of galilee, soft golden light, smoke rising, cinematic, peaceful and emotional, no people, no text",
+    "two silhouettes sitting by a small fire on the shore at dawn, seen from far behind, sea and golden sky, god rays, cinematic, emotional, faces not visible, no text",
+    "majestic heavenly light breaking through storm clouds over dark cliffs and ocean, divine rays, epic cinematic sky, hope, no text",
+    "glowing sunrise sky with golden clouds above mountains, rays of light, peaceful and majestic, cinematic, no text"
+  ],
+  "cenas": [
+    {"img": 0, "fala": "Jesus acendeu o mesmo *fogo* onde Pedro o negou.", "titulo": true},
+    {"img": 0, "fala": "E quase ninguém percebe esse *detalhe*."},
+    {"img": 1, "fala": "Na noite da prisão, Pedro se esquentava num *braseiro*.", "card": "A NOITE DA PRISÃO"},
+    {"img": 1, "fala": "E ali, três vezes, ele *negou* conhecer Jesus."},
+    {"img": 2, "fala": "Mas presta atenção, porque a Bíblia deixou uma *pista*.", "card": "MAS ESPERA…"},
+    {"img": 2, "fala": "No grego, a palavra *braseiro* aparece só duas vezes no Novo Testamento."},
+    {"img": 3, "fala": "A primeira, na *traição*. A segunda… vai te *arrepiar*.", "card": "A 2ª VEZ…"},
+    {"img": 3, "fala": "Depois de ressuscitar, Jesus espera Pedro na *praia*."},
+    {"img": 4, "fala": "E quando Pedro chega… tem um *braseiro* aceso.", "card": "O MESMO FOGO"},
+    {"img": 4, "fala": "A mesma cena da *pior noite* da vida dele."},
+    {"img": 5, "fala": "Aí Jesus pergunta: Pedro, você me *ama*?"},
+    {"img": 5, "fala": "Não uma vez. *Três*. Uma pra cada negação.", "card": "3 VEZES"},
+    {"img": 6, "fala": "Ele não voltou ao fogo pra *acusar*. Voltou pra *curar*.", "card": "PRA CURAR"},
+    {"img": 6, "fala": "Se você carrega um erro antigo, isso é *pra você*."},
+    {"img": 7, "fala": "*Curte* e comenta amém.", "cta": "Comente: AMÉM"},
+    {"img": 7, "fala": "Porque Deus te leva de volta ao lugar da queda… pra te *levantar* ali."}
+  ],
+  "legenda": "Jesus acendeu o MESMO fogo onde Pedro o negou 🔥 e quase ninguém percebe.\nManda pra alguém que ainda carrega um erro antigo. 🙏\nComenta AMÉM se isso falou com você.\n\n#jesus #biblia #fe #deus #evangelho"
+}
