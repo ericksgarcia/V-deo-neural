@@ -1,0 +1,20 @@
+{
+ "output": {
+  "image": "<data-uri>",
+  "style_id": "aa33130d-9e42-4fd3-a6c4-e36b0c753e76"
+ },
+ "metrics": {
+  "generic_output_count": 1,
+  "image_output_count": 1,
+  "predict_time": 26.278223111,
+  "total_time": 26.291219708
+ },
+ "input": {
+  "size": "2048x2048",
+  "style_match": "precise",
+  "style_reference_images": [
+   "https://api.replicate.com/v1/files/ZDljYTdhOTQtY2MzMC00Yzc2LWIwMGMtN2FkYzRmMDViYTk5.png",
+   "https://api.replicate.com/v1/files/YmIyZmQyYjMtMjUwYy00M2RjLWI3OTYtNzEwZGM3ODU5NzM2.png"
+  ]
+ }
+}
