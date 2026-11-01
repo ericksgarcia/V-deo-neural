@@ -1,0 +1,6 @@
+<defs>
+	<linearGradient id="Gradient1" gradientUnits="userSpaceOnUse" x1="809.63" y1="462.749" x2="884.011" y2="555.457">
+		<stop class="stop0" offset="0" stop-opacity="1" stop-color="rgb(208,206,205)"/>
+		<stop class="stop1" offset="1" stop-opacity="1" stop-color="rgb(255,255,255)"/>
+	</linearGradient>
+</defs>

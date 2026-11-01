@@ -11,4 +11,4 @@ def gerar(prompt,saida,size="768x1536"):
     if p["status"]!="succeeded": raise SystemExit(p)
     out=p["output"]; url=out[0] if isinstance(out,list) else out
     open(saida,"wb").write(requests.get(url,timeout=60).content); print(saida,p.get("metrics"))
-if __name__=="__main__": gerar(sys.argv[2],sys.argv[1])
+if __name__=="__main__": gerar(sys.argv[2],sys.argv[1],sys.argv[3] if len(sys.argv)>3 else "768x1536")

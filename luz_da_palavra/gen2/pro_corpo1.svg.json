@@ -1,0 +1,19 @@
+{
+ "id": "48xv52ff7drmr0d1jx4834nvag",
+ "style_id": "fac93775-97c5-449b-8d91-c16aae385d64",
+ "metrics": {
+  "image_output_count": 1,
+  "generic_output_count": 1,
+  "predict_time": 26.218974073,
+  "total_time": 26.243162967
+ },
+ "input": {
+  "size": "2048x2048",
+  "style_match": "precise",
+  "style_reference_images": [
+   "https://api.replicate.com/v1/files/NjFjZWQxZDUtMmUxZC00YzI5LTgyYmYtMzhjM2E5OTUyZmVl.png",
+   "https://api.replicate.com/v1/files/ZTI2ZWQxNDEtZjJmNy00ODIwLTgzNmUtZWFjZmY0YmM1Mjhj.png",
+   "https://api.replicate.com/v1/files/MDQ5ZTFjNjMtZmFmNS00ZjU0LWE5ZTAtNzQwZmFhNWM2MzFh.png"
+  ]
+ }
+}
