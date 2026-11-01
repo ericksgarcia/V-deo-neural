@@ -158,3 +158,32 @@ def build_view(dbname,bones,layers,outdir,fps=60):
       'aabb':{'x':0,'y':0,'width':W,'height':H},'bone':bone_json(bones),'slot':slots,'skin':[{'name':'','slot':skin}],'animation':[],'defaultActions':[]}]}
     json.dump(ske,open(f'{outdir}/{dbname}_ske.json','w'),separators=(',',':'));json.dump(atlases,open(f'{outdir}/{dbname}_atlas.json','w'))
     return stats
+
+
+def prep_png(src,dst):
+    """raster RGBA -> alfa binário, 2 px erodidos (tira a franja branca do fundo) e cor propagada para fora"""
+    from scipy import ndimage
+    a=np.array(Image.open(src).convert('RGBA'));op=a[...,3]>128
+    op=ndimage.binary_erosion(op,iterations=2)
+    a[...,3]=np.where(op,255,0).astype(np.uint8)
+    idx=ndimage.distance_transform_edt(~op,return_distances=False,return_indices=True)
+    rgb=a[...,:3][idx[0],idx[1]];a[...,:3]=rgb
+    Image.fromarray(a).save(dst)
+
+def build_view_png(dbname,bones,layers,outdir,fps=60):
+    names=[b[0] for b in bones];slots=[];skin=[];atlases=[];stats={}
+    for L in layers:
+        png=f"{outdir}/{dbname}_{L['name']}.png";prep_png(L['png'],png)
+        V,T=make_mesh(png,L.get('dense',()),h_base=L.get('h_base',20),h_fine=L.get('h_fine',9))
+        if L.get('grad'):
+            a,b,y0,y1=L['grad'];Wt=np.zeros((len(V),len(names)));w=np.clip((V[:,1]-y0)/(y1-y0),0,1);Wt[:,names.index(a)]=1-w;Wt[:,names.index(b)]=w
+        else:
+            Wt=diffuse_weights(V,T,names,L.get('caps',[]),L.get('rigid'))
+            if L.get('post'): Wt=L['post'](V,Wt,names)
+        slots.append({'name':L['name'],'parent':'root'});skin.append({'name':L['name'],'display':[display(L['name'],V,T,Wt,bones)]})
+        atlases.append({'name':dbname,'imagePath':f"{dbname}_{L['name']}.png",'width':W,'height':H,'SubTexture':[{'name':L['name'],'x':0,'y':0,'width':W,'height':H}]})
+        stats[L['name']]=(len(V),len(T))
+    ske={'name':dbname,'version':'5.5','compatibleVersion':'5.5','frameRate':fps,'armature':[{'type':'Armature','name':'jesus','frameRate':fps,
+      'aabb':{'x':0,'y':0,'width':W,'height':H},'bone':bone_json(bones),'slot':slots,'skin':[{'name':'','slot':skin}],'animation':[],'defaultActions':[]}]}
+    json.dump(ske,open(f'{outdir}/{dbname}_ske.json','w'),separators=(',',':'));json.dump(atlases,open(f'{outdir}/{dbname}_atlas.json','w'))
+    return stats

@@ -47,3 +47,10 @@ Vídeo: `saida/jesus_v4.mp4` (17,5 s). Rodar: `mesh/bin/python poc2/make_rigs.py
 
 ### v8: pés redesenhados
 Os fragmentos de sandália do SVG do Recraft (peças separadas, antepé escondido atrás do outro pé) foram descartados; `poc2/foot_art.py` desenha a sandália de perfil em vetor (sola, pé, dedos, tiras) e a mesma peça serve aos dois pés (o de trás mais escuro). Verificado em escala 4x em 4 instantes do ciclo.
+
+### v9: partindo das imagens raster novas (frente, costas, perfil) — `base/` + `poc4/`
+- `base/prep.py`: recorta o fundo (flood-fill de branco/cinza claro conectado à borda), escala para o canvas 2048 com pés em y=2025.
+- `poc4/make_rigs4.py`: malha densa (~8,6 mil vértices frente/costas) direto sobre a arte raster (`meshlib.build_view_png`), pesos por difusão. Perfil: pernas (cópia mais escura para o pé de trás), corpo e braço em camadas.
+- O perfil novo olha para a DIREITA: o personagem entra pela esquerda andando para a direita (sem espelhar).
+- Spine/Harmony/Moho avaliados: Moho e Harmony são editores GUI pagos (não rodam aqui). O runtime do Spine exige licença do Spine Editor por usuário (LICENSE do pacote @esotericsoftware/spine-webgl), então NÃO foi usado.
+- Limite atual: no perfil o braço vem aberto (T) e fundido ao tronco; a emenda do ombro aparece ao baixar o braço. Melhor correção: regenerar o perfil com braços para baixo (mesma identidade).
