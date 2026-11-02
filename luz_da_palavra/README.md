@@ -37,7 +37,11 @@ Saída: `saida/luz/<slug>.mp4` e `saida/luz/<slug>_legenda.txt`.
   fotografia **ultra realista** (câmera/lente reais, luz natural, textura real; nada de cara de ilustração, pintura,
   3D ou CGI; `ESTILO_IMG` é anexado a todo prompt). Natureza variada (montanhas, florestas, lagos, cachoeiras, céu,
   desertos, oliveiras) com cores vivas porém verdadeiras. Escreva os prompts de cena em inglês, descrevendo uma FOTO
-  de um lugar real; sem rosto de Jesus, sem texto na imagem. Letra com halo escuro + contorno para ler em qualquer fundo.
+  de um lugar real; sem rosto de Jesus, sem texto na imagem.
+  **Nunca use negação no prompt de cena** ("no lanterns", "no railings"): o flux-schnell ignora o "no" e desenha o objeto
+  (ep05: lanternas elétricas e corrimão). Descreva só o que DEVE aparecer, com materiais de época (pedra bruta, barro, fogo, lamparina).
+  **Evite casas, becos e vilas**: o flux-schnell faz arquitetura moderna (luminária elétrica, calha, chaminé, vidraça, telha
+  europeia) mesmo com prompt de época (ep05, 3 tentativas). Prefira natureza e objetos simples em close (lamparina de barro, jarro, pão, tecido, pedra). Letra com halo escuro + contorno para ler em qualquer fundo.
 - **Limite do Replicate:** conta com pouco crédito leva 429; o gerador espera e tenta de novo sozinho (~4 min por vídeo).
 - **Voz por episódio:** `estilo_extra` no JSON acrescenta direção de voz específica do vídeo (ex.: onde sussurrar).
   `voz_cache` aponta um áudio antigo já pago (usado no EP01, que tem o estilo antigo).
@@ -128,3 +132,4 @@ replays). Regras (o conferidor e o analista automático cobram):
 | 02 | Jesus chorou sabendo que ia ressuscitar Lázaro (Jo 11) | JOÃO 11:35 | 53 s | Jesus chorou diante de um túmulo que Ele mesmo ia abrir 😢 | pronto (flux-schnell; 1 requisição Achird) |
 | 03 | Deus não estava no vento, terremoto nem fogo: falou num sussurro (1 Rs 19) | 1 REIS 19:12 | 48 s | 3 vezes Deus passou por Elias, e não estava lá 🌬️ | pronto (flux-schnell; 1 requisição Achird efetiva; a 1ª falhou com 401 por falta de chave, sem áudio). Analistas depois: gancho impreciso e logo na img 2; dono decidiu não refazer |
 | 04 | Jesus dormia na tempestade depois de dizer "vamos para o outro lado" (Mc 4) | MARCOS 4:35-39 | 54 s | Até pescadores acharam que iam morrer, e Jesus dormia 🌊 | pronto (flux-schnell; 1 requisição Achird; 3 analistas Claude APROVADO; avisos de contraste nas imagens 1, 4 e 6) |
+| 05 | Doze anos: a mulher doente e a filha de Jairo (Mc 5) | MARCOS 5:22-42 | 52 s | Jesus parou no caminho, e a filha de Jairo morreu 😢 | publicado no TikTok pelo Buffer (1ª vez sem revisão do dono; música do dono; cor de cinema; 1 requisição Achird; 5 analistas Claude APROVADO; imagens 1 e 4 refeitas 3x por anacronismo) |

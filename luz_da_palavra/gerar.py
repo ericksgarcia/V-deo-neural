@@ -182,7 +182,7 @@ def tratamento(im):
     # vibrância + saturação
     cinza = x.mean(2, keepdims=True)
     sat = (x.max(2, keepdims=True) - x.min(2, keepdims=True))
-    x = np.clip(cinza + (x - cinza) * (1.18 + 0.55 * (1 - sat)), 0, 1)
+    x = np.clip(cinza + (x - cinza) * (1.10 + 0.50 * (1 - sat)), 0, 1)
     # bloom: as luzes fortes ganham um halo quente
     luz = np.clip((x.mean(2, keepdims=True) - 0.62) / 0.38, 0, 1) * x
     halo = np.asarray(Image.fromarray((luz * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(22)), np.float32) / 255

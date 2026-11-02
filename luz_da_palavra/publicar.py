@@ -80,7 +80,7 @@ def sobe_r2(mp4, chave):
                       aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"])
     s3.upload_file(mp4, os.environ["R2_BUCKET"], chave, ExtraArgs={"ContentType": "video/mp4"})
     url = os.environ["R2_PUBLIC_URL"].rstrip("/") + "/" + chave
-    req = urllib.request.Request(url, method="HEAD")
+    req = urllib.request.Request(url, method="HEAD", headers={"User-Agent": "luz-da-palavra/1.0"})  # a Cloudflare barra o UA do Python
     with urllib.request.urlopen(req, timeout=60) as r:
         tam = int(r.headers.get("Content-Length", 0))
         tipo = r.headers.get("Content-Type", "")
