@@ -5,9 +5,12 @@ Canal separado do de IA. Formato: vídeo vertical 1080x1920, **imagem de fundo g
 legenda em serifa creme com palavra-chave dourada, cartões de re-gancho e botão "Comente: AMÉM".
 
 ```bash
-python luz_da_palavra/gerar.py luz_da_palavra/roteiros/ep01_fogo.json --so-texto     # texto + tempo previsto
-python luz_da_palavra/gerar.py luz_da_palavra/roteiros/ep01_fogo.json --sem-imagens  # rascunho (fundo provisório)
-python luz_da_palavra/gerar.py luz_da_palavra/roteiros/ep01_fogo.json                # final, com Replicate
+python luz_da_palavra/temas.py                                          # temas feitos e quando liberam (2 meses)
+python luz_da_palavra/temas.py --checa "lazaro chorou"                  # há algo parecido no prazo?
+python luz_da_palavra/conferir.py luz_da_palavra/roteiros/ep02_lazaro.json   # confere ganchos (zero FALHA)
+python luz_da_palavra/gerar.py luz_da_palavra/roteiros/ep02_lazaro.json --so-texto     # texto + tempo previsto
+python luz_da_palavra/gerar.py luz_da_palavra/roteiros/ep02_lazaro.json --sem-imagens  # rascunho (fundo provisório)
+python luz_da_palavra/gerar.py luz_da_palavra/roteiros/ep02_lazaro.json                # final
 ```
 
 Saída: `saida/luz/<slug>.mp4` e `saida/luz/<slug>_legenda.txt`.
@@ -41,27 +44,40 @@ Saída: `saida/luz/<slug>.mp4` e `saida/luz/<slug>_legenda.txt`.
 
 `ref` (topo), `titulo` (3 linhas, a última em dourado), `imagens` (prompts em inglês, sem rosto de Jesus, sem texto),
 `cenas` (`fala` com `*destaque*`, `img`, opcional `card`, `cta`, `titulo`), `fatos` (fonte de cada afirmação),
-`legenda` do post.
+`tema_id`/`tema` (para a lista de 2 meses), `ganchos` (3 candidatos), `revelacao` (índice da cena), `legenda` do post.
 
-## Receita de retenção (pedido do dono, nov/2026)
+## Lista de temas (validade de 2 meses)
 
-1. **0-3 s, gancho que para o dedo:** afirmação chocante e verdadeira, concreta, com um nome bíblico
-   ("Jesus acendeu o mesmo fogo onde Pedro o negou"). Título grande na tela ao mesmo tempo. Nunca começar com
-   "Olá"/"Você sabia".
-2. **3-6 s, laço aberto:** "e quase ninguém percebe esse detalhe" / "a maioria lê errado".
-3. **A cada ~5 s um re-gancho**, falado E visual (cartão dourado grande com som de impacto suave):
-   "Mas presta atenção…", "A segunda… vai te arrepiar", "E quando ele chega…", "Não uma vez. Três.".
-   Antes de cada revelação use "…" (vira pausa de suspense) e responda na cena seguinte.
-4. **Uma pista "escondida" verificável** (palavra no hebraico/grego, número, paralelo entre passagens). Toda
-   afirmação precisa estar em `fatos` com o versículo. Nada inventado.
-5. **Virada pessoal** perto do fim: "Se você carrega um erro antigo, isso é pra você."
-6. **CTA curto** ("Curte e comenta amém") ANTES da última frase, para quem ainda está vendo.
-7. **Última frase** fecha a mensagem e ecoa o gancho (dá vontade de rever).
-8. Cenas de até ~14 palavras; 120-140 palavras no total.
+`temas.json` guarda cada vídeo feito (`tema_id`, `tema`, `ref`, data e `libera_em` = data + 60 dias). O conferidor e o gerador
+**bloqueiam** um roteiro que repita, dentro do prazo, o mesmo `tema_id`, a mesma passagem (livro + capítulo) ou 3+ palavras-chave
+do título/tema. O gerador registra o tema sozinho quando o vídeo final sai (rascunho não registra). Passados 60 dias o tema
+libera, mas só repita com um ângulo novo.
+
+## Receita de ganchos (apelação máxima; o `conferir.py` cobra isto)
+
+**Gancho inicial (0-3 s), a coisa mais importante.** <= 12 palavras, nome bíblico + choque, escrito grande na tela em 0 s,
+nunca começa com saudação/"você sabia"/"hoje", nunca entrega a resposta. Fórmulas que funcionam:
+1. *Contradição concreta:* "Jesus chorou diante de um túmulo que Ele mesmo ia abrir."
+2. *Pergunta-armadilha:* "Jesus sabia o final. Então por que chorou?"
+3. *Número + nome:* "Pedro negou 3 vezes. Jesus perguntou 3 vezes."
+4. *Identificação:* "Se você carrega um erro antigo, escuta isto."
+Liste 3 candidatos em `ganchos` e marque o escolhido. Efeito na tela: soco de zoom + clarão dourado + som de impacto.
+
+**Laço aberto (3-6 s).** A 2ª fala promete recompensa: "quase ninguém percebe esse detalhe", "o motivo vai mexer com você".
+
+**Re-gancho a cada <= 5,5 s** (cartão dourado grande com soco de zoom, ou "…" com pausa de suspense, ou pergunta). Sempre abra o
+próximo laço antes de fechar o anterior. Tipos: "MAS ESPERA…", "A 2ª VEZ…", número ("3 VEZES"), mini-revelação parcial,
+pergunta sem resposta imediata. **Contagem regressiva:** marque `"revelacao": <índice da cena>` e a tela mostra
+"A REVELAÇÃO VEM EM 12s" nos 16 s anteriores. O conferidor mede os intervalos pelos tempos reais da voz.
+
+**Revelação** entre 40% e 60% do vídeo, com pausa antes. **Virada pessoal** (~80%): "isso é pra você". **CTA curto** ("Curte e
+comenta amém") antes da última fala. **Última fala** retoma uma palavra do gancho (laço que dá vontade de rever).
+
+**Honestidade:** `fatos` com o versículo de cada afirmação; cenas de até ~14 palavras; 100-145 palavras no total.
 
 ## Episódios
 
 | Ep | Tema | Ref | Duração | Linha 1 da legenda | Estado |
 |----|------|-----|---------|--------------------|--------|
-| 01 | O mesmo fogo (anthrakia: Jo 18:18 e 21:9) | JOÃO 21:9 | 53 s | Jesus acendeu o MESMO fogo onde Pedro o negou 🔥 | pronto (imagens ainda no estilo antigo, ilustrado; 2 requisições de voz: a 1ª Charon, descartada) |
+| 01 | O mesmo fogo (anthrakia: Jo 18:18 e 21:9) | JOÃO 21:9 | 53 s | Jesus acendeu o MESMO fogo onde Pedro o negou 🔥 | pronto (imagens flux-schnell; 2 requisições de voz: a 1ª Charon, descartada) |
 | 02 | Jesus chorou sabendo que ia ressuscitar Lázaro (Jo 11) | JOÃO 11:35 | 53 s | Jesus chorou diante de um túmulo que Ele mesmo ia abrir 😢 | pronto (flux-schnell; 1 requisição Achird) |

@@ -1,4 +1,2 @@
 numpy>=2.0
 pillow>=10
-pycairo>=1.25
-faster-whisper>=1.0
