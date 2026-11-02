@@ -45,7 +45,7 @@ Este repositório contém SÓ esse canal (o antigo canal de simulações de IA f
   Sem rosto de Jesus, sem texto na imagem, sem negação no prompt e sem casas/becos (saem modernos; ver README).
 - **Transições:** fusão suave entre imagens (dissolve de 1 s com desfoque/brilho leve). **Sem soco de zoom** e sem corte seco.
 - **Música de fundo (02/nov/2026):** a trilha do dono (`luz_da_palavra/musica/trilha.m4a`, já cortada a partir de 3:55),
-  BEM BAIXA: -18 dB da voz nas pausas e ~-24 dB debaixo da fala (o gerador mede e o analista de som cobra).
+  baixa: -15 dB da voz nas pausas e ~-21 dB debaixo da fala (+3 dB, dono 02/nov) (o gerador mede e o analista de som cobra).
 - **Publicação (02/nov/2026):** TikTok pelo Buffer (`publicar.py`), **agendado nos horários 07:50, 11:50, 16:50 e 20:30 de
   Brasília** (o próximo livre depois do último agendado), capa = quadro do título (as redes não aceitam imagem de capa avulsa),
   legenda do post = `legenda` do roteiro, **rótulo "gerado por IA" DESMARCADO**. Vídeo no Cloudflare R2 (bucket público

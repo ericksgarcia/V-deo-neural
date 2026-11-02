@@ -151,8 +151,8 @@ def som(rot, rend, mp4, pasta):
         sob, pau = au.get("musica_sob_voz_db"), au.get("musica_pausa_db")
         if sob is None or sob > -16:
             out.append(("FALHA", f"música alta demais debaixo da fala ({sob} dB da voz; máx. -16): atrapalha a narração"))
-        elif sob > -19:
-            out.append(("AVISO", f"música um pouco alta debaixo da fala ({sob} dB da voz; ideal -20 a -28)"))
+        elif sob > -17.5:
+            out.append(("AVISO", f"música um pouco alta debaixo da fala ({sob} dB da voz; ideal -18 a -26)"))
         elif sob < -34:
             out.append(("AVISO", f"música quase inaudível debaixo da fala ({sob} dB da voz)"))
         if pau is not None and pau > -12:

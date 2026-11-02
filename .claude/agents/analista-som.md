@@ -15,7 +15,7 @@ Pode medir mais com ffmpeg (ex.: `ffmpeg -i saida/luz/<slug>.mp4 -af astats -f n
 
 Regras do dono:
 - Música de fundo = a trilha enviada pelo dono (`luz_da_palavra/musica/trilha.m4a`, a partir de 3:55), BEM BAIXA para não
-  atrapalhar a narração: debaixo da fala entre -20 e -28 dB da voz; nas pausas no máximo -12 dB. Fora disso = FALHA
+  atrapalhar a narração: debaixo da fala entre -18 e -26 dB da voz (alvo ~-21; o dono pediu +3 dB em 02/nov); nas pausas no máximo -12 dB (alvo -15). Fora disso = FALHA
   (mais alta) ou AVISO (quase inaudível).
 - Volume final por volta de -14 LUFS, sem estouro (pico <= -1 dBFS).
 - Sem som morto (silêncio total) no meio; narração sem buraco longo (> 1,6 s) fora das pausas de suspense.

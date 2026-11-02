@@ -43,9 +43,9 @@ Y_CARTAO = 650             # cartão de re-gancho: acima da altura dos ícones (
 Y_TITULO = 380             # título de abertura (3 linhas) termina antes de y 760
 Y_CONTAGEM = 1415           # contagem regressiva embaixo, acima da faixa da legenda do TikTok
 # Trilha de fundo (dono, 02/nov/2026): a música enviada pelo dono, a partir de 3:55 (o arquivo já começa ali), BEM BAIXA
-# para não atrapalhar a narração. Nível medido contra a voz: -18 dB nas pausas e -24 dB debaixo da fala (abaixa sozinha).
+# para não atrapalhar a narração. Nível medido contra a voz: -15 dB nas pausas e ~-21 dB debaixo da fala (abaixa sozinha; +3 dB pedido pelo dono).
 MUSICA = os.path.join(AQUI, "musica", "trilha.m4a")
-MUSICA_PAUSA_DB, MUSICA_DUCK_DB = -18.0, -6.0
+MUSICA_PAUSA_DB, MUSICA_DUCK_DB = -15.0, -6.0
 MUSICA_LOOP = 0.8           # o vídeo toca a música a partir de 0,8 s e funde no começo dela no fim (loop sem pulo)
 LAYOUT_EXTRA = {}           # medidas do render para os analistas (ex.: diferença entre o fim e o começo)
 LAYOUT = {}                 # caixas reais de cada elemento desenhado (para o analista de zona segura)
