@@ -1,0 +1,14 @@
+Analistas automáticos · ep07_chao.mp4
+
+1. técnico: OK  (53.9 s, -16.2 LUFS, pico -1.2 dBFS)
+2. zona segura (TikTok): OK  (referencia y203-254, titulo y396-717, cartao y580-689, legenda y861-1241, cta y1244-1357, contagem y1380-1451)
+3. ritmo: OK  (16 cenas)
+4. emenda (loop): OK  (diferença de fundo 1.5, sobra 0.18 s · "E foi aí que, naquele dia, Jesus escreveu duas vezes no chão. A Bíblia nunca diz o quê.")
+5. som (música e narração): OK  (música -20.6 dB sob a voz, -16.5 dB nas pausas, presente 100.0%)
+6. contraste do texto: OK  (pior brilho atrás do texto 112.0)
+7. ortografia: OK  (88 palavras conferidas)
+8. post (legenda, CTA, capa): OK  (283 caracteres, 5 hashtags, capa em 1.2 s)
+9. integridade do arquivo: OK  (36.2 MB)
+
+APROVADO nos automáticos
+Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep07_chao/revisao
