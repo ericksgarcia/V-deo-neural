@@ -333,7 +333,7 @@ def _mosaico(ims, colunas, destino):
     m.save(destino, quality=88)
 
 
-def pacote_revisao(rot, mp4, rend, pasta):
+def pacote_revisao(rot, mp4, rend, pasta, rascunho=False):
     """Monta em .cache/luz/<slug>/revisao/ o material que os analistas Claude leem (sem nenhuma API externa)."""
     dest = os.path.join(pasta, "revisao")
     os.makedirs(dest, exist_ok=True)
@@ -342,7 +342,10 @@ def pacote_revisao(rot, mp4, rend, pasta):
     usos = {}
     for c in rot["cenas"]:
         usos.setdefault(c["img"], []).append(limpa(c["fala"]))
-    ims = [_rotulo(Image.open(a).convert("RGB").resize((432, 768)), f"IMAGEM {i}") for i, a in enumerate(rend["imagens"])]
+    sys.path.insert(0, AQUI)
+    import gerar                      # o mosaico mostra a foto COM o tratamento de cor, como aparece no vídeo
+    trat = (lambda im: im) if rascunho else gerar.tratamento
+    ims = [_rotulo(trat(Image.open(a).convert("RGB")).resize((432, 768)), f"IMAGEM {i}") for i, a in enumerate(rend["imagens"])]
     _mosaico(ims, 4, os.path.join(dest, "imagens.jpg"))
     # quadros-chave: um por cena, com a interface do TikTok marcada em vermelho
     linhas, quadros = [], []
@@ -439,7 +442,7 @@ def analisa(rot, mp4, pasta, rascunho=False):
                  + (f"  ({resumo})" if resumo else "")] + [f"    {n}: {m}" for n, m in probs]
         linhas += bloco
         print("\n".join(bloco), flush=True)
-    dest = pacote_revisao(rot, mp4, rend, pasta)
+    dest = pacote_revisao(rot, mp4, rend, pasta, rascunho)
     linhas += ["", "APROVADO nos automáticos" if not falhas else f"NÃO APROVADO: {falhas} FALHA",
                f"Pacote para os analistas Claude (fatos, imagens, tela): {dest}"]
     print(f"  -> {linhas[-2]}\n  {linhas[-1]}")

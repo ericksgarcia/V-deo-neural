@@ -64,12 +64,14 @@ VOZ = "Achird"
 MODELO_TTS = "gemini-3.8-flash-tts"
 MODELO_IMG = "black-forest-labs/flux-schnell"
 # Estilo visual fixo de TODAS as imagens (dono, nov/2026): fotografia de natureza ULTRA REALISTA (nada de cara de
-# ilustração/pintura/3D), cores vivas e luz dramática que prendem o olho. Modelo: flux-schnell (Replicate).
+# ilustração/pintura/3D) que BRILHA na tela: cores intensas, contraste forte, detalhe nítido de 4K (dono, 02/nov: "a pessoa
+# precisa ver e a foto brilhar"); além do prompt, `tratamento()` dá a cor de cinema no render. Modelo: flux-schnell (Replicate).
 # Nunca cite marcas (revista, câmera, agência): o modelo desenha o logo na foto (aconteceu no ep01 e no ep03).
 ESTILO_IMG = (
     "ultra realistic professional landscape photograph, shot on a full-frame camera with a 24mm lens, real natural light, "
-    "true-to-life textures, sharp focus, natural film grain, vivid yet true-to-life colors, subtle contrast, no HDR glow, "
-    "dramatic golden-hour or blue-hour sky, award-winning nature photography, raw photo, 8k, photorealistic. "
+    "true-to-life textures, tack-sharp crisp micro-detail, rich vivid saturated colors, strong contrast, deep shadows and "
+    "luminous glowing highlights, clear deep-colored sky (not washed out, not hazy), dramatic golden-hour or blue-hour light, "
+    "award-winning nature photography, 8k, photorealistic, eye-catching. "
     "Not an illustration, not a painting, not digital art, not 3D render, not CGI, no fantasy, no text, no letters, "
     "no logo, no watermark, no signature, no border"
 )
@@ -164,6 +166,29 @@ def gera_imagem(prompt, destino, semente):
     # schnell sai em ~1 MP: amplia com nitidez suave para o vídeo (1080x1920 + zoom) não ficar mole
     im = im.resize((im.width * 2, im.height * 2), Image.LANCZOS).filter(ImageFilter.UnsharpMask(2, 60, 2))
     im.save(destino)
+
+
+def tratamento(im):
+    """Cor de cinema 4K (dono, 02/nov/2026: "a foto precisa brilhar, parecer 4K, diferente do que a pessoa vê no feed").
+    Aplicado no render (a imagem paga no Replicate fica intacta no cache): realce de detalhe local (clarity), curva em S,
+    vibrância (puxa mais as cores apagadas que as já fortes), brilho suave nas luzes (bloom) e nitidez final."""
+    x = np.asarray(im.convert("RGB"), np.float32) / 255
+    # clarity: detalhe de média escala (textura de pedra, folhas, nuvens) mais marcado
+    borrada = np.asarray(im.convert("RGB").filter(ImageFilter.GaussianBlur(28)), np.float32) / 255
+    x = np.clip(x + 0.45 * (x - borrada), 0, 1)
+    # curva em S suave: pretos mais profundos e luzes mais vivas, sem estourar
+    x = x + 0.22 * x * (1 - x) * (2 * x - 1)
+    x = np.clip(0.5 + (x - 0.5) * 1.10, 0, 1)
+    # vibrância + saturação
+    cinza = x.mean(2, keepdims=True)
+    sat = (x.max(2, keepdims=True) - x.min(2, keepdims=True))
+    x = np.clip(cinza + (x - cinza) * (1.18 + 0.55 * (1 - sat)), 0, 1)
+    # bloom: as luzes fortes ganham um halo quente
+    luz = np.clip((x.mean(2, keepdims=True) - 0.62) / 0.38, 0, 1) * x
+    halo = np.asarray(Image.fromarray((luz * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(22)), np.float32) / 255
+    x = 1 - (1 - x) * (1 - 0.35 * halo)
+    out = Image.fromarray((np.clip(x, 0, 1) * 255).astype(np.uint8))
+    return out.filter(ImageFilter.UnsharpMask(1.6, 90, 2))
 
 
 def fundo_provisorio(i, destino):
@@ -647,7 +672,8 @@ class Fundo:
         for arq in arqs:
             im = Image.open(arq).convert("RGB")
             esc = max(W * 1.18 / im.width, H * 1.18 / im.height)
-            self.imgs.append(im.resize((int(im.width * esc), int(im.height * esc)), Image.LANCZOS))
+            im = im.resize((int(im.width * esc), int(im.height * esc)), Image.LANCZOS)
+            self.imgs.append(im if provisorio else tratamento(im))     # cor de cinema 4K (dono, 02/nov)
         self.jan = janelas      # [(i_img, t0, t1)]
         self.prov = provisorio
 
