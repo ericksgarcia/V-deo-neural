@@ -1,7 +1,7 @@
 # Luz da Palavra
 
 Canal separado do de IA. Formato: vídeo vertical 1080x1920, **imagem de fundo gerada no Replicate**
-(flux-1.1-pro-ultra, 9:16) com zoom lento, **narração no Gemini TTS** (`gemini-3.8-flash-tts`, **voz Achird**), referência bíblica no topo,
+(**flux-schnell**, 9:16, ampliada 2x com nitidez) com zoom lento, **narração no Gemini TTS** (`gemini-3.8-flash-tts`, **voz Achird**), referência bíblica no topo,
 legenda em serifa creme com palavra-chave dourada, cartões de re-gancho e botão "Comente: AMÉM".
 
 ```bash
@@ -28,9 +28,14 @@ Saída: `saida/luz/<slug>.mp4` e `saida/luz/<slug>_legenda.txt`.
 - **Tom (identidade do canal):** amigo cristão caloroso revelando um detalhe escondido da Bíblia; reverente, cheio de
   assombro; suspense amigável antes de cada revelação; final terno e esperançoso. Nunca pregador gritando, trailer,
   sombrio ou robótico (`ESTILO_VOZ` em `gerar.py`).
-- **Imagens:** natureza variada (montanhas, florestas, lagos, cachoeiras, céu estrelado, mar), não só pôr do sol, mas
-  sempre com cores hipersaturadas, luz dramática e grande-angular (`ESTILO_IMG` é anexado a todo prompt). Sem rosto de
-  Jesus, sem texto na imagem. Letra com halo escuro + contorno para ler em qualquer fundo.
+- **Imagens (decisão de 02/nov/2026):** SEMPRE o modelo `black-forest-labs/flux-schnell` no Replicate, com pedido de
+  fotografia **ultra realista** (câmera/lente reais, luz natural, textura real; nada de cara de ilustração, pintura,
+  3D ou CGI; `ESTILO_IMG` é anexado a todo prompt). Natureza variada (montanhas, florestas, lagos, cachoeiras, céu,
+  desertos, oliveiras) com cores vivas porém verdadeiras. Escreva os prompts de cena em inglês, descrevendo uma FOTO
+  de um lugar real; sem rosto de Jesus, sem texto na imagem. Letra com halo escuro + contorno para ler em qualquer fundo.
+- **Limite do Replicate:** conta com pouco crédito leva 429; o gerador espera e tenta de novo sozinho (~4 min por vídeo).
+- **Voz por episódio:** `estilo_extra` no JSON acrescenta direção de voz específica do vídeo (ex.: onde sussurrar).
+  `voz_cache` aponta um áudio antigo já pago (usado no EP01, que tem o estilo antigo).
 
 ## Roteiro (`roteiros/<slug>.json`)
 
@@ -58,4 +63,5 @@ Saída: `saida/luz/<slug>.mp4` e `saida/luz/<slug>_legenda.txt`.
 
 | Ep | Tema | Ref | Duração | Linha 1 da legenda | Estado |
 |----|------|-----|---------|--------------------|--------|
-| 01 | O mesmo fogo (anthrakia: Jo 18:18 e 21:9) | JOÃO 21:9 | 53 s | Jesus acendeu o MESMO fogo onde Pedro o negou 🔥 | pronto (Achird; 2 requisições: 1ª Charon descartada a pedido do dono) |
+| 01 | O mesmo fogo (anthrakia: Jo 18:18 e 21:9) | JOÃO 21:9 | 53 s | Jesus acendeu o MESMO fogo onde Pedro o negou 🔥 | pronto (imagens ainda no estilo antigo, ilustrado; 2 requisições de voz: a 1ª Charon, descartada) |
+| 02 | Jesus chorou sabendo que ia ressuscitar Lázaro (Jo 11) | JOÃO 11:35 | 53 s | Jesus chorou diante de um túmulo que Ele mesmo ia abrir 😢 | pronto (flux-schnell; 1 requisição Achird) |

@@ -37,13 +37,14 @@ CREME = (238, 232, 220)
 # Identidade do canal (dono, nov/2026): voz Achird no Gemini TTS, UMA requisição por vídeo (trava em narracao()).
 VOZ = "Achird"
 MODELO_TTS = "gemini-3.8-flash-tts"
-MODELO_IMG = "black-forest-labs/flux-1.1-pro-ultra"
-# Estilo visual fixo de TODAS as imagens (dono, nov/2026): natureza variada com cores hipersaturadas que prendem o olho.
+MODELO_IMG = "black-forest-labs/flux-schnell"
+# Estilo visual fixo de TODAS as imagens (dono, nov/2026): fotografia de natureza ULTRA REALISTA (nada de cara de
+# ilustração/pintura/3D), cores vivas e luz dramática que prendem o olho. Modelo: flux-schnell (Replicate).
 ESTILO_IMG = (
-    "breathtaking hyper-saturated nature photography, vivid rich colors, glowing dramatic light, deep electric blues "
-    "and teals contrasted with fiery oranges, golds and magentas, lush saturated greens, ultra wide-angle low camera "
-    "with strong depth and leading lines, HDR, high contrast, crisp detail, cinematic, awe-inspiring, vertical 9:16, "
-    "no text, no watermark"
+    "ultra realistic professional landscape photograph, shot on a Canon EOS R5 with a 24mm lens, real natural light, "
+    "true-to-life textures, sharp focus, natural film grain, vivid yet true-to-life colors, subtle contrast, no HDR glow, "
+    "dramatic golden-hour or blue-hour sky, National Geographic award-winning photography, raw photo, 8k, photorealistic. "
+    "Not an illustration, not a painting, not digital art, not 3D render, not CGI, no fantasy, no text, no watermark"
 )
 ESTILO_VOZ = (
     "Voice: Achird. Channel 'Luz da Palavra': a warm Brazilian (pt-BR) Christian friend revealing a hidden detail "
@@ -53,11 +54,10 @@ ESTILO_VOZ = (
     "never robotic. "
     "First sentence: urgent and intriguing, slightly faster, a voice that makes someone stop scrolling. "
     "Every few seconds build friendly suspense: before each '…' slow down, lower the voice a little, lean in, hold "
-    "a real silence, then say the reveal clearly with quiet amazement. 'Mas presta atenção' and 'vai te arrepiar' "
-    "sound like a secret being shared. "
-    "'Não uma vez. Três.' lands slowly, word by word. "
-    "From 'Ele não voltou ao fogo pra acusar' to the end: tender, compassionate, a smile in the voice, full of hope, "
-    "like speaking to someone who is hurting. 'Curte e comenta amém' is light and warm, not salesy. The last "
+    "a real silence, then say the reveal clearly with quiet amazement; teasers like 'Mas presta atenção' sound like "
+    "a secret being shared. Short punchy lines land slowly, word by word. "
+    "In the personal turn near the end, become tender and compassionate, a smile in the voice, full of hope, like "
+    "speaking to someone who is hurting. The call to comment is light and warm, not salesy. The last "
     "sentence is soft and confident, ending in peace. "
     "Natural Brazilian Portuguese, connected sentences, pace about 2.8 words per second with real pauses before reveals."
 )
@@ -107,16 +107,23 @@ def _http_json(url, corpo=None, token=None, metodo=None, timeout=120):
         cab["Authorization"] = "Bearer " + token
         cab["Prefer"] = "wait"
     req = urllib.request.Request(url, json.dumps(corpo).encode() if corpo is not None else None, cab, method=metodo)
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return json.load(r)
+    for tentativa in range(6):          # 429 do Replicate = limite de requisições por minuto: espera e tenta de novo
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return json.load(r)
+        except urllib.error.HTTPError as e:
+            if e.code != 429 or "replicate" not in url or tentativa == 5:
+                raise
+            print(f"  (Replicate pediu calma, aguardando {10 + 5 * tentativa}s)", flush=True)
+            time.sleep(10 + 5 * tentativa)
 
 
 def gera_imagem(prompt, destino, semente):
     token = os.environ.get("REPLICATE_API_TOKEN")
     if not token:
         raise RuntimeError("falta REPLICATE_API_TOKEN (.cache/luz.env)")
-    entrada = {"prompt": prompt + ". Style: " + ESTILO_IMG, "aspect_ratio": "9:16", "output_format": "png",
-               "seed": semente, "safety_tolerance": 2, "raw": False}
+    entrada = {"prompt": prompt + ". " + ESTILO_IMG, "aspect_ratio": "9:16", "output_format": "png",
+               "num_outputs": 1, "go_fast": True, "megapixels": "1", "seed": semente}
     p = _http_json(f"https://api.replicate.com/v1/models/{MODELO_IMG}/predictions", {"input": entrada}, token,
                    timeout=180)
     while p.get("status") not in ("succeeded", "failed", "canceled"):
@@ -126,7 +133,10 @@ def gera_imagem(prompt, destino, semente):
         raise RuntimeError(f"Replicate falhou: {p.get('error')}")
     url = p["output"][0] if isinstance(p["output"], list) else p["output"]
     with urllib.request.urlopen(url, timeout=120) as r:
-        Image.open(io.BytesIO(r.read())).convert("RGB").save(destino)
+        im = Image.open(io.BytesIO(r.read())).convert("RGB")
+    # schnell sai em ~1 MP: amplia com nitidez suave para o vídeo (1080x1920 + zoom) não ficar mole
+    im = im.resize((im.width * 2, im.height * 2), Image.LANCZOS).filter(ImageFilter.UnsharpMask(2, 60, 2))
+    im.save(destino)
 
 
 def fundo_provisorio(i, destino):
@@ -175,8 +185,11 @@ def _le_wav(dados):
 
 def narracao(rot, pasta, autoriza_nova=False):
     texto = texto_tts(rot["cenas"])
-    chave = hashlib.sha1((VOZ + MODELO_TTS + ESTILO_VOZ + texto).encode()).hexdigest()[:10]
+    estilo = ESTILO_VOZ + (" " + rot["estilo_extra"] if rot.get("estilo_extra") else "")
+    chave = hashlib.sha1((VOZ + MODELO_TTS + estilo + texto).encode()).hexdigest()[:10]
     arq = os.path.join(pasta, f"voz_{chave}.npy")
+    if rot.get("voz_cache") and os.path.exists(os.path.join(pasta, rot["voz_cache"])):   # episódio antigo (estilo legado)
+        arq = os.path.join(pasta, rot["voz_cache"])
     if os.path.exists(arq):
         print(f"[voz] cache (nenhuma requisição) · {VOZ} · {MODELO_TTS}")
         return np.load(arq)
@@ -190,7 +203,7 @@ def narracao(rot, pasta, autoriza_nova=False):
     print(f"[voz] 1 requisição: {VOZ} · {MODELO_TTS}", flush=True)
     usos.append({"voz": VOZ, "modelo": MODELO_TTS, "quando": time.strftime("%Y-%m-%d %H:%M"), "chave": chave})
     json.dump(usos, open(livro, "w"), indent=1)
-    corpo = {"contents": [{"parts": [{"text": texto, "speechMetadata": {"style": ESTILO_VOZ}}]}],
+    corpo = {"contents": [{"parts": [{"text": texto, "speechMetadata": {"style": estilo}}]}],
              "generationConfig": {"responseModalities": ["AUDIO"],
                                   "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": VOZ}}}}}
     url = (f"https://generativelanguage.googleapis.com/v1beta/models/{MODELO_TTS}:generateContent?key="
@@ -350,6 +363,13 @@ def fonte(nome, tam):
     return ImageFont.truetype(os.path.join(FONTES, nome), tam)
 
 
+def fonte_cabe(nome, tam, txt, largura):
+    """Maior fonte (até `tam`) em que o texto cabe em `largura` px."""
+    while tam > 40 and fonte(nome, tam).getlength(txt) > largura:
+        tam -= 4
+    return fonte(nome, tam)
+
+
 def texto_brilho(txt, f, cor, brilho=None, sombra=True, espaco=0):
     """Camada RGBA com texto + sombra suave (+ brilho dourado opcional)."""
     bb = f.getbbox(txt)
@@ -427,7 +447,8 @@ class Cena:
                 x += pw + esp
         self.card = None
         if c.get("card"):
-            self.card, mc = texto_brilho(c["card"], fonte("Cinzel-Bold.ttf", 96), OURO, brilho=(255, 150, 30))
+            self.card, mc = texto_brilho(c["card"], fonte_cabe("Cinzel-Bold.ttf", 96, c["card"], 900), OURO,
+                                         brilho=(255, 150, 30))
             self.card_m = mc
         self.cta = desenha_cta(c["cta"]) if c.get("cta") else None
 
@@ -493,7 +514,7 @@ def titulo_camadas(linhas):
     out, y = [], 470
     for i, ln in enumerate(linhas):
         ultimo = i == len(linhas) - 1
-        f = fonte("Cinzel-Bold.ttf", 104 if ultimo else 86)
+        f = fonte_cabe("Cinzel-Bold.ttf", 104 if ultimo else 86, ln, 900)
         img, m = texto_brilho(ln, f, OURO if ultimo else (255, 255, 255), brilho=(255, 150, 30) if ultimo else None)
         out.append((img, y - m))
         y += 116 if not ultimo else 130
