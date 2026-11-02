@@ -1,0 +1,9 @@
+Analistas automáticos · ep04_tempestade.mp4
+
+1. técnico: OK  (54.2 s, -15.6 LUFS, pico -1.2 dBFS)
+2. zona segura (TikTok): OK  (referencia y210-248, titulo y378-737, cartao y595-691, legenda y861-1223, cta y1244-1357, contagem y1380-1451)
+3. ritmo: OK  (15 cenas)
+4. emenda (loop): OK  (diferença de fundo 0.7, sobra 0.19 s · "E foi aí que, no meio daquela tempestade, até pescadores acharam que iam morrer. Jesus dormia.")
+
+APROVADO nos automáticos
+Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep04_tempestade/revisao
