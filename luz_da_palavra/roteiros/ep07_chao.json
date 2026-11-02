@@ -20,8 +20,8 @@
   ],
   "ganchos": [
     "Jesus escreveu duas vezes no chão. A Bíblia nunca diz o quê. [ESCOLHIDO: número + nome, 12 palavras]",
-    "Só uma vez Jesus aparece escrevendo. E ninguém sabe o quê.",
-    "Uma mulher, pedras nas mãos, e Jesus escrevendo no chão. Por quê?"
+    "Jesus escreveu no chão diante de uma mulher. E ninguém sabe o quê.",
+    "Uma mulher condenada e Jesus escrevendo no chão. Por quê?"
   ],
   "imagens": [
     "close up of dry cracked earth with fine lines drawn in the dust, warm golden light, shallow depth of field",
@@ -34,22 +34,85 @@
     "a vast green valley at sunrise with golden light and gentle morning mist, deep peace"
   ],
   "cenas": [
-    { "img": 0, "fala": "Jesus escreveu *duas vezes* no chão. A Bíblia nunca diz o quê.", "titulo": true },
-    { "img": 0, "fala": "Mas o que *aconteceu* depois quase ninguém percebe.", "card": "UM DETALHE ESCONDIDO" },
-    { "img": 1, "fala": "Trouxeram uma mulher apanhada em *adultério*.", "card": "A MULHER" },
-    { "img": 2, "fala": "A lei mandava *apedrejar*. E aquilo era uma armadilha.", "card": "ARMADILHA" },
-    { "img": 3, "fala": "Jesus não respondeu. Inclinou-se e *escreveu* na terra…", "card": "MAS ESPERA…" },
-    { "img": 2, "fala": "Insistiram. Então Ele disse: quem não tem *pecado*, atire a primeira pedra.", "card": "A PRIMEIRA PEDRA" },
-    { "img": 3, "fala": "E se inclinou *de novo*, escrevendo outra vez.", "card": "DE NOVO" },
-    { "img": 4, "fala": "Então, um a um, eles *saíram*. Os mais velhos primeiro.", "card": "OS VELHOS PRIMEIRO" },
-    { "img": 5, "fala": "Ficaram só Jesus e a *mulher*, no meio.", "card": "SÓ OS DOIS" },
-    { "img": 5, "fala": "Ele perguntou: ninguém te *condenou*?", "card": "NINGUÉM?" },
-    { "img": 6, "fala": "Ela respondeu: *ninguém*, Senhor.", "card": "NINGUÉM" },
-    { "img": 6, "fala": "Jesus disse: nem eu te *condeno*. Vai e não peques mais.", "card": "NEM EU" },
-    { "img": 4, "fala": "Só Ele podia atirar a pedra. E *não* atirou.", "card": "SÓ ELE PODIA" },
-    { "img": 7, "fala": "Se você carrega um erro, Ele não está de *pedra* na mão.", "card": "ISSO É PRA VOCÊ" },
-    { "img": 7, "fala": "Em uma palavra: o que você acha que Ele *escreveu*? Comenta.", "cta": "Comente: UMA PALAVRA" },
-    { "img": 0, "fala": "E foi aí que, naquele *dia*," }
+    {
+      "img": 0,
+      "fala": "Jesus escreveu *duas vezes* no chão. A Bíblia nunca diz o quê.",
+      "titulo": true
+    },
+    {
+      "img": 0,
+      "fala": "Mas o que *aconteceu* depois quase ninguém percebe.",
+      "card": "UM DETALHE ESCONDIDO"
+    },
+    {
+      "img": 1,
+      "fala": "Trouxeram uma mulher apanhada em *adultério*.",
+      "card": "A MULHER"
+    },
+    {
+      "img": 2,
+      "fala": "A lei mandava *apedrejar*. E aquilo era uma armadilha.",
+      "card": "ARMADILHA"
+    },
+    {
+      "img": 3,
+      "fala": "Jesus nada disse. Inclinou-se e *escreveu* na terra…",
+      "card": "MAS ESPERA…"
+    },
+    {
+      "img": 2,
+      "fala": "Insistiram. Então Ele disse: quem não tem *pecado*, atire a primeira pedra.",
+      "card": "A PRIMEIRA PEDRA"
+    },
+    {
+      "img": 3,
+      "fala": "E se inclinou *de novo*, escrevendo outra vez.",
+      "card": "DE NOVO"
+    },
+    {
+      "img": 4,
+      "fala": "Então, um a um, eles *saíram*. Os mais velhos primeiro.",
+      "card": "OS VELHOS PRIMEIRO"
+    },
+    {
+      "img": 5,
+      "fala": "Ficaram só Jesus e a *mulher*, no meio.",
+      "card": "SÓ OS DOIS"
+    },
+    {
+      "img": 5,
+      "fala": "Ele perguntou: ninguém te *condenou*?",
+      "card": "NINGUÉM?"
+    },
+    {
+      "img": 6,
+      "fala": "Ela respondeu: *ninguém*, Senhor.",
+      "card": "NINGUÉM"
+    },
+    {
+      "img": 6,
+      "fala": "Jesus disse: nem eu te *condeno*. Vai e não peques mais.",
+      "card": "NEM EU"
+    },
+    {
+      "img": 4,
+      "fala": "Só Ele podia atirar a pedra. E *não* atirou.",
+      "card": "SÓ ELE PODIA"
+    },
+    {
+      "img": 7,
+      "fala": "Se você carrega um erro, Ele não está de *pedra* na mão.",
+      "card": "ISSO É PRA VOCÊ"
+    },
+    {
+      "img": 7,
+      "fala": "Em uma palavra: o que você acha que Ele *escreveu*? Comenta.",
+      "cta": "Comente: UMA PALAVRA"
+    },
+    {
+      "img": 0,
+      "fala": "E foi aí que, naquele *dia*,"
+    }
   ],
   "emenda": "E foi aí que, naquele dia, Jesus escreveu duas vezes no chão. A Bíblia nunca diz o quê.",
   "estilo_extra": "'A Bíblia nunca diz o quê' is hushed and curious. 'Ninguém, Senhor' is small and trembling. 'Nem eu te condeno' is the tenderest line, slow and warm. 'E não atirou' is quiet awe. Never shout.",
