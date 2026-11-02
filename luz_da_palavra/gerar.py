@@ -103,8 +103,8 @@ def palavras(fala):
 
 
 # ---------------------------------------------------------------- imagens (Replicate)
-def _http_json(url, corpo=None, token=None, metodo=None, timeout=120):
-    cab = {"Content-Type": "application/json"}
+def _http_json(url, corpo=None, token=None, metodo=None, timeout=120, cabecalhos=None):
+    cab = {"Content-Type": "application/json", **(cabecalhos or {})}
     if token:
         cab["Authorization"] = "Bearer " + token
         cab["Prefer"] = "wait"
@@ -208,10 +208,9 @@ def narracao(rot, pasta, autoriza_nova=False):
     corpo = {"contents": [{"parts": [{"text": texto, "speechMetadata": {"style": estilo}}]}],
              "generationConfig": {"responseModalities": ["AUDIO"],
                                   "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": VOZ}}}}}
-    url = (f"https://generativelanguage.googleapis.com/v1beta/models/{MODELO_TTS}:generateContent?key="
-           + os.environ["GEMINI_API_KEY"])
-    try:
-        resp = _http_json(url, corpo, timeout=300)
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODELO_TTS}:generateContent"
+    try:                                  # chave no cabeçalho (não na URL): compatível com "Network secrets" do ambiente
+        resp = _http_json(url, corpo, timeout=300, cabecalhos={"x-goog-api-key": os.environ["GEMINI_API_KEY"]})
     except urllib.error.HTTPError as e:
         raise RuntimeError(f"TTS falhou ({e.code}): {e.read().decode('utf-8', 'ignore')[:300]}")
     dados = base64.b64decode(resp["candidates"][0]["content"]["parts"][0]["inlineData"]["data"])

@@ -15,7 +15,9 @@ python luz_da_palavra/gerar.py luz_da_palavra/roteiros/ep02_lazaro.json         
 
 Saída: `saida/luz/<slug>.mp4` e `saida/luz/<slug>_legenda.txt`.
 
-- **Chaves** em `.cache/luz.env` (fora do git): `REPLICATE_API_TOKEN=` e `GEMINI_API_KEY=`. Nunca comitar.
+- **Chaves** (nunca no git): variáveis de ambiente `REPLICATE_API_TOKEN` (site permitido `api.replicate.com`) e `GEMINI_API_KEY`
+  (site permitido `generativelanguage.googleapis.com`), cadastradas em Network secrets do ambiente; ou, local, `.cache/luz.env`.
+  A chave do Gemini vai no cabeçalho `x-goog-api-key`, não na URL.
 - **Rede:** o ambiente precisa liberar `api.replicate.com` e `replicate.delivery` (imagens) e
   `generativelanguage.googleapis.com` (voz).
 - **Custo:** 1 requisição de voz e 1 imagem por prompt; tudo fica em `.cache/luz/<slug>/`. Mudar o texto de
