@@ -1,7 +1,13 @@
 {
+  "tema_id": "jesus-chorou-lazaro",
+  "tema": "Jesus chorou diante do tumulo de Lazaro mesmo sabendo que ia ressuscita-lo",
   "slug": "ep02_lazaro",
   "ref": "JOÃO 11:35",
-  "titulo": ["JESUS CHOROU", "NUM TÚMULO QUE", "ELE MESMO ABRIU"],
+  "titulo": [
+    "JESUS CHOROU",
+    "NUM TÚMULO QUE",
+    "ELE MESMO ABRIU"
+  ],
   "fatos": [
     "Jo 11:4,11,14-15: Jesus sabia que Lazaro seria ressuscitado e disse aos discipulos que iria desperta-lo.",
     "Jo 11:6: ao saber da doenca, Jesus ficou ainda dois dias onde estava.",
@@ -9,6 +15,11 @@
     "Jo 11:33: ao ver Maria e os que a acompanhavam chorando, Jesus comoveu-se em espirito e perturbou-se.",
     "Jo 11:35: 'Jesus chorou' (o versiculo mais curto da Biblia em portugues).",
     "Jo 11:43: Jesus clamou em alta voz: 'Lazaro, vem para fora!'"
+  ],
+  "ganchos": [
+    "Jesus chorou diante de um túmulo que Ele mesmo ia abrir. [ESCOLHIDO: contradição + imagem forte, 11 palavras]",
+    "Jesus sabia que ia ressuscitar Lázaro. Então por que chorou?",
+    "O versículo mais curto da Bíblia esconde o maior consolo."
   ],
   "imagens": [
     "an ancient stone burial cave carved into a rocky hillside in Judea at sunrise, a large round stone rolled aside, golden light on the limestone, dry grass in the foreground",
@@ -22,15 +33,15 @@
   ],
   "cenas": [
     {"img": 0, "fala": "Jesus chorou diante de um túmulo que Ele mesmo ia *abrir*.", "titulo": true},
-    {"img": 0, "fala": "E o motivo vai *mexer* com você."},
+    {"img": 0, "fala": "E o motivo vai *mexer* com você.", "card": "O MOTIVO"},
     {"img": 1, "fala": "Lázaro morreu, e Jesus *demorou* dois dias pra chegar.", "card": "DE PROPÓSITO"},
-    {"img": 1, "fala": "Ele já sabia o *final*. Ia ressuscitá-lo."},
+    {"img": 1, "fala": "Ele já sabia o *final*. Ia ressuscitá-lo.", "card": "ELE SABIA"},
     {"img": 2, "fala": "Mas presta atenção no versículo mais *curto* da Bíblia.", "card": "MAS ESPERA…"},
-    {"img": 2, "fala": "João 11:35. Duas palavras: *Jesus chorou*."},
+    {"img": 2, "fala": "João 11:35. Duas palavras: *Jesus chorou*.", "card": "2 PALAVRAS"},
     {"img": 3, "fala": "Ele chorou mesmo sabendo… que tudo ia *acabar bem*.", "card": "POR QUÊ?"},
-    {"img": 3, "fala": "Porque viu Maria chorando, e se *comoveu*."},
+    {"img": 3, "fala": "Porque viu Maria chorando, e se *comoveu*.", "card": "MARIA CHORAVA"},
     {"img": 4, "fala": "Minutos depois, gritou: Lázaro, vem pra *fora*!", "card": "4 DIAS"},
-    {"img": 4, "fala": "Quatro dias morto. E ele *saiu* andando."},
+    {"img": 4, "fala": "Quatro dias morto. E ele *saiu* andando.", "card": "VOLTOU À VIDA"},
     {"img": 5, "fala": "Então repara: o mesmo Jesus que *chora*…"},
     {"img": 5, "fala": "é o que tem poder pra *ressuscitar*.", "card": "AS DUAS COISAS"},
     {"img": 6, "fala": "Ele não *ignora* a tua dor, mesmo sabendo o final.", "card": "ELE CHORA COM VOCÊ"},
@@ -39,6 +50,7 @@
     {"img": 7, "fala": "Porque Jesus chorou naquele túmulo… pra te mostrar que Ele *sente* a tua dor."}
   ],
   "estilo_extra": "'Jesus chorou' is said very softly and slowly, almost a whisper of reverence, with a long silence after it. 'Lázaro, vem pra fora' is said with sudden warm strength, not shouting. 'Ele vê' is tender and slow.",
+  "revelacao": 6,
   "velocidade": 1.04,
   "legenda": "Jesus chorou diante de um túmulo que Ele mesmo ia abrir 😢 e o motivo vai mexer com você.\nManda pra quem está de luto ou sofrendo agora. 🙏\nComenta AMÉM se você precisava ouvir isso.\n\n#jesus #biblia #fe #deus #evangelho"
 }

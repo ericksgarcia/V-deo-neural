@@ -1,0 +1,28 @@
+[
+ {
+  "slug": "ep01_fogo",
+  "tema_id": "anthrakia-fogo-pedro",
+  "tema": "O mesmo braseiro: Jesus acendeu o fogo onde Pedro o negou",
+  "ref": "JOÃO 21:9",
+  "titulo": [
+   "JESUS ACENDEU",
+   "O MESMO FOGO",
+   "DA TRAIÇÃO"
+  ],
+  "feito_em": "2026-11-01",
+  "libera_em": "2026-12-31"
+ },
+ {
+  "slug": "ep02_lazaro",
+  "tema_id": "jesus-chorou-lazaro",
+  "tema": "Jesus chorou diante do tumulo de Lazaro mesmo sabendo que ia ressuscita-lo",
+  "ref": "JOÃO 11:35",
+  "titulo": [
+   "JESUS CHOROU",
+   "NUM TÚMULO QUE",
+   "ELE MESMO ABRIU"
+  ],
+  "feito_em": "2026-11-02",
+  "libera_em": "2027-01-01"
+ }
+]

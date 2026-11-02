@@ -1,4 +1,6 @@
 {
+  "tema_id": "anthrakia-fogo-pedro",
+  "tema": "O mesmo braseiro: Jesus acendeu o fogo onde Pedro o negou",
   "slug": "ep01_fogo",
   "ref": "JOÃO 21:9",
   "titulo": [
@@ -10,6 +12,11 @@
     "Joao 18:18 e 21:9 usam a mesma palavra grega, anthrakia (braseiro / fogo de brasas).",
     "anthrakia aparece so nessas duas passagens em todo o Novo Testamento.",
     "Pedro negou Jesus tres vezes (Jo 18:17, 25, 27); Jesus pergunta 'tu me amas?' tres vezes (Jo 21:15-17)."
+  ],
+  "ganchos": [
+    "Jesus acendeu o mesmo fogo onde Pedro o negou. [ESCOLHIDO: nome + contraste + imagem concreta, 10 palavras]",
+    "Pedro negou Jesus 3 vezes. E Jesus perguntou 3 vezes. Não foi coincidência.",
+    "Existe uma palavra que só aparece 2 vezes no Novo Testamento… e as 2 são de fogo."
   ],
   "imagens": [
     "a small fire of glowing charcoal embers on a mossy rocky riverbank in a vivid mountain valley at dusk, sparks rising",
@@ -23,23 +30,24 @@
   ],
   "cenas": [
     {"img": 0, "fala": "Jesus acendeu o mesmo *fogo* onde Pedro o negou.", "titulo": true},
-    {"img": 0, "fala": "E quase ninguém percebe esse *detalhe*."},
+    {"img": 0, "fala": "E quase ninguém percebe esse *detalhe*.", "card": "NINGUÉM PERCEBE"},
     {"img": 1, "fala": "Na noite da prisão, Pedro se esquentava num *braseiro*.", "card": "A NOITE DA PRISÃO"},
-    {"img": 1, "fala": "E ali, três vezes, ele *negou* conhecer Jesus."},
+    {"img": 1, "fala": "E ali, três vezes, ele *negou* conhecer Jesus.", "card": "3 NEGAÇÕES"},
     {"img": 2, "fala": "Mas presta atenção, porque a Bíblia deixou uma *pista*.", "card": "MAS ESPERA…"},
-    {"img": 2, "fala": "No grego, a palavra *braseiro* aparece só duas vezes no Novo Testamento."},
+    {"img": 2, "fala": "No grego, a palavra *braseiro* aparece só duas vezes no Novo Testamento.", "card": "SÓ 2 VEZES"},
     {"img": 3, "fala": "A primeira, na *traição*. A segunda… vai te *arrepiar*.", "card": "A 2ª VEZ…"},
-    {"img": 3, "fala": "Depois de ressuscitar, Jesus espera Pedro na *praia*."},
+    {"img": 3, "fala": "Depois de ressuscitar, Jesus espera Pedro na *praia*.", "card": "NA PRAIA"},
     {"img": 4, "fala": "E quando Pedro chega… tem um *braseiro* aceso.", "card": "O MESMO FOGO"},
-    {"img": 4, "fala": "A mesma cena da *pior noite* da vida dele."},
+    {"img": 4, "fala": "A mesma cena da *pior noite* da vida dele.", "card": "A PIOR NOITE"},
     {"img": 5, "fala": "Aí Jesus pergunta: Pedro, você me *ama*?"},
     {"img": 5, "fala": "Não uma vez. *Três*. Uma pra cada negação.", "card": "3 VEZES"},
     {"img": 6, "fala": "Ele não voltou ao fogo pra *acusar*. Voltou pra *curar*.", "card": "PRA CURAR"},
-    {"img": 6, "fala": "Se você carrega um erro antigo, isso é *pra você*."},
+    {"img": 6, "fala": "Se você carrega um erro antigo, isso é *pra você*.", "card": "É PRA VOCÊ"},
     {"img": 7, "fala": "*Curte* e comenta amém.", "cta": "Comente: AMÉM"},
     {"img": 7, "fala": "Porque Deus te leva de volta ao lugar da queda… pra te *levantar* ali."}
   ],
   "voz_cache": "voz_ea56f811e5.npy",
+  "revelacao": 8,
   "velocidade": 1.04,
   "legenda": "Jesus acendeu o MESMO fogo onde Pedro o negou 🔥 e quase ninguém percebe.\nManda pra alguém que ainda carrega um erro antigo. 🙏\nComenta AMÉM se isso falou com você.\n\n#jesus #biblia #fe #deus #evangelho"
 }

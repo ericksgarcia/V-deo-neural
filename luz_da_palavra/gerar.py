@@ -25,6 +25,8 @@ import urllib.request
 import wave
 
 import numpy as np
+import conferir
+import temas
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -454,9 +456,10 @@ class Cena:
 
     def desenha(self, quadro, t):
         if self.card is not None:
-            k = np.clip((t - self.a) / 0.35, 0, 1)
-            esc = 1.35 - 0.35 * (1 - (1 - k) ** 3)
-            a = k * np.clip((self.b - t) / 0.3, 0, 1)
+            k = np.clip((t - self.a - 0.1) / 0.3, 0, 1)
+            esc = 1.55 - 0.55 * (1 - (1 - k) ** 3)
+            fim_card = min(self.b, self.a + 2.5)
+            a = k * np.clip((fim_card - t) / 0.3, 0, 1)
             im = self.card.resize((int(self.card.width * esc), int(self.card.height * esc)), Image.BILINEAR)
             quadro.alpha_composite(com_alfa(im, a), ((W - im.width) // 2, 760 - im.height // 2))
         for img, x, y, t0, d in self.pal:
@@ -587,8 +590,12 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
     fundo = Fundo(arqs, [tuple(j) for j in jan], provisorio)
     sob, cab = sobreposicao(), cabecalho(rot["ref"])
     tit = titulo_camadas(rot["titulo"])
-    fim_titulo = tempos[1][1] if len(tempos) > 1 else tempos[0][1]
+    fim_titulo = (tempos[1][0] + 0.25) if len(tempos) > 1 else tempos[0][1]      # o título some quando entra o 1º re-gancho
     parts = particulas()
+    ganchos_t = [tempos[0][0]] + [tp[0] for c, tp in zip(cenas, tempos) if c.get("card") or c.get("cta")]
+    rev_t = tempos[rot["revelacao"]][0] if "revelacao" in rot else None
+    chips = {}
+    flash_cor = Image.new("RGBA", (W, H), (255, 214, 140, 255))
     aviso = None
     if provisorio:
         aviso, _ = texto_brilho("RASCUNHO · fundo provisório", fonte("Cormorant-SemiBold.ttf", 36), (255, 120, 120))
@@ -607,6 +614,15 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
     for q in range(nq):
         t = q / FPS
         img = fundo.quadro(t)
+        dt_ = [t - h for h in ganchos_t if 0 <= t - h < 0.9]
+        if dt_:                                         # impacto no gancho: soco de zoom + clarão dourado
+            e = min(dt_)
+            sz = 1 + 0.09 * np.exp(-e / 0.16)
+            img = img.resize((W, H), Image.BILINEAR, box=(W / 2 - W / (2 * sz), H / 2 - H / (2 * sz),
+                                                          W / 2 + W / (2 * sz), H / 2 + H / (2 * sz)))
+            fl = flash_cor.copy()
+            fl.putalpha(Image.new("L", (W, H), int(95 * np.exp(-e / 0.10))))
+            img.alpha_composite(fl)
         img.alpha_composite(sob)
         d = ImageDraw.Draw(img)
         for (x, y, r, vel, fase) in parts:
@@ -617,10 +633,17 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
         img.alpha_composite(cab)
         if t < fim_titulo:
             for k, (im, y) in enumerate(tit):
-                ka = np.clip((t - 0.12 * k) / 0.3, 0, 1) * np.clip((fim_titulo - t) / 0.3, 0, 1)
+                ka = np.clip((t - 0.12 * k) / 0.3, 0, 1) * np.clip((fim_titulo - 0.2 - t) / 0.25, 0, 1)
                 esc = 1.25 - 0.25 * (1 - (1 - np.clip((t - 0.12 * k) / 0.3, 0, 1)) ** 3)
                 im2 = im.resize((int(im.width * esc), int(im.height * esc)), Image.BILINEAR) if esc > 1.001 else im
                 img.alpha_composite(com_alfa(im2, ka), ((W - im2.width) // 2, y - (im2.height - im.height) // 2))
+        if rev_t is not None and 0 < rev_t - t <= 16 and t > fim_titulo:      # contagem regressiva da revelação
+            seg = int(np.ceil(rev_t - t))
+            if seg not in chips:
+                chips[seg], _ = texto_brilho(f"A REVELAÇÃO VEM EM {seg}s", fonte("Cinzel-Bold.ttf", 46), (255, 236, 200),
+                                             brilho=(255, 150, 30))
+            pulso = 0.78 + 0.22 * np.sin(t * 7)
+            img.alpha_composite(com_alfa(chips[seg], pulso), ((W - chips[seg].width) // 2, 345 - chips[seg].height // 2))
         for o in objs:
             if o.a - 0.05 <= t < o.b:
                 o.desenha(img, t)
@@ -641,11 +664,15 @@ def main():
     ap.add_argument("roteiro")
     ap.add_argument("--so-texto", action="store_true")
     ap.add_argument("--autorizo-nova-voz", action="store_true", help="só com licença do dono (regra: 1 voz por vídeo)")
+    ap.add_argument("--ignora-conferidor", action="store_true", help="só para teste; o canal exige zero FALHA")
     ap.add_argument("--sem-imagens", action="store_true", help="rascunho com fundo provisório (não chama Replicate)")
     a = ap.parse_args()
     carrega_chaves()
     rot = json.load(open(a.roteiro, encoding="utf-8"))
     n = sum(len(limpa(c["fala"]).split()) for c in rot["cenas"])
+    print("[ganchos] conferindo o roteiro:")
+    if conferir.imprime(conferir.confere(rot)) and not a.ignora_conferidor:
+        sys.exit("[ganchos] corrija as FALHA acima (python luz_da_palavra/conferir.py <roteiro>) antes de gerar.")
     if a.so_texto:
         print(texto_tts(rot["cenas"]))
         print(f"\n{n} palavras ≈ {n / 2.8:.0f} s")
@@ -656,13 +683,19 @@ def main():
     voz = ajusta_ritmo(narracao(rot, pasta, a.autorizo_nova_voz), rot.get("teto_pausa", 0.3), rot.get("velocidade", 1.08))
     tempos = tempos_cenas(voz, rot["cenas"])
     for c, (x, y, fa, fb) in zip(rot["cenas"], tempos):
-        print(f"  {x:5.2f}-{y:5.2f}  {limpa(c['fala'])}")
+        print(f"  {x:5.2f}-{y:5.2f}  {'[GANCHO] ' if conferir.eh_gancho(c) or c.get('cta') else ''}{limpa(c['fala'])}")
+    dur_tot = len(voz) / SR + 1.2
+    print("[ganchos] com os tempos reais da voz:")
+    if conferir.imprime(conferir.confere(rot, [tp[0] for tp in tempos], dur_tot)) and not a.ignora_conferidor:
+        sys.exit("[ganchos] há lacunas sem gancho nos tempos reais; ajuste os cartões (sem mudar a fala) e rode de novo.")
     os.makedirs(os.path.join(RAIZ, "saida", "luz"), exist_ok=True)
     nome = rot["slug"] + ("_rascunho" if a.sem_imagens else "")
     saida = os.path.join(RAIZ, "saida", "luz", nome + ".mp4")
     renderiza(rot, arqs, voz, tempos, saida, a.sem_imagens)
     with open(os.path.join(RAIZ, "saida", "luz", rot["slug"] + "_legenda.txt"), "w", encoding="utf-8") as f:
         f.write(rot["legenda"] + "\n")
+    if not a.sem_imagens:
+        temas.registra(rot)          # entra na lista de temas (vale 2 meses)
     print(f"[ok] {saida}  ({len(voz) / SR + 1.2:.1f} s)")
 
 
