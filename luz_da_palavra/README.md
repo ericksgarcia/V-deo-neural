@@ -40,6 +40,12 @@ Saída: `saida/luz/<slug>.mp4` e `saida/luz/<slug>_legenda.txt`.
 - **Voz por episódio:** `estilo_extra` no JSON acrescenta direção de voz específica do vídeo (ex.: onde sussurrar).
   `voz_cache` aponta um áudio antigo já pago (usado no EP01, que tem o estilo antigo).
 
+## Transições entre imagens (decisão de 02/nov/2026)
+
+Sem soco de zoom e sem corte seco. A troca é uma **fusão de cinema** de 1,0 s (curva ease in-out, começa 0,3 s antes da fala da
+nova cena): as duas imagens continuam em movimento lento (Ken Burns), com leve desfoque e um brilho quente no meio da troca.
+Está em `Fundo.quadro` (`gerar.py`); vale para todos os vídeos automaticamente.
+
 ## Roteiro (`roteiros/<slug>.json`)
 
 `ref` (topo), `titulo` (3 linhas, a última em dourado), `imagens` (prompts em inglês, sem rosto de Jesus, sem texto),
@@ -61,11 +67,11 @@ nunca começa com saudação/"você sabia"/"hoje", nunca entrega a resposta. Fó
 2. *Pergunta-armadilha:* "Jesus sabia o final. Então por que chorou?"
 3. *Número + nome:* "Pedro negou 3 vezes. Jesus perguntou 3 vezes."
 4. *Identificação:* "Se você carrega um erro antigo, escuta isto."
-Liste 3 candidatos em `ganchos` e marque o escolhido. Efeito na tela: soco de zoom + clarão dourado + som de impacto.
+Liste 3 candidatos em `ganchos` e marque o escolhido. Efeito na tela: clarão dourado curto + som de impacto (sem zoom no fundo).
 
 **Laço aberto (3-6 s).** A 2ª fala promete recompensa: "quase ninguém percebe esse detalhe", "o motivo vai mexer com você".
 
-**Re-gancho a cada <= 5,5 s** (cartão dourado grande com soco de zoom, ou "…" com pausa de suspense, ou pergunta). Sempre abra o
+**Re-gancho a cada <= 5,5 s** (cartão dourado grande, ou "…" com pausa de suspense, ou pergunta). Sempre abra o
 próximo laço antes de fechar o anterior. Tipos: "MAS ESPERA…", "A 2ª VEZ…", número ("3 VEZES"), mini-revelação parcial,
 pergunta sem resposta imediata. **Contagem regressiva:** marque `"revelacao": <índice da cena>` e a tela mostra
 "A REVELAÇÃO VEM EM 12s" nos 16 s anteriores. O conferidor mede os intervalos pelos tempos reais da voz.

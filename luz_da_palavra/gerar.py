@@ -457,7 +457,7 @@ class Cena:
     def desenha(self, quadro, t):
         if self.card is not None:
             k = np.clip((t - self.a - 0.1) / 0.3, 0, 1)
-            esc = 1.55 - 0.55 * (1 - (1 - k) ** 3)
+            esc = 1.3 - 0.3 * (1 - (1 - k) ** 3)
             fim_card = min(self.b, self.a + 2.5)
             a = k * np.clip((fim_card - t) / 0.3, 0, 1)
             im = self.card.resize((int(self.card.width * esc), int(self.card.height * esc)), Image.BILINEAR)
@@ -549,7 +549,7 @@ class Fundo:
 
     def _quadro(self, i, t, t0, t1):
         im = self.imgs[i]
-        k = np.clip((t - t0) / max(0.1, t1 - t0), 0, 1.2)
+        k = np.clip((t - t0) / max(0.1, t1 - t0), 0, 1.5)
         zoom = 1.0 + 0.15 * k if i % 2 == 0 else 1.15 - 0.15 * k
         cw, ch = W * 1.18 / zoom * im.width / (W * 1.18), H * 1.18 / zoom * im.height / (H * 1.18)
         cw, ch = im.width / 1.18 / zoom * 1.0, im.height / 1.18 / zoom
@@ -557,14 +557,26 @@ class Fundo:
         dy = (im.height - ch) * (0.5 + 0.2 * (k - 0.5))
         return im.resize((W, H), Image.BILINEAR, box=(dx, dy, dx + cw, dy + ch))
 
+    ANTES, DUR = 0.3, 1.0      # a transição começa 0,3 s antes da fala da nova cena e dura 1,0 s
+
     def quadro(self, t):
-        atual = [j for j in self.jan if j[1] <= t] or [self.jan[0]]
-        i, t0, t1 = atual[-1]
-        q = self._quadro(i, t, t0, t1)
+        """Fusão suave (curva ease in-out) entre as imagens: as duas continuam em movimento durante a troca, com um leve
+        desfoque e um brilho quente no meio (como um 'dissolve' de cinema), sem corte seco e sem soco de zoom."""
+        atual = [j for j in self.jan if j[1] - self.ANTES <= t] or [self.jan[0]]
         idx = self.jan.index(atual[-1])
-        if idx > 0 and t - t0 < 0.5:
-            pi, p0, p1 = self.jan[idx - 1]
-            q = Image.blend(self._quadro(pi, t, p0, p1), q, (t - t0) / 0.5)
+        i, t0, t1 = atual[-1]
+        ini = t0 - self.ANTES if idx > 0 else t0
+        q = self._quadro(i, t, ini, t1)
+        if idx > 0:
+            p = (t - ini) / self.DUR
+            if 0 <= p < 1:
+                pi, p0, p1 = self.jan[idx - 1]
+                e = p * p * (3 - 2 * p)
+                q = Image.blend(self._quadro(pi, t, p0 - (self.ANTES if idx > 1 else 0), p1), q, e)
+                meio = float(np.sin(np.pi * p))
+                if meio > 0.05:
+                    q = q.filter(ImageFilter.GaussianBlur(5 * meio))
+                    q = Image.blend(q, Image.new("RGB", q.size, (255, 226, 170)), 0.10 * meio)
         return q.convert("RGBA")
 
 
@@ -614,14 +626,10 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
     for q in range(nq):
         t = q / FPS
         img = fundo.quadro(t)
-        dt_ = [t - h for h in ganchos_t if 0 <= t - h < 0.9]
-        if dt_:                                         # impacto no gancho: soco de zoom + clarão dourado
-            e = min(dt_)
-            sz = 1 + 0.09 * np.exp(-e / 0.16)
-            img = img.resize((W, H), Image.BILINEAR, box=(W / 2 - W / (2 * sz), H / 2 - H / (2 * sz),
-                                                          W / 2 + W / (2 * sz), H / 2 + H / (2 * sz)))
+        dt_ = [t - h for h in ganchos_t if 0 <= t - h < 0.6]
+        if dt_:                                         # clarão dourado curto no gancho (sem zoom no fundo)
             fl = flash_cor.copy()
-            fl.putalpha(Image.new("L", (W, H), int(95 * np.exp(-e / 0.10))))
+            fl.putalpha(Image.new("L", (W, H), int(70 * np.exp(-min(dt_) / 0.10))))
             img.alpha_composite(fl)
         img.alpha_composite(sob)
         d = ImageDraw.Draw(img)

@@ -26,6 +26,7 @@ Este repositório contém SÓ esse canal (o antigo canal de simulações de IA f
 - **Voz: SEMPRE Achird** (Gemini TTS `gemini-3.8-flash-tts`). **UMA requisição de voz por vídeo** (trava em `gerar.py`).
 - **Imagens: SEMPRE `black-forest-labs/flux-schnell`** no Replicate, fotografia **ultra realista** (nada de ilustração/pintura/3D),
   natureza e lugares reais, cores vivas porém verdadeiras. Sem rosto de Jesus, sem texto na imagem.
+- **Transições:** fusão suave entre imagens (dissolve de 1 s com desfoque/brilho leve). **Sem soco de zoom** e sem corte seco.
 - Tom: amigo cristão caloroso, reverente, assombro e suspense amigável; nunca pregador gritando nem sombrio.
 - Honestidade: toda afirmação bíblica precisa estar em `fatos` com o versículo. Nada inventado.
 - Língua: português do Brasil, frases curtas, 100-145 palavras, 40-55 s (teto 60 s).
