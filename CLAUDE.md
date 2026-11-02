@@ -4,8 +4,10 @@ Canal de TikTok **Luz da Palavra**: vídeos verticais que revelam um detalhe esc
 ultra realista (Replicate) e narração no Gemini TTS. Leia `luz_da_palavra/README.md` (regras, receita de ganchos, episódios).
 Este repositório contém SÓ esse canal (o antigo canal de simulações de IA foi removido em 02/nov/2026).
 
-## Quando o usuário pedir "um novo vídeo"
+## Quando o usuário pedir "um novo vídeo" (faça TUDO, do roteiro ao agendamento, sem esperar o dono)
 
+0. Preparação: `git fetch origin && git merge origin/claude/cool-gauss-mg0fhk`, `pip install -q -r luz_da_palavra/requirements.txt`
+   e `python luz_da_palavra/publicar.py --fila` (confere que Buffer e Cloudflare respondem e mostra o próximo horário livre).
 1. `python luz_da_palavra/temas.py` e leia `luz_da_palavra/README.md`. **Cada tema vale 2 meses: não repita** tema nem
    passagem (livro + capítulo) ainda no prazo. Escolha um tema NOVO, com fato verificável no texto bíblico (versículos),
    e confirme que não está na lista (`temas.py --checa "palavras"`). Avise em uma linha o tema escolhido.
@@ -28,28 +30,36 @@ Este repositório contém SÓ esse canal (o antigo canal de simulações de IA f
    `analista-fatos` (de novo), `analista-imagens`, `analista-tela`, `analista-som` e `analista-post`. Qualquer FALHA: corrija
    (sem mudar a fala, se possível), gere de novo e repita até os 5 darem APROVADO. Leia os relatórios você mesmo; não publique
    na dúvida.
-7. **Publicar:** `python luz_da_palavra/publicar.py <roteiro> --aprovados fatos,imagens,tela,som,post` sobe o vídeo no R2, posta
-   no TikTok pelo Buffer (legenda do post, capa pelo quadro do título, rótulo de IA desmarcado) e registra em `publicados.json`.
-   Envie ao dono o `.mp4`, a capa e a legenda, com o status do post. Atualize a tabela de episódios do README, faça commit e push.
+7. **Agendar:** `python luz_da_palavra/publicar.py <roteiro> --aprovados fatos,imagens,tela,som,post` sobe o vídeo no Cloudflare R2
+   (`luz/pendentes/`), olha o último post agendado no Buffer e agenda no PRÓXIMO horário livre do dono (07:50, 11:50, 16:50,
+   20:30 de Brasília), com legenda, capa (quadro do título) e rótulo de IA desmarcado; registra em `publicados.json` (vai pro git).
+   `--agora` só se o dono pedir para publicar já. `python luz_da_palavra/publicar.py --arruma` move para `luz/enviados/` o que já
+   saiu; `--lista` mostra pendentes x enviados no Cloudflare. Envie ao dono o `.mp4`, a capa e a legenda (colada no chat), com o
+   dia/hora agendados. Atualize a tabela de episódios do README, faça commit e push (branch da conversa + tronco).
 
 ## Regras do dono (não mude sem licença)
 
 - **Voz: SEMPRE Achird** (Gemini TTS `gemini-3.8-flash-tts`). **UMA requisição de voz por vídeo** (trava em `gerar.py`).
 - **Imagens: SEMPRE `black-forest-labs/flux-schnell`** (nunca cite marca no prompt: vira logo na foto) no Replicate, fotografia **ultra realista** (nada de ilustração/pintura/3D),
-  natureza e lugares reais, cores vivas porém verdadeiras. Sem rosto de Jesus, sem texto na imagem.
+  natureza e lugares reais. A foto precisa BRILHAR (cores intensas, contraste forte, cara de 4K; `tratamento()` no render).
+  Sem rosto de Jesus, sem texto na imagem, sem negação no prompt e sem casas/becos (saem modernos; ver README).
 - **Transições:** fusão suave entre imagens (dissolve de 1 s com desfoque/brilho leve). **Sem soco de zoom** e sem corte seco.
 - **Música de fundo (02/nov/2026):** a trilha do dono (`luz_da_palavra/musica/trilha.m4a`, já cortada a partir de 3:55),
   BEM BAIXA: -18 dB da voz nas pausas e ~-24 dB debaixo da fala (o gerador mede e o analista de som cobra).
-- **Publicação (02/nov/2026):** TikTok pelo Buffer (`publicar.py`), capa = quadro do título (as redes não aceitam imagem de capa
-  avulsa), legenda do post = `legenda` do roteiro, **rótulo "gerado por IA" DESMARCADO**. Vídeo no Cloudflare R2 (bucket público).
+- **Publicação (02/nov/2026):** TikTok pelo Buffer (`publicar.py`), **agendado nos horários 07:50, 11:50, 16:50 e 20:30 de
+  Brasília** (o próximo livre depois do último agendado), capa = quadro do título (as redes não aceitam imagem de capa avulsa),
+  legenda do post = `legenda` do roteiro, **rótulo "gerado por IA" DESMARCADO**. Vídeo no Cloudflare R2 (bucket público
+  `xlaudebuffer`, pastas `luz/pendentes/` e `luz/enviados/`). O dono não revisa antes: os 5 analistas Claude são obrigatórios.
 - **Gemini só para a voz (TTS).** Roteiros, análises e revisões são feitos pelo Claude; imagens só no Replicate.
 - **Área dos ícones do TikTok:** nenhum texto na coluna da direita (x > 940, y 760-1580), na faixa de baixo (y > 1500)
   nem no topo (y < 150). A contagem regressiva fica embaixo (y ~1415), DISCRETA (a legenda é o destaque).
 - Tom: amigo cristão caloroso, reverente, assombro e suspense amigável; nunca pregador gritando nem sombrio.
 - Honestidade: toda afirmação bíblica precisa estar em `fatos` com o versículo. Nada inventado.
 - Língua: português do Brasil, frases curtas, 100-145 palavras, 40-55 s (teto 60 s).
-- **Chaves nunca vão para o git.** Ficam em `.cache/luz.env` (`REPLICATE_API_TOKEN`, `GEMINI_API_KEY`), `.cache/r2.env` (R2) e
-  `.cache/buffer.env` (`BUFFER_API_KEY`), ou nas variáveis de ambiente. Na nuvem o proxy injeta Replicate e Gemini: rode com valor fictício.
+- **Chaves nunca vão para o git nem para o chat.** Na nuvem são segredos do ambiente que o proxy injeta: Replicate, Gemini,
+  `api.buffer.com` e `api.cloudflare.com` (Authorization: Bearer). Os scripts já usam um valor fictício quando a variável não
+  existe; não peça chave ao dono. Se der 401/403, diga qual segredo falta. Rede liberada necessária: api.replicate.com,
+  replicate.delivery, generativelanguage.googleapis.com, api.buffer.com, api.cloudflare.com, *.r2.dev.
   Se uma chave aparecer no chat, avise o dono para revogá-la.
 
 ## Branches (a plataforma cria um `claude/<nome>` por conversa)

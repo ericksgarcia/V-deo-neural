@@ -68,6 +68,23 @@ translúcida pequena, sem brilho nem pulso, barra fina que esvazia: a legenda é
    nem rosto, combina com a fala) e `analista-tela` (ortografia, legibilidade, sobreposição, área dos ícones). Rodam em paralelo;
    só entrega com os três APROVADO. Nenhum analista usa o Gemini (Gemini é só a voz).
 
+## Publicação e agendamento (decisão de 02/nov/2026)
+
+`publicar.py` sobe o vídeo no Cloudflare R2 (bucket `xlaudebuffer`, `luz/pendentes/<slug>.mp4`, link público `*.r2.dev`) e cria o
+post no TikTok pelo Buffer: legenda do post, capa = quadro do título (`thumbnailOffset`), rótulo de IA desmarcado. Agenda no
+próximo horário livre do dono (**07:50, 11:50, 16:50, 20:30 de Brasília**) depois do último post agendado no canal.
+
+```bash
+python luz_da_palavra/publicar.py --fila                 # fila do Buffer e próximo horário livre
+python luz_da_palavra/publicar.py <roteiro> --aprovados fatos,imagens,tela,som,post     # agenda (trava sem os 5 APROVADO)
+python luz_da_palavra/publicar.py <roteiro> --status     # status do post
+python luz_da_palavra/publicar.py --lista                # Cloudflare: pendentes x enviados, cruzando com o Buffer
+python luz_da_palavra/publicar.py --arruma               # move para luz/enviados/ o que já foi publicado
+```
+
+`publicados.json` (no git) guarda cada envio (post do Buffer, link, chave no R2): impede post duplicado.
+Chaves: segredos do ambiente injetados pelo proxy em `api.buffer.com` e `api.cloudflare.com` (Authorization: Bearer).
+
 ## Roteiro (`roteiros/<slug>.json`)
 
 `ref` (topo), `titulo` (3 linhas, a última em dourado), `imagens` (prompts em inglês, sem rosto de Jesus, sem texto),

@@ -100,6 +100,9 @@ def carrega_chaves():
             if "=" in linha and not linha.strip().startswith("#"):
                 k, v = linha.strip().split("=", 1)
                 os.environ.setdefault(k.strip(), v.strip())
+    # na nuvem o proxy injeta as chaves do Replicate e do Gemini (segredos do ambiente): basta um valor qualquer aqui
+    os.environ.setdefault("REPLICATE_API_TOKEN", "injetada-pelo-proxy")
+    os.environ.setdefault("GEMINI_API_KEY", "injetada-pelo-proxy")
 
 
 # ---------------------------------------------------------------- texto
