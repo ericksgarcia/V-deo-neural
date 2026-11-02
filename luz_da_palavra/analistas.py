@@ -10,7 +10,8 @@ Analistas automáticos (código, aqui):
   1. técnico        formato 1080x1920/30 fps, duração, quadros pretos, volume (LUFS) e pico;
   2. zona segura    nenhum texto embaixo dos ícones do TikTok (coluna da direita), da faixa de baixo nem do topo
                     (caixas reais de cada elemento, gravadas pelo gerador em .cache/luz/<slug>/render.json);
-  3. ritmo          velocidade da fala por cena, tempo de leitura dos cartões, cenas curtas demais.
+  3. ritmo          velocidade da fala por cena, tempo de leitura dos cartões, cenas curtas demais;
+  4. emenda         o fim cola no começo (mesmo fundo, sem silêncio) para a pessoa rever sem perceber.
 Depois monta o pacote .cache/luz/<slug>/revisao/ (imagens.jpg, quadros_N.jpg com a interface do TikTok em vermelho,
 roteiro.txt) para os analistas Claude (.claude/agents/analista-*.md): fatos bíblicos, imagens e tela.
 """
@@ -107,6 +108,22 @@ def ritmo(rot, tempos):
     return out, f"{len(tempos)} cenas"
 
 
+# ---------------------------------------------------------------- 4. emenda
+def emenda(rot, rend, mp4):
+    """O vídeo termina no meio da frase que a 1ª fala completa, sem respiro e com o mesmo fundo do 1º quadro."""
+    if not rot.get("emenda"):
+        return [("FALHA", "roteiro sem \"emenda\" (a última fala precisa emendar na 1ª)")], ""
+    out = []
+    dif = rend.get("emenda_diff")
+    if dif is not None and dif > 10:
+        out.append(("FALHA", f"fundo do último quadro difere do 1º (diferença {dif:.1f}; máx. 10): o recomeço vira corte"))
+    a, b, fa, fb = rend["tempos"][-1]
+    sobra = rend["dur"] - fb
+    if sobra > 0.45:
+        out.append(("FALHA", f"{sobra:.2f} s de silêncio depois da última palavra (máx. 0,45): o loop fica perceptível"))
+    return out, f"diferença de fundo {dif if dif is None else round(dif, 1)}, sobra {sobra:.2f} s · \"{rot['emenda']}\""
+
+
 # ---------------------------------------------------------------- pacote para os analistas Claude
 def _quadro(mp4, t):
     p = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{t:.2f}", "-i", mp4, "-frames:v", "1", "-f", "image2pipe",
@@ -187,6 +204,7 @@ def analisa(rot, mp4, pasta, rascunho=False):
         ("1. técnico", lambda: tecnico(mp4, rot)),
         ("2. zona segura (TikTok)", lambda: zona_segura(rend["layout"])),
         ("3. ritmo", lambda: ritmo(rot, tempos)),
+        ("4. emenda (loop)", lambda: emenda(rot, rend, mp4)),
     ]
     linhas, falhas = [f"Analistas automáticos · {os.path.basename(mp4)}", ""], 0
     for nome, fn in times:

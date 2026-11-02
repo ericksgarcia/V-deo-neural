@@ -10,10 +10,12 @@ Este repositório contém SÓ esse canal (o antigo canal de simulações de IA f
    passagem (livro + capítulo) ainda no prazo. Escolha um tema NOVO, com fato verificável no texto bíblico (versículos),
    e confirme que não está na lista (`temas.py --checa "palavras"`). Avise em uma linha o tema escolhido.
 2. Crie `luz_da_palavra/roteiros/epNN_nome.json` no formato do README: `tema_id`, `tema`, `ref`, `titulo`, `fatos`,
-   **`ganchos` (3 candidatos)**, `imagens` (8 prompts em inglês), `cenas` com cartões de re-gancho, `revelacao`, `cta`, `legenda`.
+   **`ganchos` (3 candidatos)**, `imagens` (8 prompts em inglês), `cenas` com cartões de re-gancho, `revelacao`, `cta`, `emenda`, `legenda`.
 3. **Ganchos com apelação máxima, é obrigatório:** gancho inicial <= 12 palavras com nome bíblico + choque/contradição/número,
    escrito grande na tela em 0 s; 2ª fala abre um laço; um gancho/re-gancho (cartão, "…" ou pergunta) a cada <= 5,5 s; revelação
-   entre 40% e 60%; virada pessoal, CTA e última fala que retoma o gancho.
+   entre 40% e 60%; virada pessoal; **CTA = pergunta do episódio com resposta curta e comparável** (opções, SIM/NÃO, uma
+   palavra, um nome; nunca "curte e comenta"), repetida na legenda; **última fala em aberto que EMENDA na 1ª** (loop invisível,
+   mesma imagem da 1ª cena, campo `emenda`). Detalhes e fórmulas no README.
 4. `python luz_da_palavra/conferir.py <roteiro>`: **corrija até zero FALHA** (o gerador também se recusa a rodar com FALHA).
    Em seguida rode o **`analista-fatos` no roteiro, ANTES da voz** (o erro de fato custa uma voz nova se achado depois;
    no ep03 o gancho "3 vezes Deus passou" saiu errado: em 1Rs 19:11 Deus passa uma vez). Só gere com ele APROVADO.

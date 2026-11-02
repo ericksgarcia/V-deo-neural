@@ -15,7 +15,9 @@ Verifique em cada quadro:
 3. Texto legível sobre o fundo (contraste) = ilegível FALHA, difícil AVISO.
 4. Nada cortado na borda; elementos sem se sobrepor (cartão x legenda x contagem x botão) = senão FALHA.
 5. O que deve aparecer aparece (cartão, título no início, contagem "A REVELAÇÃO VEM EM Ns" embaixo antes da
-   revelação, botão "Comente: AMÉM" no fim). A fala entra palavra por palavra: faltar o fim da frase no quadro é normal.
+   revelação, botão "Comente: ..." com a pergunta do episódio). A fala entra palavra por palavra: faltar o fim da frase é normal.
+6. Emenda (loop): extraia o último quadro (`ffmpeg -sseof -0.1`) e o primeiro; o fundo precisa ser o mesmo enquadramento e o
+   botão "Comente" já deve ter sumido no último. Se o recomeço parecer um corte, FALHA.
 
 Não invente problemas. Responda SÓ neste formato, em português:
 ```

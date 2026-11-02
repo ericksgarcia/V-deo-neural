@@ -7,7 +7,8 @@ Regras (pedido do dono, nov/2026: apelação máxima no gancho inicial e em um g
   laço aberto     = a 2ª fala promete algo ("quase ninguém percebe", "o motivo vai mexer com você");
   re-ganchos      = cena com cartão, reticências "…" ou pergunta; no máximo ~5,5 s entre dois ganchos;
   revelação       = o roteiro marca em qual cena ela vem ("revelacao"); a tela mostra a contagem regressiva;
-  fechamento      = CTA antes da última fala e última fala que retoma uma palavra do gancho (laço);
+  fechamento      = CTA com pergunta do episódio (resposta curta e comparável, nunca "curte e comenta") antes da
+                    última fala; a última fala fica em aberto e EMENDA na 1ª (o vídeo recomeça sem a pessoa notar);
   honestidade     = "fatos" com o versículo de cada afirmação; tema fora do prazo de 2 meses.
 """
 import json
@@ -27,6 +28,8 @@ CHOQUE = ("ninguém", "nunca", "quase", "mesmo", "escondido", "segredo", "proibi
           "demorou", "calou", "fugiu", "rejeitou", "perdeu", "só ", "apenas", "primeira", "única", "último", "ultima")
 PROMESSA = ("ninguém", "quase", "motivo", "segredo", "detalhe", "vai ", "espera", "presta", "antes", "escondid", "pista",
             "verdade", "por quê", "porque", "?")
+CTA_GENERICO = ("curte e comenta", "comenta amém", "comente amém", "deixa seu like", "deixa o like", "se inscreve",
+                "segue o canal", "compartilha esse vídeo", "curta e comente")
 MAX_GAP, GAP_FALHA, ALVO_FIM = 5.5, 7.0, 55
 
 
@@ -113,11 +116,32 @@ def confere(rot, inicios=None, fim=None):
         r.append(("AVISO", "sem \"revelacao\" (índice da cena da revelação): a contagem regressiva não aparece"))
     elif not 3 <= rot["revelacao"] < len(cenas):
         r.append(("FALHA", "\"revelacao\" fora do intervalo de cenas"))
-    if not any(c.get("cta") for c in cenas[:-1]):
+    ctas = [c for c in cenas[:-1] if c.get("cta")]
+    if not ctas:
         r.append(("FALHA", "sem CTA (\"cta\") antes da última fala"))
-    ult = {w for w in re.findall(r"\w{5,}", limpa(cenas[-1]["fala"]).lower())}
-    if not ult & {w for w in re.findall(r"\w{5,}", limpa(cenas[0]["fala"]).lower())}:
-        r.append(("AVISO", "última fala não retoma nenhuma palavra do gancho (laço que dá vontade de rever)"))
+    for c in ctas:                                 # CTA que dá vontade de ler o que os outros escreveram
+        fl = limpa(c["fala"]).lower()
+        if any(g in fl for g in CTA_GENERICO):
+            r.append(("FALHA", f"CTA genérico ('{limpa(c['fala'])}'): faça uma pergunta do episódio com resposta curta "
+                               "(escolha entre opções, SIM/NÃO, uma palavra ou um nome) que as pessoas queiram comparar"))
+        elif "?" not in fl and " ou " not in fl and "nome" not in fl:
+            r.append(("AVISO", "CTA sem pergunta, escolha ou nome: a resposta precisa ser curta e comparável"))
+        if len(c["cta"]) > 30:
+            r.append(("AVISO", f"botão do CTA longo '{c['cta']}' (> 30 letras)"))
+    if ctas and "?" not in rot.get("legenda", "").split("\n")[0] + rot.get("legenda", ""):
+        r.append(("AVISO", "legenda do post sem a pergunta do CTA (repita a pergunta na legenda)"))
+    # EMENDA: a última fala termina no meio de uma frase que continua na 1ª fala -> o vídeo recomeça sem a pessoa notar
+    ultima = limpa(cenas[-1]["fala"]).strip()
+    if not rot.get("emenda"):
+        r.append(("FALHA", "sem \"emenda\": a última fala precisa emendar na 1ª (escreva a frase completa em \"emenda\")"))
+    else:
+        if re.search(r"[.!?]$", ultima):
+            r.append(("FALHA", "última fala termina com ponto final: precisa ficar em aberto e continuar na 1ª fala"))
+        junta = re.sub(r"\W+", " ", (ultima + " " + limpa(cenas[0]["fala"])).lower()).strip()
+        if re.sub(r"\W+", " ", limpa(rot["emenda"]).lower()).strip() != junta:
+            r.append(("FALHA", "\"emenda\" precisa ser exatamente a última fala + a 1ª fala (a frase que o loop forma)"))
+        if cenas[-1]["img"] != cenas[0]["img"]:
+            r.append(("FALHA", "na emenda a última cena usa a MESMA imagem da 1ª (senão o recomeço aparece como corte)"))
     n = sum(nprs(c["fala"]) for c in cenas)
     if not 100 <= n <= 145:
         r.append(("AVISO", f"{n} palavras (alvo 100-145)"))

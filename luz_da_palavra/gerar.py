@@ -42,6 +42,7 @@ LARG_TEXTO = 740            # largura máxima de qualquer texto centralizado: x 
 Y_CARTAO = 650             # cartão de re-gancho: acima da altura dos ícones (que começam por volta de y 760)
 Y_TITULO = 380             # título de abertura (3 linhas) termina antes de y 760
 Y_CONTAGEM = 1415           # contagem regressiva embaixo, acima da faixa da legenda do TikTok
+LAYOUT_EXTRA = {}           # medidas do render para os analistas (ex.: diferença entre o fim e o começo)
 LAYOUT = {}                 # caixas reais de cada elemento desenhado (para o analista de zona segura)
 
 
@@ -352,7 +353,12 @@ def impacto():
     return (np.sin(2 * np.pi * (55 + 30 * np.exp(-t * 8)) * t) * np.exp(-t * 2.5) * 0.9).astype(np.float32)
 
 
-def mixa(voz, tempos, cenas, dur):
+def cauda(rot):
+    """Silêncio depois da última palavra. Com emenda o vídeo acaba colado na fala e recomeça sem respiro."""
+    return 0.12 if rot.get("emenda") else 1.2
+
+
+def mixa(voz, tempos, cenas, dur, emenda=False):
     n = int(dur * SR)
     mus = pad(dur)[:n]
     sfx = np.zeros(n, np.float32)
@@ -362,7 +368,7 @@ def mixa(voz, tempos, cenas, dur):
         j = min(n, i + len(som))
         sfx[i:j] += som[: j - i] * ganho
 
-    poe(impacto(), 0.0, 0.35)
+    poe(impacto(), 0.0, 0.10 if emenda else 0.35)      # com emenda o "boom" do 0 s quase some (não denuncia o loop)
     for c, (a, b, fa, fb) in zip(cenas, tempos):
         if c.get("card"):
             poe(swell(), a - 1.2 + 0.25, 0.10)
@@ -373,7 +379,7 @@ def mixa(voz, tempos, cenas, dur):
     env = np.convolve(np.abs(v), np.ones(4800) / 4800, "same")
     duck = 1 - 0.55 * np.clip(env / 0.05, 0, 1)
     mix = v + (mus * 0.35 + np.clip(sfx, -0.2, 0.2)) * duck
-    fade = int(1.0 * SR)
+    fade = int((0.03 if emenda else 1.0) * SR)       # com emenda: sem fade-out audível (o loop não pode "terminar")
     mix[-fade:] *= np.linspace(1, 0, fade)
     return (mix / max(1.0, np.abs(mix).max() / 0.9)).astype(np.float32)
 
@@ -491,9 +497,9 @@ class Cena:
             if k * fim > 0.3:
                 marca("legenda", img, x, y + dy)
             quadro.alpha_composite(com_alfa(img, k * fim), (x, y + dy))
-    def desenha_cta(self, quadro, t):
-        if self.cta is not None and t >= self.a:
-            k = np.clip((t - self.a) / 0.4, 0, 1)
+    def desenha_cta(self, quadro, t, fim=1e9):
+        if self.cta is not None and self.a <= t < fim:
+            k = np.clip((t - self.a) / 0.4, 0, 1) * np.clip((fim - t) / 0.5, 0, 1)
             pulso = 1 + 0.04 * np.sin((t - self.a) * 6)
             im = self.cta.resize((int(self.cta.width * pulso), int(self.cta.height * pulso)), Image.BILINEAR)
             marca("cta", im, (W - im.width) // 2, 1300 - im.height // 2)
@@ -501,7 +507,7 @@ class Cena:
 
 
 def desenha_cta(txt):
-    f = fonte("Cinzel-Bold.ttf", 44)
+    f = fonte_cabe("Cinzel-Bold.ttf", 44, txt, LARG_TEXTO - 160)
     tw = int(f.getlength(txt))
     w, h = tw + 150, 104
     img = Image.new("RGBA", (w + 60, h + 60), (0, 0, 0, 0))
@@ -582,7 +588,8 @@ def sobreposicao():
 
 
 class Fundo:
-    def __init__(self, arqs, janelas, provisorio):
+    def __init__(self, arqs, janelas, provisorio, emenda=False):
+        self.emenda = emenda    # loop: a última janela anda ao contrário e termina no enquadramento do 1º quadro
         self.imgs = []
         for arq in arqs:
             im = Image.open(arq).convert("RGB")
@@ -591,9 +598,9 @@ class Fundo:
         self.jan = janelas      # [(i_img, t0, t1)]
         self.prov = provisorio
 
-    def _quadro(self, i, t, t0, t1):
+    def _quadro(self, i, t, t0, t1, reverso=False):
         im = self.imgs[i]
-        k = np.clip((t - t0) / max(0.1, t1 - t0), 0, 1.5)
+        k = np.clip(((t1 - t) if reverso else (t - t0)) / max(0.1, t1 - t0), 0, 1.5)
         zoom = 1.0 + 0.15 * k if i % 2 == 0 else 1.15 - 0.15 * k
         cw, ch = W * 1.18 / zoom * im.width / (W * 1.18), H * 1.18 / zoom * im.height / (H * 1.18)
         cw, ch = im.width / 1.18 / zoom * 1.0, im.height / 1.18 / zoom
@@ -610,7 +617,8 @@ class Fundo:
         idx = self.jan.index(atual[-1])
         i, t0, t1 = atual[-1]
         ini = t0 - self.ANTES if idx > 0 else t0
-        q = self._quadro(i, t, ini, t1)
+        rev = self.emenda and idx == len(self.jan) - 1 and idx > 0 and i == self.jan[0][0]
+        q = self._quadro(i, t, ini, t1, rev)
         if idx > 0:
             p = (t - ini) / self.DUR
             if 0 <= p < 1:
@@ -632,7 +640,7 @@ def particulas(n=45, semente=1):
 
 def renderiza(rot, arqs, voz, tempos, saida, provisorio):
     cenas = rot["cenas"]
-    dur = len(voz) / SR + 1.2
+    dur = len(voz) / SR + cauda(rot)
     tempos = [list(tp) for tp in tempos]
     tempos[-1][1] = 1e9
     objs = [Cena(c, tp) for c, tp in zip(cenas, tempos)]
@@ -643,11 +651,17 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
             ult = c["img"]
     for k in range(len(jan)):
         jan[k][2] = jan[k + 1][1] if k + 1 < len(jan) else dur
-    fundo = Fundo(arqs, [tuple(j) for j in jan], provisorio)
+    fundo = Fundo(arqs, [tuple(j) for j in jan], provisorio, bool(rot.get("emenda")))
     sob, cab = sobreposicao(), cabecalho(rot["ref"])
+    # quanto o fundo do último quadro difere do primeiro (0 = emenda invisível); o analista automático cobra
+    a0 = np.asarray(fundo.quadro(0).convert("RGB").resize((108, 192)), np.float32)
+    a1 = np.asarray(fundo.quadro(dur - 1 / FPS).convert("RGB").resize((108, 192)), np.float32)
+    LAYOUT_EXTRA["emenda_diff"] = float(np.abs(a0 - a1).mean())
     tit = titulo_camadas(rot["titulo"])
     fim_titulo = (tempos[1][0] + 0.25) if len(tempos) > 1 else tempos[0][1]      # o título some quando entra o 1º re-gancho
     parts = particulas()
+    # com emenda o botão "Comente" sai 1,5 s depois de entrar a última fala: o fim fica igual ao começo
+    fim_cta = (tempos[-1][0] + 1.5) if rot.get("emenda") else 1e9
     ganchos_t = [tempos[0][0]] + [tp[0] for c, tp in zip(cenas, tempos) if c.get("card") or c.get("cta")]
     rev_t = tempos[rot["revelacao"]][0] if "revelacao" in rot else None
     flash_cor = Image.new("RGBA", (W, H), (255, 214, 140, 255))
@@ -655,7 +669,7 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
     if provisorio:
         aviso, _ = texto_brilho("RASCUNHO · fundo provisório", fonte("Cormorant-SemiBold.ttf", 36), (255, 120, 120))
 
-    audio = mixa(voz, tempos, cenas, dur)
+    audio = mixa(voz, tempos, cenas, dur, bool(rot.get("emenda")))
     arq_a = saida + ".wav"
     with wave.open(arq_a, "wb") as w:
         w.setnchannels(1), w.setsampwidth(2), w.setframerate(SR)
@@ -672,7 +686,8 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
         dt_ = [t - h for h in ganchos_t if 0 <= t - h < 0.6]
         if dt_:                                         # clarão dourado curto no gancho (sem zoom no fundo)
             fl = flash_cor.copy()
-            fl.putalpha(Image.new("L", (W, H), int(70 * np.exp(-min(dt_) / 0.10))))
+            forca = 20 if (rot.get("emenda") and t < 0.6) else 70      # com emenda o clarão do 0 s é leve
+            fl.putalpha(Image.new("L", (W, H), int(forca * np.exp(-min(dt_) / 0.10))))
             img.alpha_composite(fl)
         img.alpha_composite(sob)
         d = ImageDraw.Draw(img)
@@ -700,7 +715,7 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
         for o in objs:
             if o.a - 0.05 <= t < o.b:
                 o.desenha(img, t)
-            o.desenha_cta(img, t)                    # o botão "Comente" fica até o fim
+            o.desenha_cta(img, t, fim_cta)           # o botão "Comente" fica até o fim (com emenda, some antes)
         if aviso is not None:
             img.alpha_composite(aviso, ((W - aviso.width) // 2, 1560))
         proc.stdin.write(img.convert("RGB").tobytes())
@@ -736,10 +751,15 @@ def main():
     os.makedirs(pasta, exist_ok=True)
     arqs = imagens(rot, pasta, a.sem_imagens)
     voz = ajusta_ritmo(narracao(rot, pasta, a.autorizo_nova_voz), rot.get("teto_pausa", 0.3), rot.get("velocidade", 1.08))
+    if rot.get("emenda"):                # loop: corta o silêncio que o TTS deixa no fim (a última palavra cola no começo)
+        h = SR // 100
+        env = np.abs(voz[: len(voz) // h * h]).reshape(-1, h).max(1)
+        fala_ate = (np.where(env > 0.03)[0][-1] + 1) * h if (env > 0.03).any() else len(voz)
+        voz = voz[: min(len(voz), fala_ate + int(0.06 * SR))]
     tempos = tempos_cenas(voz, rot["cenas"])
     for c, (x, y, fa, fb) in zip(rot["cenas"], tempos):
         print(f"  {x:5.2f}-{y:5.2f}  {'[GANCHO] ' if conferir.eh_gancho(c) or c.get('cta') else ''}{limpa(c['fala'])}")
-    dur_tot = len(voz) / SR + 1.2
+    dur_tot = len(voz) / SR + cauda(rot)
     print("[ganchos] com os tempos reais da voz:")
     if conferir.imprime(conferir.confere(rot, [tp[0] for tp in tempos], dur_tot)) and not a.ignora_conferidor:
         sys.exit("[ganchos] há lacunas sem gancho nos tempos reais; ajuste os cartões (sem mudar a fala) e rode de novo.")
@@ -751,7 +771,7 @@ def main():
     with open(os.path.join(dir_saida, rot["slug"] + "_legenda.txt"), "w", encoding="utf-8") as f:
         f.write(rot["legenda"] + "\n")
     # o que os analistas precisam para revisar sem renderizar de novo
-    json.dump({"layout": LAYOUT, "tempos": tempos, "dur": dur_tot, "imagens": arqs, "voz_sr": SR},
+    json.dump({"layout": LAYOUT, **LAYOUT_EXTRA, "emenda": rot.get("emenda"), "tempos": tempos, "dur": dur_tot, "imagens": arqs, "voz_sr": SR},
               open(os.path.join(pasta, "render.json"), "w"), indent=1)
     np.save(os.path.join(pasta, "voz_final.npy"), voz)
     print(f"[ok] renderizado: {saida}  ({dur_tot:.1f} s)")

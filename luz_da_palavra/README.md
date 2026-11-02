@@ -67,7 +67,7 @@ translúcida pequena, sem brilho nem pulso, barra fina que esvazia: a legenda é
 ## Roteiro (`roteiros/<slug>.json`)
 
 `ref` (topo), `titulo` (3 linhas, a última em dourado), `imagens` (prompts em inglês, sem rosto de Jesus, sem texto),
-`cenas` (`fala` com `*destaque*`, `img`, opcional `card`, `cta`, `titulo`), `fatos` (fonte de cada afirmação),
+`cenas` (`fala` com `*destaque*`, `img`, opcional `card`, `cta`, `titulo`), `emenda` (última fala + 1ª fala), `fatos` (fonte de cada afirmação),
 `tema_id`/`tema` (para a lista de 2 meses), `ganchos` (3 candidatos), `revelacao` (índice da cena), `legenda` do post.
 
 ## Lista de temas (validade de 2 meses)
@@ -94,8 +94,29 @@ próximo laço antes de fechar o anterior. Tipos: "MAS ESPERA…", "A 2ª VEZ…
 pergunta sem resposta imediata. **Contagem regressiva:** marque `"revelacao": <índice da cena>` e a tela mostra
 "A REVELAÇÃO VEM EM 12s" nos 16 s anteriores. O conferidor mede os intervalos pelos tempos reais da voz.
 
-**Revelação** entre 40% e 60% do vídeo, com pausa antes. **Virada pessoal** (~80%): "isso é pra você". **CTA curto** ("Curte e
-comenta amém") antes da última fala. **Última fala** retoma uma palavra do gancho (laço que dá vontade de rever).
+**Revelação** entre 40% e 60% do vídeo, com pausa antes. **Virada pessoal** (~80%): "isso é pra você".
+
+**CTA que dá vontade de ler os comentários (decisão de 02/nov/2026).** Nada de "curte e comenta amém" genérico (o conferidor
+dá FALHA). O CTA é uma **pergunta do próprio episódio com resposta curta e comparável**, para a pessoa comentar E voltar para ver
+o que os outros responderam. Fórmulas:
+1. *Escolha entre opções:* "Vento, terremoto ou sussurro: como Deus tem falado com você?" (botão "Comente: VENTO, FOGO OU SUSSURRO")
+2. *Você teria percebido?:* "Você já tinha notado esse detalhe? Comenta SIM ou NÃO." (divide o público, todo mundo quer ver o placar)
+3. *Uma palavra:* "Em uma palavra: o que você quer deixar nesse túmulo hoje?"
+4. *Um nome:* "Escreve o nome de quem precisa ouvir isso." (gera marcação e compartilhamento)
+5. *Lado do personagem:* "Se você fosse Pedro, voltaria pro fogo? Comenta."
+O botão (`cta`) mostra o formato da resposta (<= 30 letras) e a **legenda do post repete a pergunta**. Dica: depois de postar,
+o dono responde/fixa o primeiro comentário com a própria resposta (puxa a conversa).
+
+**Emenda (loop invisível, decisão de 02/nov/2026).** A **última fala termina no meio de uma frase que a 1ª fala completa**, e o
+vídeo acaba colado na última palavra: quem chega ao fim continua ouvindo a frase e revê o vídeo sem perceber (mais retenção e
+replays). Regras (o conferidor e o analista automático cobram):
+- `"emenda"` no roteiro = a frase inteira que o loop forma (última fala + 1ª fala).
+- A última fala NÃO termina com ponto (`.`/`!`/`?`); termina em aberto ("…", "que", "porque", "quando", "foi aí que").
+- A última cena usa a MESMA imagem da 1ª; o gerador faz o movimento dela terminar no enquadramento do 1º quadro, corta o silêncio
+  final, tira o fade-out, esconde o botão "Comente" 1,5 s antes do fim e suaviza o clarão/"boom" do 0 s.
+- O CTA vem ANTES da última fala (a última fala é a ponte de volta).
+- Exemplos: última "E foi por isso que, naquele dia…" + 1ª "Jesus chorou diante de um túmulo que Ele mesmo ia abrir."; última
+  "Porque, no monte, depois do fogo…" + 1ª "Deus falou com Elias num sussurro."
 
 **Honestidade:** `fatos` com o versículo de cada afirmação; cenas de até ~14 palavras; 100-145 palavras no total.
 
