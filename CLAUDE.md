@@ -18,7 +18,10 @@ Este repositório contém SÓ esse canal (o antigo canal de simulações de IA f
 5. `python luz_da_palavra/gerar.py <roteiro>`: gera as imagens (flux-schnell, ~4 min por causa do limite do Replicate),
    **UMA** requisição de voz (Achird) e o vídeo, e registra o tema na lista. Mudar o texto falado depois = nova requisição de voz
    (peça licença ao dono). Mudar cartões, título, destaques, legenda ou imagens não gasta voz.
-6. Confira visualmente os quadros (mosaico com ffmpeg). Entregue **juntos** o `.mp4` e a legenda (`saida/luz/<slug>_legenda.txt`)
+6. **Analistas antes de entregar (obrigatório).** O `gerar.py` já roda os analistas automáticos (`analistas.py`: técnico,
+   zona segura do TikTok, ritmo) e para com FALHA. Depois rode em paralelo os 3 analistas Claude (`.claude/agents/`):
+   `analista-fatos`, `analista-imagens` e `analista-tela`, cada um com o slug. Qualquer FALHA: corrija (sem mudar a fala, se
+   possível), gere de novo e repita os analistas até todos darem APROVADO. Entregue **juntos** o `.mp4` e a legenda (`saida/luz/<slug>_legenda.txt`)
    e cole a legenda no chat. Atualize a tabela de episódios do `luz_da_palavra/README.md`, faça commit e push.
 
 ## Regras do dono (não mude sem licença)
@@ -27,6 +30,9 @@ Este repositório contém SÓ esse canal (o antigo canal de simulações de IA f
 - **Imagens: SEMPRE `black-forest-labs/flux-schnell`** no Replicate, fotografia **ultra realista** (nada de ilustração/pintura/3D),
   natureza e lugares reais, cores vivas porém verdadeiras. Sem rosto de Jesus, sem texto na imagem.
 - **Transições:** fusão suave entre imagens (dissolve de 1 s com desfoque/brilho leve). **Sem soco de zoom** e sem corte seco.
+- **Gemini só para a voz (TTS).** Roteiros, análises e revisões são feitos pelo Claude; imagens só no Replicate.
+- **Área dos ícones do TikTok:** nenhum texto na coluna da direita (x > 940, y 760-1580), na faixa de baixo (y > 1500)
+  nem no topo (y < 150). A contagem regressiva fica embaixo (y ~1415), em pílula escura bem visível.
 - Tom: amigo cristão caloroso, reverente, assombro e suspense amigável; nunca pregador gritando nem sombrio.
 - Honestidade: toda afirmação bíblica precisa estar em `fatos` com o versículo. Nada inventado.
 - Língua: português do Brasil, frases curtas, 100-145 palavras, 40-55 s (teto 60 s).

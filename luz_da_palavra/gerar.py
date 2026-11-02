@@ -25,6 +25,7 @@ import urllib.request
 import wave
 
 import numpy as np
+import analistas
 import conferir
 import temas
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -35,6 +36,22 @@ FONTES = os.path.join(AQUI, "fontes")
 W, H, FPS, SR = 1080, 1920, 30, 48000
 OURO = (255, 208, 92)
 CREME = (238, 232, 220)
+# Área livre da interface do TikTok (1080x1920): nada de texto embaixo da coluna de ícones à direita
+# (curtir/comentar/salvar/compartilhar/perfil) nem na faixa de baixo (nome, legenda, música). Os analistas cobram.
+LARG_TEXTO = 780            # largura máxima de qualquer texto centralizado: x 150..930
+Y_CARTAO = 650             # cartão de re-gancho: acima da altura dos ícones (que começam por volta de y 760)
+Y_TITULO = 380             # título de abertura (3 linhas) termina antes de y 760
+Y_CONTAGEM = 1415           # contagem regressiva embaixo, acima da faixa da legenda do TikTok
+LAYOUT = {}                 # caixas reais de cada elemento desenhado (para o analista de zona segura)
+
+
+def marca(nome, im, x, y):
+    """Registra a área visível (alfa forte) de um elemento desenhado em (x, y)."""
+    bb = im.getchannel("A").point(lambda p: 255 if p > 90 else 0).getbbox()
+    if bb:
+        b = [x + bb[0], y + bb[1], x + bb[2], y + bb[3]]
+        a = LAYOUT.get(nome)
+        LAYOUT[nome] = b if a is None else [min(a[0], b[0]), min(a[1], b[1]), max(a[2], b[2]), max(a[3], b[3])]
 
 # Identidade do canal (dono, nov/2026): voz Achird no Gemini TTS, UMA requisição por vídeo (trava em narracao()).
 VOZ = "Achird"
@@ -427,7 +444,7 @@ class Cena:
         esp = f.getlength(" ")
         for w_, d in pal:
             lw = (fi if d else f).getlength(w_)
-            if atual and larg + esp + lw > 860:
+            if atual and larg + esp + lw > LARG_TEXTO:
                 linhas.append(atual)
                 atual, larg = [], 0
             atual.append((w_, d, lw))
@@ -448,7 +465,7 @@ class Cena:
                 x += pw + esp
         self.card = None
         if c.get("card"):
-            self.card, mc = texto_brilho(c["card"], fonte_cabe("Cinzel-Bold.ttf", 96, c["card"], 900), OURO,
+            self.card, mc = texto_brilho(c["card"], fonte_cabe("Cinzel-Bold.ttf", 96, c["card"], LARG_TEXTO - 40), OURO,
                                          brilho=(255, 150, 30))
             self.card_m = mc
         self.cta = desenha_cta(c["cta"]) if c.get("cta") else None
@@ -460,19 +477,24 @@ class Cena:
             fim_card = min(self.b, self.a + 2.5)
             a = k * np.clip((fim_card - t) / 0.3, 0, 1)
             im = self.card.resize((int(self.card.width * esc), int(self.card.height * esc)), Image.BILINEAR)
-            quadro.alpha_composite(com_alfa(im, a), ((W - im.width) // 2, 760 - im.height // 2))
+            if a > 0.3:
+                marca("cartao", im, (W - im.width) // 2, Y_CARTAO - im.height // 2)
+            quadro.alpha_composite(com_alfa(im, a), ((W - im.width) // 2, Y_CARTAO - im.height // 2))
         for img, x, y, t0, d in self.pal:
             k = np.clip((t - t0 + 0.08) / 0.18, 0, 1)
             if k <= 0:
                 continue
             fim = np.clip((self.b - t) / 0.15, 0, 1) if self.b < 1e8 else 1
             dy = int(14 * (1 - k))
+            if k * fim > 0.3:
+                marca("legenda", img, x, y + dy)
             quadro.alpha_composite(com_alfa(img, k * fim), (x, y + dy))
     def desenha_cta(self, quadro, t):
         if self.cta is not None and t >= self.a:
             k = np.clip((t - self.a) / 0.4, 0, 1)
             pulso = 1 + 0.04 * np.sin((t - self.a) * 6)
             im = self.cta.resize((int(self.cta.width * pulso), int(self.cta.height * pulso)), Image.BILINEAR)
+            marca("cta", im, (W - im.width) // 2, 1300 - im.height // 2)
             quadro.alpha_composite(com_alfa(im, k), ((W - im.width) // 2, 1300 - im.height // 2))
 
 
@@ -499,12 +521,38 @@ def desenha_cta(txt):
     return img
 
 
+def chip_contagem(seg, prog):
+    """Contagem regressiva da revelação: pílula escura com borda dourada, número grande e barra que esvazia."""
+    f = fonte("Cinzel-Bold.ttf", 46)
+    fn = fonte("Cinzel-Bold.ttf", 76)
+    txt, num = "A REVELAÇÃO VEM EM ", f"{seg}s"
+    tw, nw = int(f.getlength(txt)), int(fn.getlength(num))
+    w, h = min(tw + nw + 90, LARG_TEXTO - 20), 132
+    img = Image.new("RGBA", (w + 80, h + 80), (0, 0, 0, 0))
+    g = Image.new("L", img.size, 0)
+    ImageDraw.Draw(g).rounded_rectangle((40, 40, 40 + w, 40 + h), 40, fill=230)
+    g = g.filter(ImageFilter.GaussianBlur(20))
+    brilho = Image.new("RGBA", img.size, (255, 160, 30, 0))
+    brilho.putalpha(g)
+    img = Image.alpha_composite(img, brilho)
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle((40, 40, 40 + w, 40 + h), 40, fill=(12, 10, 8, 238), outline=OURO, width=5)
+    x0 = 40 + (w - tw - nw) // 2
+    d.text((x0, 40 + 58), txt, font=f, fill=(255, 240, 215), anchor="lm")
+    d.text((x0 + tw, 40 + 56), num, font=fn, fill=OURO, anchor="lm")
+    bx0, bx1, by = 40 + 36, 40 + w - 36, 40 + h - 22             # barra de progresso que esvazia até a revelação
+    d.rounded_rectangle((bx0, by, bx1, by + 8), 4, fill=(80, 64, 30, 255))
+    d.rounded_rectangle((bx0, by, bx0 + max(8, int((bx1 - bx0) * prog)), by + 8), 4, fill=OURO)
+    return img
+
+
 def cabecalho(ref):
     f = fonte("Cinzel-Bold.ttf", 40)
     img, m = texto_brilho(ref, f, OURO, brilho=(255, 160, 40), espaco=6)
     camada = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     x = (W - img.width) // 2
     camada.alpha_composite(img, (x, 230 - img.height // 2))
+    marca("referencia", img, x, 230 - img.height // 2)
     d = ImageDraw.Draw(camada)
     for lado in (-1, 1):
         cx = W // 2 + lado * (img.width // 2 - m + 30)
@@ -513,10 +561,10 @@ def cabecalho(ref):
 
 
 def titulo_camadas(linhas):
-    out, y = [], 470
+    out, y = [], Y_TITULO
     for i, ln in enumerate(linhas):
         ultimo = i == len(linhas) - 1
-        f = fonte_cabe("Cinzel-Bold.ttf", 104 if ultimo else 86, ln, 900)
+        f = fonte_cabe("Cinzel-Bold.ttf", 104 if ultimo else 86, ln, LARG_TEXTO + 40)
         img, m = texto_brilho(ln, f, OURO if ultimo else (255, 255, 255), brilho=(255, 150, 30) if ultimo else None)
         out.append((img, y - m))
         y += 116 if not ultimo else 130
@@ -605,7 +653,6 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
     parts = particulas()
     ganchos_t = [tempos[0][0]] + [tp[0] for c, tp in zip(cenas, tempos) if c.get("card") or c.get("cta")]
     rev_t = tempos[rot["revelacao"]][0] if "revelacao" in rot else None
-    chips = {}
     flash_cor = Image.new("RGBA", (W, H), (255, 214, 140, 255))
     aviso = None
     if provisorio:
@@ -619,7 +666,7 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
 
     cmd = ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS),
            "-i", "-", "-i", arq_a, "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p",
-           "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", saida]
+           "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000", "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", saida]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     nq = int(dur * FPS)
     for q in range(nq):
@@ -643,14 +690,18 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
                 ka = np.clip((t - 0.12 * k) / 0.3, 0, 1) * np.clip((fim_titulo - 0.2 - t) / 0.25, 0, 1)
                 esc = 1.25 - 0.25 * (1 - (1 - np.clip((t - 0.12 * k) / 0.3, 0, 1)) ** 3)
                 im2 = im.resize((int(im.width * esc), int(im.height * esc)), Image.BILINEAR) if esc > 1.001 else im
+                if ka > 0.3:
+                    marca("titulo", im2, (W - im2.width) // 2, y - (im2.height - im.height) // 2)
                 img.alpha_composite(com_alfa(im2, ka), ((W - im2.width) // 2, y - (im2.height - im.height) // 2))
         if rev_t is not None and 0 < rev_t - t <= 16 and t > fim_titulo:      # contagem regressiva da revelação
             seg = int(np.ceil(rev_t - t))
-            if seg not in chips:
-                chips[seg], _ = texto_brilho(f"A REVELAÇÃO VEM EM {seg}s", fonte("Cinzel-Bold.ttf", 46), (255, 236, 200),
-                                             brilho=(255, 150, 30))
-            pulso = 0.78 + 0.22 * np.sin(t * 7)
-            img.alpha_composite(com_alfa(chips[seg], pulso), ((W - chips[seg].width) // 2, 345 - chips[seg].height // 2))
+            ch = chip_contagem(seg, (rev_t - t) / 16)
+            entra = np.clip((t - max(fim_titulo, rev_t - 16)) / 0.35, 0, 1)
+            pulso = 1 + 0.035 * np.sin(t * 6)
+            ch2 = ch.resize((int(ch.width * pulso), int(ch.height * pulso)), Image.BILINEAR)
+            pos = ((W - ch2.width) // 2, Y_CONTAGEM - ch2.height // 2)
+            marca("contagem", ch2, *pos)
+            img.alpha_composite(com_alfa(ch2, entra), pos)
         for o in objs:
             if o.a - 0.05 <= t < o.b:
                 o.desenha(img, t)
@@ -673,6 +724,8 @@ def main():
     ap.add_argument("--autorizo-nova-voz", action="store_true", help="só com licença do dono (regra: 1 voz por vídeo)")
     ap.add_argument("--ignora-conferidor", action="store_true", help="só para teste; o canal exige zero FALHA")
     ap.add_argument("--sem-imagens", action="store_true", help="rascunho com fundo provisório (não chama Replicate)")
+    ap.add_argument("--ignora-analistas", action="store_true", help="só para teste; o canal exige zero FALHA dos analistas")
+    ap.add_argument("--saida", help="pasta de saída (padrão: saida/luz)")
     a = ap.parse_args()
     carrega_chaves()
     rot = json.load(open(a.roteiro, encoding="utf-8"))
@@ -695,15 +748,26 @@ def main():
     print("[ganchos] com os tempos reais da voz:")
     if conferir.imprime(conferir.confere(rot, [tp[0] for tp in tempos], dur_tot)) and not a.ignora_conferidor:
         sys.exit("[ganchos] há lacunas sem gancho nos tempos reais; ajuste os cartões (sem mudar a fala) e rode de novo.")
-    os.makedirs(os.path.join(RAIZ, "saida", "luz"), exist_ok=True)
+    dir_saida = a.saida or os.path.join(RAIZ, "saida", "luz")
+    os.makedirs(dir_saida, exist_ok=True)
     nome = rot["slug"] + ("_rascunho" if a.sem_imagens else "")
-    saida = os.path.join(RAIZ, "saida", "luz", nome + ".mp4")
+    saida = os.path.join(dir_saida, nome + ".mp4")
     renderiza(rot, arqs, voz, tempos, saida, a.sem_imagens)
-    with open(os.path.join(RAIZ, "saida", "luz", rot["slug"] + "_legenda.txt"), "w", encoding="utf-8") as f:
+    with open(os.path.join(dir_saida, rot["slug"] + "_legenda.txt"), "w", encoding="utf-8") as f:
         f.write(rot["legenda"] + "\n")
-    if not a.sem_imagens:
+    # o que os analistas precisam para revisar sem renderizar de novo
+    json.dump({"layout": LAYOUT, "tempos": tempos, "dur": dur_tot, "imagens": arqs, "voz_sr": SR},
+              open(os.path.join(pasta, "render.json"), "w"), indent=1)
+    np.save(os.path.join(pasta, "voz_final.npy"), voz)
+    print(f"[ok] renderizado: {saida}  ({dur_tot:.1f} s)")
+    print("[analistas] revisando cada parte do vídeo antes de finalizar:")
+    falhas = analistas.analisa(rot, saida, pasta, rascunho=a.sem_imagens)
+    if falhas and not a.ignora_analistas:
+        sys.exit(f"[analistas] {falhas} FALHA: vídeo NÃO aprovado (relatório em {saida[:-4]}_analise.txt). "
+                 "Corrija e rode de novo; o tema não foi registrado.")
+    if not a.sem_imagens and not a.saida:
         temas.registra(rot)          # entra na lista de temas (vale 2 meses)
-    print(f"[ok] {saida}  ({len(voz) / SR + 1.2:.1f} s)")
+    print(f"[ok] aprovado nos analistas automáticos: {saida}\n[ok] agora rode os analistas Claude (analista-fatos, analista-imagens, analista-tela) antes de entregar.")
 
 
 if __name__ == "__main__":

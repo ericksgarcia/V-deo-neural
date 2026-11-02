@@ -48,6 +48,22 @@ Sem soco de zoom e sem corte seco. A troca é uma **fusão de cinema** de 1,0 s 
 nova cena): as duas imagens continuam em movimento lento (Ken Burns), com leve desfoque e um brilho quente no meio da troca.
 Está em `Fundo.quadro` (`gerar.py`); vale para todos os vídeos automaticamente.
 
+## Layout e área dos ícones do TikTok (decisão de 02/nov/2026)
+
+Nenhum texto embaixo da interface do TikTok: coluna de ícones à direita (x > 940, y 760-1580), faixa de nome/legenda/música
+embaixo (y > 1500) e abas no topo (y < 150). Textos centralizados com no máximo 780 px de largura. Posições: referência y 230,
+título y 380-720, cartão y 650, legenda y ~1040, botão "Comente" y 1300, **contagem regressiva embaixo em y 1415** (pílula escura
+com borda dourada, número grande e barra que esvazia). O gerador grava a caixa real de cada elemento em `.cache/luz/<slug>/render.json`.
+
+## Analistas (antes de entregar)
+
+1. **Automáticos** (`analistas.py`, o gerador roda sozinho e para com FALHA): técnico (1080x1920, 30 fps, duração, quadros pretos,
+   volume normalizado em -14 LUFS), zona segura do TikTok e ritmo (palavras/s, tempo de leitura dos cartões). Também monta o
+   pacote `.cache/luz/<slug>/revisao/` (imagens.jpg, quadros_N.jpg com a interface do TikTok em vermelho, roteiro.txt).
+2. **Analistas Claude** (`.claude/agents/`): `analista-fatos` (versículos e afirmações), `analista-imagens` (realismo, sem texto
+   nem rosto, combina com a fala) e `analista-tela` (ortografia, legibilidade, sobreposição, área dos ícones). Rodam em paralelo;
+   só entrega com os três APROVADO. Nenhum analista usa o Gemini (Gemini é só a voz).
+
 ## Roteiro (`roteiros/<slug>.json`)
 
 `ref` (topo), `titulo` (3 linhas, a última em dourado), `imagens` (prompts em inglês, sem rosto de Jesus, sem texto),
