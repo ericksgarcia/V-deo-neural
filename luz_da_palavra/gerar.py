@@ -42,6 +42,11 @@ LARG_TEXTO = 740            # largura máxima de qualquer texto centralizado: x 
 Y_CARTAO = 650             # cartão de re-gancho: acima da altura dos ícones (que começam por volta de y 760)
 Y_TITULO = 380             # título de abertura (3 linhas) termina antes de y 760
 Y_CONTAGEM = 1415           # contagem regressiva embaixo, acima da faixa da legenda do TikTok
+# Trilha de fundo (dono, 02/nov/2026): a música enviada pelo dono, a partir de 3:55 (o arquivo já começa ali), BEM BAIXA
+# para não atrapalhar a narração. Nível medido contra a voz: -18 dB nas pausas e -24 dB debaixo da fala (abaixa sozinha).
+MUSICA = os.path.join(AQUI, "musica", "trilha.m4a")
+MUSICA_PAUSA_DB, MUSICA_DUCK_DB = -18.0, -6.0
+MUSICA_LOOP = 0.8           # o vídeo toca a música a partir de 0,8 s e funde no começo dela no fim (loop sem pulo)
 LAYOUT_EXTRA = {}           # medidas do render para os analistas (ex.: diferença entre o fim e o começo)
 LAYOUT = {}                 # caixas reais de cada elemento desenhado (para o analista de zona segura)
 
@@ -358,9 +363,45 @@ def cauda(rot):
     return 0.12 if rot.get("emenda") else 1.2
 
 
+def le_musica(segundos, arquivo=MUSICA):
+    """Música de fundo mono 48 kHz (os primeiros `segundos`)."""
+    p = subprocess.run(["ffmpeg", "-v", "error", "-i", arquivo, "-t", f"{segundos:.2f}", "-ac", "1", "-ar", str(SR),
+                        "-f", "f32le", "-"], capture_output=True, check=True)
+    x = np.frombuffer(p.stdout, np.float32).copy()
+    if len(x) < int(segundos * SR):
+        raise RuntimeError(f"a música {arquivo} tem menos de {segundos:.0f} s a partir do ponto de início")
+    return x
+
+
+def _rms_db(x):
+    return float(20 * np.log10(np.sqrt(np.mean(np.square(x))) + 1e-9)) if len(x) else -120.0
+
+
+def trilha(dur, voz_rms, emenda):
+    """Música baixa: nível relativo à voz; com emenda, o fim funde no início dela (o loop não dá pulo na música)."""
+    n = int(dur * SR)
+    x = le_musica(dur + MUSICA_LOOP + 0.5)
+    lp = int(MUSICA_LOOP * SR)
+    m = x[lp: lp + n].copy()
+    if emenda:                      # últimos 0,8 s: m(t) -> x(t + 0,8 - dur), que termina em x(0,8) = 1º quadro
+        k = np.linspace(0, 1, lp) ** 0.5
+        m[-lp:] = m[-lp:] * (1 - k) + x[:lp] * k
+    else:
+        m[: SR // 2] *= np.linspace(0, 1, SR // 2)
+    ganho = 10 ** (MUSICA_PAUSA_DB / 20) * voz_rms / (np.sqrt(np.mean(m ** 2)) + 1e-9)
+    return (m * ganho).astype(np.float32)
+
+
 def mixa(voz, tempos, cenas, dur, emenda=False):
     n = int(dur * SR)
-    mus = pad(dur)[:n]
+    v = np.zeros(n, np.float32)
+    v[: len(voz)] = voz[:n]
+    h = SR // 20                                      # janelas de 50 ms
+    fr = np.sqrt(np.mean(v[: n // h * h].reshape(-1, h) ** 2, 1))
+    falando = fr > 0.03
+    voz_rms = float(np.sqrt(np.mean(fr[falando] ** 2))) if falando.any() else 0.1
+    com_musica = os.path.exists(MUSICA)
+    mus = trilha(dur, voz_rms, emenda) if com_musica else pad(dur)[:n] * 0.35
     sfx = np.zeros(n, np.float32)
 
     def poe(som, t0, ganho):
@@ -373,15 +414,27 @@ def mixa(voz, tempos, cenas, dur, emenda=False):
         if c.get("card"):
             poe(swell(), a - 1.2 + 0.25, 0.10)
             poe(impacto(), a + 0.25, 0.22)
-    v = np.zeros(n, np.float32)
-    v[: len(voz)] = voz[:n]
-    # abaixa música/efeitos enquanto a voz fala
-    env = np.convolve(np.abs(v), np.ones(4800) / 4800, "same")
-    duck = 1 - 0.55 * np.clip(env / 0.05, 0, 1)
-    mix = v + (mus * 0.35 + np.clip(sfx, -0.2, 0.2)) * duck
-    fade = int((0.03 if emenda else 1.0) * SR)       # com emenda: sem fade-out audível (o loop não pode "terminar")
-    mix[-fade:] *= np.linspace(1, 0, fade)
-    return (mix / max(1.0, np.abs(mix).max() / 0.9)).astype(np.float32)
+    # abaixa música/efeitos enquanto a voz fala (ataque e soltura suaves, ~0,3 s)
+    env = np.convolve(np.abs(v), np.ones(SR // 10) / (SR // 10), "same")
+    env = np.convolve(env, np.ones(SR // 4) / (SR // 4), "same")
+    duck = 1 - (1 - 10 ** (MUSICA_DUCK_DB / 20)) * np.clip(env / 0.04, 0, 1)
+    fundo = mus * duck
+    mix = v + fundo + np.clip(sfx, -0.2, 0.2) * duck
+    if not emenda:                                   # com emenda: sem fade-out (o loop não pode "terminar")
+        fade = SR
+        mix[-fade:] *= np.linspace(1, 0, fade)
+    pico = float(np.abs(mix).max())
+    # medidas para o analista de som: música x voz nos trechos de fala e nas pausas
+    fm = np.sqrt(np.mean(fundo[: n // h * h].reshape(-1, h) ** 2, 1))
+    pausa = fr < 0.005
+    LAYOUT_EXTRA["audio"] = {
+        "musica": os.path.relpath(MUSICA, RAIZ) if com_musica else None,
+        "musica_sob_voz_db": round(_rms_db(fm[falando]) - _rms_db(fr[falando]), 1) if falando.any() else None,
+        "musica_pausa_db": round(_rms_db(fm[pausa]) - 20 * np.log10(voz_rms), 1) if pausa.any() else None,
+        "musica_presente_pct": round(100 * float(np.mean(fm > 10 ** (-60 / 20))), 1),
+        "pico_antes_norm": round(pico, 3),
+    }
+    return (mix / max(1.0, pico / 0.9)).astype(np.float32)
 
 
 # ---------------------------------------------------------------- visual
@@ -632,6 +685,37 @@ class Fundo:
         return q.convert("RGBA")
 
 
+class Escurece:
+    """Escurecimento automático atrás do texto (dono, 02/nov: os analistas acharam cartões difíceis de ler sobre céu claro).
+    Mede o brilho do fundo na faixa do cartão e da legenda em cada quadro e escurece só o necessário."""
+    NIVEIS = 32
+
+    def __init__(self):
+        self.atual = None                      # força suavizada (sem degrau nem tremida de um quadro para o outro)
+        yy = np.arange(H, dtype=np.float32)[:, None]
+        faixa = np.exp(-((yy - 900) / 380) ** 4) * np.ones((1, W), np.float32)    # plana do cartão (y~650) à legenda (y~1200)
+        self.mascaras = [Image.fromarray((faixa * 255 * k / (self.NIVEIS - 1)).astype(np.uint8))
+                         for k in range(self.NIVEIS)]
+        self.preto = Image.new("RGBA", (W, H), (4, 4, 8, 0))
+
+    @staticmethod
+    def brilho(img):
+        """Brilho (0-255) do fundo nas áreas de texto: percentil 75 da luminância, em resolução reduzida."""
+        p = np.asarray(img.convert("L").resize((108, 192), Image.BILINEAR), np.float32)
+        return {"cartao": float(np.percentile(p[57:71, 17:91], 75)), "legenda": float(np.percentile(p[86:124, 17:91], 75))}
+
+    def aplica(self, img):
+        b = self.brilho(img)
+        alvo = float(np.clip((max(b.values()) - 80) / 60, 0, 1)) * 0.8        # até 80% de escurecimento no centro
+        self.atual = alvo if self.atual is None else self.atual + (alvo - self.atual) * 0.12
+        k = int(round(self.atual * (self.NIVEIS - 1)))
+        if k:
+            camada = self.preto.copy()
+            camada.putalpha(self.mascaras[k])
+            img.alpha_composite(camada)
+        return k
+
+
 def particulas(n=45, semente=1):
     rng = np.random.default_rng(semente)
     return [(rng.uniform(0, W), rng.uniform(0, H), rng.uniform(1.5, 4.5), rng.uniform(12, 40), rng.uniform(0, 6.28))
@@ -659,6 +743,12 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
     LAYOUT_EXTRA["emenda_diff"] = float(np.abs(a0 - a1).mean())
     tit = titulo_camadas(rot["titulo"])
     fim_titulo = (tempos[1][0] + 0.25) if len(tempos) > 1 else tempos[0][1]      # o título some quando entra o 1º re-gancho
+    # capa (dono, 02/nov): o TikTok só aceita um QUADRO do vídeo como capa (Buffer: metadata.thumbnailOffset). A capa é o
+    # quadro com o título inteiro no ar; a legenda da cena 0 não aparece (o título já é o gancho escrito), capa limpa.
+    t_capa = round(min(1.2, max(0.75, fim_titulo - 0.6)), 2)
+    LAYOUT_EXTRA["capa_t"] = t_capa
+    sem_legenda0 = not rot.get("legenda_cena0", False)
+    escur, contraste = Escurece(), {}
     parts = particulas()
     # com emenda o botão "Comente" sai 1,5 s depois de entrar a última fala: o fim fica igual ao começo
     fim_cta = (tempos[-1][0] + 1.5) if rot.get("emenda") else 1e9
@@ -690,6 +780,14 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
             fl.putalpha(Image.new("L", (W, H), int(forca * np.exp(-min(dt_) / 0.10))))
             img.alpha_composite(fl)
         img.alpha_composite(sob)
+        escur.aplica(img)
+        if q % 3 == 0:                                  # contraste: brilho do fundo atrás do texto, por cena (analista)
+            ci = max([k for k, o in enumerate(objs) if o.a - 0.05 <= t] or [0])
+            b = escur.brilho(img)
+            m = contraste.setdefault(ci, {"cartao": 0.0, "legenda": 0.0})
+            if cenas[ci].get("card") and t <= objs[ci].a + 2.5:
+                m["cartao"] = max(m["cartao"], round(b["cartao"], 1))
+            m["legenda"] = max(m["legenda"], round(b["legenda"], 1))
         d = ImageDraw.Draw(img)
         for (x, y, r, vel, fase) in parts:
             yy = (y - vel * t) % H
@@ -712,8 +810,8 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
             pos = ((W - ch.width) // 2, Y_CONTAGEM - ch.height // 2)
             marca("contagem", ch, *pos)
             img.alpha_composite(com_alfa(ch, entra), pos)
-        for o in objs:
-            if o.a - 0.05 <= t < o.b:
+        for k, o in enumerate(objs):
+            if o.a - 0.05 <= t < o.b and not (k == 0 and sem_legenda0 and t < fim_titulo):
                 o.desenha(img, t)
             o.desenha_cta(img, t, fim_cta)           # o botão "Comente" fica até o fim (com emenda, some antes)
         if aviso is not None:
@@ -724,6 +822,10 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
     proc.stdin.close()
     proc.wait()
     os.remove(arq_a)
+    LAYOUT_EXTRA["contraste"] = {str(k): v for k, v in sorted(contraste.items())}
+    # capa: o mesmo quadro que o TikTok vai usar, para o dono e os analistas verem
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{t_capa:.2f}", "-i", saida, "-frames:v", "1", "-q:v", "2",
+                    saida[:-4] + "_capa.jpg"], check=True)
 
 
 # ---------------------------------------------------------------- principal
@@ -771,7 +873,8 @@ def main():
     with open(os.path.join(dir_saida, rot["slug"] + "_legenda.txt"), "w", encoding="utf-8") as f:
         f.write(rot["legenda"] + "\n")
     # o que os analistas precisam para revisar sem renderizar de novo
-    json.dump({"layout": LAYOUT, **LAYOUT_EXTRA, "emenda": rot.get("emenda"), "tempos": tempos, "dur": dur_tot, "imagens": arqs, "voz_sr": SR},
+    json.dump({"layout": LAYOUT, **LAYOUT_EXTRA, "emenda": rot.get("emenda"), "tempos": tempos, "dur": dur_tot, "imagens": arqs,
+               "voz_sr": SR, "capa": saida[:-4] + "_capa.jpg"},
               open(os.path.join(pasta, "render.json"), "w"), indent=1)
     np.save(os.path.join(pasta, "voz_final.npy"), voz)
     print(f"[ok] renderizado: {saida}  ({dur_tot:.1f} s)")
@@ -782,7 +885,8 @@ def main():
                  "Corrija e rode de novo; o tema não foi registrado.")
     if not a.sem_imagens and not a.saida:
         temas.registra(rot)          # entra na lista de temas (vale 2 meses)
-    print(f"[ok] aprovado nos analistas automáticos: {saida}\n[ok] agora rode os analistas Claude (analista-fatos, analista-imagens, analista-tela) antes de entregar.")
+    print(f"[ok] aprovado nos analistas automáticos: {saida}\n[ok] agora rode os 5 analistas Claude (analista-fatos, "
+          "analista-imagens, analista-tela, analista-som, analista-post) e só publique com todos APROVADO.")
 
 
 if __name__ == "__main__":

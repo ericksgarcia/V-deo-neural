@@ -1,0 +1,16 @@
+Analistas automáticos · ep05_doze.mp4
+
+1. técnico: OK  (52.1 s, -15.5 LUFS, pico -1.3 dBFS)
+2. zona segura (TikTok): OK  (referencia y210-248, titulo y395-723, cartao y580-711, legenda y909-1195, cta y1244-1357, contagem y1380-1451)
+3. ritmo: 0 FALHA, 1 AVISO  (16 cenas)
+    AVISO: cena 13: 4.2 palavras/s (corrido demais para ler)
+4. emenda (loop): OK  (diferença de fundo 0.5, sobra 0.18 s · "E tudo começou quando, naquele dia, Jesus parou no caminho, e a filha de Jairo morreu.")
+5. som (música e narração): OK  (música -23.9 dB sob a voz, -18.5 dB nas pausas, presente 100.0%)
+6. contraste do texto: OK  (pior brilho atrás do texto 111.0)
+7. ortografia: 0 FALHA, 1 AVISO  (88 palavras conferidas)
+    AVISO: fora do dicionário (conferir grafia): cumi
+8. post (legenda, CTA, capa): OK  (229 caracteres, 5 hashtags, capa em 1.2 s)
+9. integridade do arquivo: OK  (28.4 MB)
+
+APROVADO nos automáticos
+Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep05_doze/revisao
