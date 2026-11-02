@@ -89,3 +89,4 @@ comenta amém") antes da última fala. **Última fala** retoma uma palavra do ga
 |----|------|-----|---------|--------------------|--------|
 | 01 | O mesmo fogo (anthrakia: Jo 18:18 e 21:9) | JOÃO 21:9 | 53 s | Jesus acendeu o MESMO fogo onde Pedro o negou 🔥 | pronto (imagens flux-schnell; 2 requisições de voz: a 1ª Charon, descartada) |
 | 02 | Jesus chorou sabendo que ia ressuscitar Lázaro (Jo 11) | JOÃO 11:35 | 53 s | Jesus chorou diante de um túmulo que Ele mesmo ia abrir 😢 | pronto (flux-schnell; 1 requisição Achird) |
+| 03 | Deus não estava no vento, terremoto nem fogo: falou num sussurro (1 Rs 19) | 1 REIS 19:12 | 48 s | 3 vezes Deus passou por Elias, e não estava lá 🌬️ | pronto (flux-schnell; 1 requisição Achird efetiva; a 1ª falhou com 401 por falta de chave, sem áudio) |
