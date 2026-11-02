@@ -27,7 +27,7 @@
   "imagens": [
     "a dramatic rocky mountain summit in the desert at dawn, huge boulders and a deep canyon, golden sunrays breaking through clouds, ultra detailed",
     "a lonely rocky cave entrance on a desert mountainside at dusk, warm orange sky, dry shrubs in the foreground",
-    "powerful wind blowing across a rocky mountain ridge, swirling dust and dry grass bending hard, stormy golden sky, real photograph",
+    "powerful wind blowing across a mountain ridge, swirling dust and dry grass bending, stormy golden sky, dramatic clouds",
     "a rocky canyon with fallen boulders and cracked earth after an earthquake, dust hanging in the air in sunlight",
     "a wild fire of dry brush glowing on a desert hillside at dusk, sparks rising into a dark blue sky",
     "a perfectly still quiet mountain valley at first light, soft golden mist, a single gentle sunbeam, calm and peaceful",
@@ -93,7 +93,7 @@
     {
       "img": 6,
       "fala": "Elias cobriu o rosto, porque reconheceu a *voz*.",
-      "card": "ELE COBRIU O ROSTO"
+      "card": "ELE RECONHECEU"
     },
     {
       "img": 6,
@@ -118,5 +118,6 @@
   "estilo_extra": "'sussurro tranquilo e suave' is said as a soft whisper with a pause before it. 'Era ali' is tender and slow. Wind, earthquake and fire lines are said with rising intensity but never shouting.",
   "revelacao": 9,
   "velocidade": 1.04,
-  "legenda": "Deus passou por Elias, mas não estava no terremoto 🌬️ e onde Ele estava vai mexer com você.\nManda pra quem está cansado de esperar um sinal. 🙏\nComenta AMÉM se você precisava ouvir isso.\n\n#jesus #biblia #fe #deus #evangelho"
+  "legenda": "Deus passou por Elias, mas não estava no terremoto 🌬️ e onde Ele estava vai mexer com você.\nManda pra quem está cansado de esperar um sinal. 🙏\nComenta AMÉM se você precisava ouvir isso.\n\n#jesus #biblia #fe #deus #evangelho",
+  "revisao": "Publicado assim. Analistas (02/nov) acharam: gancho impreciso (1Rs 19:11: Deus passa 1 vez; os 3 sao vento, terremoto e fogo) e logo National Geographic na imagem 2. Dono decidiu nao refazer; licoes aplicadas aos proximos."
 }

@@ -52,15 +52,15 @@ Está em `Fundo.quadro` (`gerar.py`); vale para todos os vídeos automaticamente
 
 Nenhum texto embaixo da interface do TikTok: coluna de ícones à direita (x > 940, y 760-1580), faixa de nome/legenda/música
 embaixo (y > 1500) e abas no topo (y < 150). Textos centralizados com no máximo 740 px de largura. Posições: referência y 230,
-título y 380-720, cartão y 650, legenda y ~1040, botão "Comente" y 1300, **contagem regressiva embaixo em y 1415** (pílula escura
-com borda dourada, número grande e barra que esvazia). O gerador grava a caixa real de cada elemento em `.cache/luz/<slug>/render.json`.
+título y 380-720, cartão y 650, legenda y ~1040, botão "Comente" y 1300, **contagem regressiva embaixo em y 1415**, discreta (pílula
+translúcida pequena, sem brilho nem pulso, barra fina que esvazia: a legenda é o destaque). O gerador grava a caixa real de cada elemento em `.cache/luz/<slug>/render.json`.
 
 ## Analistas (antes de entregar)
 
 1. **Automáticos** (`analistas.py`, o gerador roda sozinho e para com FALHA): técnico (1080x1920, 30 fps, duração, quadros pretos,
    volume normalizado em -14 LUFS), zona segura do TikTok e ritmo (palavras/s, tempo de leitura dos cartões). Também monta o
    pacote `.cache/luz/<slug>/revisao/` (imagens.jpg, quadros_N.jpg com a interface do TikTok em vermelho, roteiro.txt).
-2. **Analistas Claude** (`.claude/agents/`): `analista-fatos` (versículos e afirmações), `analista-imagens` (realismo, sem texto
+2. **Analistas Claude** (`.claude/agents/`): `analista-fatos` (roda também ANTES da voz, no roteiro) (versículos e afirmações), `analista-imagens` (realismo, sem texto
    nem rosto, combina com a fala) e `analista-tela` (ortografia, legibilidade, sobreposição, área dos ícones). Rodam em paralelo;
    só entrega com os três APROVADO. Nenhum analista usa o Gemini (Gemini é só a voz).
 
@@ -103,6 +103,6 @@ comenta amém") antes da última fala. **Última fala** retoma uma palavra do ga
 
 | Ep | Tema | Ref | Duração | Linha 1 da legenda | Estado |
 |----|------|-----|---------|--------------------|--------|
-| 01 | O mesmo fogo (anthrakia: Jo 18:18 e 21:9) | JOÃO 21:9 | 53 s | Jesus acendeu o MESMO fogo onde Pedro o negou 🔥 | pronto (imagens flux-schnell; 2 requisições de voz: a 1ª Charon, descartada) |
+| 01 | O mesmo fogo (anthrakia: Jo 18:18 e 21:9) | JOÃO 21:9 | 53 s | Jesus acendeu o MESMO fogo onde Pedro o negou 🔥 | pronto (imagens flux-schnell; 2 requisições de voz: a 1ª Charon, descartada; logo National Geographic na cena da floresta, mantido) |
 | 02 | Jesus chorou sabendo que ia ressuscitar Lázaro (Jo 11) | JOÃO 11:35 | 53 s | Jesus chorou diante de um túmulo que Ele mesmo ia abrir 😢 | pronto (flux-schnell; 1 requisição Achird) |
-| 03 | Deus não estava no vento, terremoto nem fogo: falou num sussurro (1 Rs 19) | 1 REIS 19:12 | 48 s | 3 vezes Deus passou por Elias, e não estava lá 🌬️ | pronto (flux-schnell; 1 requisição Achird efetiva; a 1ª falhou com 401 por falta de chave, sem áudio) |
+| 03 | Deus não estava no vento, terremoto nem fogo: falou num sussurro (1 Rs 19) | 1 REIS 19:12 | 48 s | 3 vezes Deus passou por Elias, e não estava lá 🌬️ | pronto (flux-schnell; 1 requisição Achird efetiva; a 1ª falhou com 401 por falta de chave, sem áudio). Analistas depois: gancho impreciso e logo na img 2; dono decidiu não refazer |

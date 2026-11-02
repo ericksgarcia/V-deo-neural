@@ -15,24 +15,27 @@ Este repositório contém SÓ esse canal (o antigo canal de simulações de IA f
    escrito grande na tela em 0 s; 2ª fala abre um laço; um gancho/re-gancho (cartão, "…" ou pergunta) a cada <= 5,5 s; revelação
    entre 40% e 60%; virada pessoal, CTA e última fala que retoma o gancho.
 4. `python luz_da_palavra/conferir.py <roteiro>`: **corrija até zero FALHA** (o gerador também se recusa a rodar com FALHA).
+   Em seguida rode o **`analista-fatos` no roteiro, ANTES da voz** (o erro de fato custa uma voz nova se achado depois;
+   no ep03 o gancho "3 vezes Deus passou" saiu errado: em 1Rs 19:11 Deus passa uma vez). Só gere com ele APROVADO.
 5. `python luz_da_palavra/gerar.py <roteiro>`: gera as imagens (flux-schnell, ~4 min por causa do limite do Replicate),
    **UMA** requisição de voz (Achird) e o vídeo, e registra o tema na lista. Mudar o texto falado depois = nova requisição de voz
    (peça licença ao dono). Mudar cartões, título, destaques, legenda ou imagens não gasta voz.
 6. **Analistas antes de entregar (obrigatório).** O `gerar.py` já roda os analistas automáticos (`analistas.py`: técnico,
    zona segura do TikTok, ritmo) e para com FALHA. Depois rode em paralelo os 3 analistas Claude (`.claude/agents/`):
-   `analista-fatos`, `analista-imagens` e `analista-tela`, cada um com o slug. Qualquer FALHA: corrija (sem mudar a fala, se
+   `analista-fatos` (de novo, rápido), `analista-imagens` e `analista-tela`, cada um com o slug. Narração: o Claude não ouve
+   áudio; avise o dono para escutar antes de postar. Qualquer FALHA: corrija (sem mudar a fala, se
    possível), gere de novo e repita os analistas até todos darem APROVADO. Entregue **juntos** o `.mp4` e a legenda (`saida/luz/<slug>_legenda.txt`)
    e cole a legenda no chat. Atualize a tabela de episódios do `luz_da_palavra/README.md`, faça commit e push.
 
 ## Regras do dono (não mude sem licença)
 
 - **Voz: SEMPRE Achird** (Gemini TTS `gemini-3.8-flash-tts`). **UMA requisição de voz por vídeo** (trava em `gerar.py`).
-- **Imagens: SEMPRE `black-forest-labs/flux-schnell`** no Replicate, fotografia **ultra realista** (nada de ilustração/pintura/3D),
+- **Imagens: SEMPRE `black-forest-labs/flux-schnell`** (nunca cite marca no prompt: vira logo na foto) no Replicate, fotografia **ultra realista** (nada de ilustração/pintura/3D),
   natureza e lugares reais, cores vivas porém verdadeiras. Sem rosto de Jesus, sem texto na imagem.
 - **Transições:** fusão suave entre imagens (dissolve de 1 s com desfoque/brilho leve). **Sem soco de zoom** e sem corte seco.
 - **Gemini só para a voz (TTS).** Roteiros, análises e revisões são feitos pelo Claude; imagens só no Replicate.
 - **Área dos ícones do TikTok:** nenhum texto na coluna da direita (x > 940, y 760-1580), na faixa de baixo (y > 1500)
-  nem no topo (y < 150). A contagem regressiva fica embaixo (y ~1415), em pílula escura bem visível.
+  nem no topo (y < 150). A contagem regressiva fica embaixo (y ~1415), DISCRETA (a legenda é o destaque).
 - Tom: amigo cristão caloroso, reverente, assombro e suspense amigável; nunca pregador gritando nem sombrio.
 - Honestidade: toda afirmação bíblica precisa estar em `fatos` com o versículo. Nada inventado.
 - Língua: português do Brasil, frases curtas, 100-145 palavras, 40-55 s (teto 60 s).

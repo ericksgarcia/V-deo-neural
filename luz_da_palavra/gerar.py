@@ -59,9 +59,9 @@ MODELO_TTS = "gemini-3.8-flash-tts"
 MODELO_IMG = "black-forest-labs/flux-schnell"
 # Estilo visual fixo de TODAS as imagens (dono, nov/2026): fotografia de natureza ULTRA REALISTA (nada de cara de
 # ilustração/pintura/3D), cores vivas e luz dramática que prendem o olho. Modelo: flux-schnell (Replicate).
-# Nunca cite marcas (ex.: "National Geographic"): o modelo desenha o logo na foto (aconteceu no ep03).
+# Nunca cite marcas (revista, câmera, agência): o modelo desenha o logo na foto (aconteceu no ep01 e no ep03).
 ESTILO_IMG = (
-    "ultra realistic professional landscape photograph, shot on a Canon EOS R5 with a 24mm lens, real natural light, "
+    "ultra realistic professional landscape photograph, shot on a full-frame camera with a 24mm lens, real natural light, "
     "true-to-life textures, sharp focus, natural film grain, vivid yet true-to-life colors, subtle contrast, no HDR glow, "
     "dramatic golden-hour or blue-hour sky, award-winning nature photography, raw photo, 8k, photorealistic. "
     "Not an illustration, not a painting, not digital art, not 3D render, not CGI, no fantasy, no text, no letters, "
@@ -524,27 +524,22 @@ def desenha_cta(txt):
 
 
 def chip_contagem(seg, prog):
-    """Contagem regressiva da revelação: pílula escura com borda dourada, número grande e barra que esvazia."""
-    f = fonte("Cinzel-Bold.ttf", 46)
-    fn = fonte("Cinzel-Bold.ttf", 76)
+    """Contagem regressiva da revelação, DISCRETA (dono, 02/nov): pílula translúcida pequena, sem brilho nem pulso,
+    para não roubar a atenção da legenda. Fica embaixo, fora da área dos ícones do TikTok."""
+    f = fonte("Cinzel-Bold.ttf", 30)
+    fn = fonte("Cinzel-Bold.ttf", 38)
     txt, num = "A REVELAÇÃO VEM EM ", f"{seg}s"
     tw, nw = int(f.getlength(txt)), int(fn.getlength(num))
-    w, h = min(tw + nw + 90, LARG_TEXTO - 20), 132
-    img = Image.new("RGBA", (w + 80, h + 80), (0, 0, 0, 0))
-    g = Image.new("L", img.size, 0)
-    ImageDraw.Draw(g).rounded_rectangle((40, 40, 40 + w, 40 + h), 40, fill=230)
-    g = g.filter(ImageFilter.GaussianBlur(20))
-    brilho = Image.new("RGBA", img.size, (255, 160, 30, 0))
-    brilho.putalpha(g)
-    img = Image.alpha_composite(img, brilho)
+    w, h = tw + nw + 56, 70
+    img = Image.new("RGBA", (w + 8, h + 8), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle((40, 40, 40 + w, 40 + h), 40, fill=(12, 10, 8, 238), outline=OURO, width=5)
-    x0 = 40 + (w - tw - nw) // 2
-    d.text((x0, 40 + 58), txt, font=f, fill=(255, 240, 215), anchor="lm")
-    d.text((x0 + tw, 40 + 56), num, font=fn, fill=OURO, anchor="lm")
-    bx0, bx1, by = 40 + 36, 40 + w - 36, 40 + h - 22             # barra de progresso que esvazia até a revelação
-    d.rounded_rectangle((bx0, by, bx1, by + 8), 4, fill=(80, 64, 30, 255))
-    d.rounded_rectangle((bx0, by, bx0 + max(8, int((bx1 - bx0) * prog)), by + 8), 4, fill=OURO)
+    d.rounded_rectangle((4, 4, 4 + w, 4 + h), 35, fill=(10, 8, 6, 120), outline=OURO + (110,), width=2)
+    x0 = 4 + (w - tw - nw) // 2
+    d.text((x0, 4 + 31), txt, font=f, fill=(240, 232, 218, 215), anchor="lm")
+    d.text((x0 + tw, 4 + 30), num, font=fn, fill=OURO + (225,), anchor="lm")
+    bx0, bx1, by = 4 + 30, 4 + w - 30, 4 + h - 12               # barra fina que esvazia até a revelação
+    d.rounded_rectangle((bx0, by, bx1, by + 3), 1, fill=(255, 255, 255, 45))
+    d.rounded_rectangle((bx0, by, bx0 + max(3, int((bx1 - bx0) * prog)), by + 3), 1, fill=OURO + (170,))
     return img
 
 
@@ -698,12 +693,10 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
         if rev_t is not None and 0 < rev_t - t <= 16 and t > fim_titulo:      # contagem regressiva da revelação
             seg = int(np.ceil(rev_t - t))
             ch = chip_contagem(seg, (rev_t - t) / 16)
-            entra = np.clip((t - max(fim_titulo, rev_t - 16)) / 0.35, 0, 1)
-            pulso = 1 + 0.035 * np.sin(t * 6)
-            ch2 = ch.resize((int(ch.width * pulso), int(ch.height * pulso)), Image.BILINEAR)
-            pos = ((W - ch2.width) // 2, Y_CONTAGEM - ch2.height // 2)
-            marca("contagem", ch2, *pos)
-            img.alpha_composite(com_alfa(ch2, entra), pos)
+            entra = np.clip((t - max(fim_titulo, rev_t - 16)) / 0.5, 0, 1) * np.clip((rev_t - t) / 0.3, 0, 1)
+            pos = ((W - ch.width) // 2, Y_CONTAGEM - ch.height // 2)
+            marca("contagem", ch, *pos)
+            img.alpha_composite(com_alfa(ch, entra), pos)
         for o in objs:
             if o.a - 0.05 <= t < o.b:
                 o.desenha(img, t)

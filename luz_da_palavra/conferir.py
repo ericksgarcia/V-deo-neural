@@ -78,6 +78,15 @@ def confere(rot, inicios=None, fim=None):
         r.append(("AVISO", "gancho sem nome bíblico (Jesus, Pedro, Maria…): o nome concreto prende mais"))
     if not cho and not re.search(r"\d", baixo):
         r.append(("AVISO", "gancho sem palavra de choque/contraste (ninguém, nunca, mesmo, negou, escondido…) nem número"))
+    # o título grande na tela e o gancho falado precisam contar a MESMA coisa (no ep03 divergiram)
+    tit = " ".join(rot.get("titulo", [])).lower()
+    pal_g = {w for w in re.findall(r"\w{4,}", baixo)} - {"estava", "mesmo", "quando", "porque", "depois"}
+    if tit and not any(w in tit for w in pal_g):
+        r.append(("AVISO", "título da tela não repete nenhuma palavra forte do gancho falado (devem dizer a mesma coisa)"))
+    tags = re.findall(r"#\w+", rot.get("legenda", ""))
+    genericas = {"#jesus", "#biblia", "#fe", "#deus", "#evangelho", "#fyp", "#foryou", "#viral"}
+    if tags and not [t for t in tags if t.lower() not in genericas]:
+        r.append(("AVISO", "legenda só com hashtags genéricas: inclua 1-2 do episódio (ex.: #elias, #lazaro, #pedro)"))
     if not cenas[0].get("titulo"):
         r.append(("AVISO", "cena 0 sem \"titulo\": true (o gancho precisa estar escrito grande na tela em 0 s)"))
     if len(cenas) > 1 and not any(p in limpa(cenas[1]["fala"]).lower() for p in PROMESSA):
