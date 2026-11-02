@@ -1,0 +1,18 @@
+Analistas automáticos · ep06_fornalha.mp4
+
+1. técnico: OK  (54.1 s, -16.6 LUFS, pico -1.2 dBFS)
+2. zona segura (TikTok): OK  (referencia y210-248, titulo y390-723, cartao y583-716, legenda y861-1221, cta y1244-1357, contagem y1380-1451)
+3. ritmo: 0 FALHA, 4 AVISO  (16 cenas)
+    AVISO: cena 3: 4.6 palavras/s (corrido demais para ler)
+    AVISO: cena 13: 4.5 palavras/s (corrido demais para ler)
+    AVISO: cena 14: 4.3 palavras/s (corrido demais para ler)
+    AVISO: cena 15: 4.3 palavras/s (corrido demais para ler)
+4. emenda (loop): OK  (diferença de fundo 0.4, sobra 0.18 s · "E foi assim que, naquele dia, lançaram 3 homens atados no fogo. O rei viu 4, soltos.")
+5. som (música e narração): OK  (música -20.8 dB sob a voz, -15.6 dB nas pausas, presente 100.0%)
+6. contraste do texto: OK  (pior brilho atrás do texto 118.0)
+7. ortografia: OK  (93 palavras conferidas)
+8. post (legenda, CTA, capa): OK  (259 caracteres, 5 hashtags, capa em 1.2 s)
+9. integridade do arquivo: OK  (38.2 MB)
+
+APROVADO nos automáticos
+Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep06_fornalha/revisao
