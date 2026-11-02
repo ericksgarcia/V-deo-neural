@@ -38,7 +38,7 @@ OURO = (255, 208, 92)
 CREME = (238, 232, 220)
 # Área livre da interface do TikTok (1080x1920): nada de texto embaixo da coluna de ícones à direita
 # (curtir/comentar/salvar/compartilhar/perfil) nem na faixa de baixo (nome, legenda, música). Os analistas cobram.
-LARG_TEXTO = 780            # largura máxima de qualquer texto centralizado: x 150..930
+LARG_TEXTO = 740            # largura máxima de qualquer texto centralizado: x 170..910 (folga dos ícones)
 Y_CARTAO = 650             # cartão de re-gancho: acima da altura dos ícones (que começam por volta de y 760)
 Y_TITULO = 380             # título de abertura (3 linhas) termina antes de y 760
 Y_CONTAGEM = 1415           # contagem regressiva embaixo, acima da faixa da legenda do TikTok
@@ -59,11 +59,13 @@ MODELO_TTS = "gemini-3.8-flash-tts"
 MODELO_IMG = "black-forest-labs/flux-schnell"
 # Estilo visual fixo de TODAS as imagens (dono, nov/2026): fotografia de natureza ULTRA REALISTA (nada de cara de
 # ilustração/pintura/3D), cores vivas e luz dramática que prendem o olho. Modelo: flux-schnell (Replicate).
+# Nunca cite marcas (ex.: "National Geographic"): o modelo desenha o logo na foto (aconteceu no ep03).
 ESTILO_IMG = (
     "ultra realistic professional landscape photograph, shot on a Canon EOS R5 with a 24mm lens, real natural light, "
     "true-to-life textures, sharp focus, natural film grain, vivid yet true-to-life colors, subtle contrast, no HDR glow, "
-    "dramatic golden-hour or blue-hour sky, National Geographic award-winning photography, raw photo, 8k, photorealistic. "
-    "Not an illustration, not a painting, not digital art, not 3D render, not CGI, no fantasy, no text, no watermark"
+    "dramatic golden-hour or blue-hour sky, award-winning nature photography, raw photo, 8k, photorealistic. "
+    "Not an illustration, not a painting, not digital art, not 3D render, not CGI, no fantasy, no text, no letters, "
+    "no logo, no watermark, no signature, no border"
 )
 ESTILO_VOZ = (
     "Voice: Achird. Channel 'Luz da Palavra': a warm Brazilian (pt-BR) Christian friend revealing a hidden detail "

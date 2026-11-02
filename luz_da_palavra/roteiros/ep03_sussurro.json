@@ -10,8 +10,10 @@
   ],
   "fatos": [
     "1Rs 19:1-4: Elias fugiu de Jezabel, foi ao deserto e pediu a morte, cansado.",
+    "1Rs 19:3: Elias teve medo e fugiu para salvar a vida.",
     "1Rs 19:9: Elias passou a noite numa caverna no monte Horebe.",
-    "1Rs 19:11: o Senhor disse que ia passar; veio um vento forte que fendia montes e quebrava rochas, mas o Senhor nao estava no vento.",
+    "1Rs 19:10,14: Elias disse: so eu fiquei, e procuram tirar-me a vida (achava que estava sozinho).",
+    "1Rs 19:11 (NVI): 'saia e fique no monte, pois o Senhor vai passar'; veio um vento forte que fendia montes e quebrava rochas, mas o Senhor nao estava no vento.",
     "1Rs 19:11: depois do vento, um terremoto; o Senhor nao estava no terremoto.",
     "1Rs 19:12: depois do terremoto, um fogo; o Senhor nao estava no fogo.",
     "1Rs 19:12: depois do fogo, um cicio tranquilo e suave (sussurro).",
@@ -25,7 +27,7 @@
   "imagens": [
     "a dramatic rocky mountain summit in the desert at dawn, huge boulders and a deep canyon, golden sunrays breaking through clouds, ultra detailed",
     "a lonely rocky cave entrance on a desert mountainside at dusk, warm orange sky, dry shrubs in the foreground",
-    "powerful wind blowing across a mountain ridge, swirling dust and dry grass bending, stormy golden sky, dramatic clouds",
+    "powerful wind blowing across a rocky mountain ridge, swirling dust and dry grass bending hard, stormy golden sky, real photograph",
     "a rocky canyon with fallen boulders and cracked earth after an earthquake, dust hanging in the air in sunlight",
     "a wild fire of dry brush glowing on a desert hillside at dusk, sparks rising into a dark blue sky",
     "a perfectly still quiet mountain valley at first light, soft golden mist, a single gentle sunbeam, calm and peaceful",
@@ -33,22 +35,85 @@
     "a vast calm sunrise over mountains and a mirror-like lake, pink and gold clouds, deep peace"
   ],
   "cenas": [
-    {"img": 0, "fala": "3 vezes Deus passou por Elias, e *não* estava lá.", "titulo": true},
-    {"img": 0, "fala": "E onde Ele estava vai *mexer* com você.", "card": "ONDE ELE ESTAVA"},
-    {"img": 1, "fala": "Elias fugiu da rainha Jezabel e *desabou* numa caverna.", "card": "FUGINDO"},
-    {"img": 1, "fala": "Cansado, com medo, achando que estava *sozinho*.", "card": "SOZINHO"},
-    {"img": 1, "fala": "Então Deus disse: fica no monte, que *eu vou passar*.", "card": "DEUS VAI PASSAR"},
-    {"img": 2, "fala": "Veio um vento tão forte que *quebrava* rochas.", "card": "1º O VENTO"},
-    {"img": 2, "fala": "Mas a Bíblia diz: Deus *não estava* no vento.", "card": "MAS ESPERA…"},
-    {"img": 3, "fala": "Veio um terremoto. Deus não estava *ali*.", "card": "2º O TERREMOTO"},
-    {"img": 4, "fala": "Veio um fogo. E Deus *também não*.", "card": "3º O FOGO"},
-    {"img": 5, "fala": "Então veio um *sussurro* tranquilo e suave…", "card": "ENTÃO…"},
-    {"img": 5, "fala": "Era *ali*. Deus estava no silêncio.", "card": "ERA ELE"},
-    {"img": 6, "fala": "Elias cobriu o rosto, porque reconheceu a *voz*.", "card": "ELE RECONHECEU"},
-    {"img": 6, "fala": "Deus não precisa *gritar* pra te alcançar.", "card": "ISSO É PRA VOCÊ"},
-    {"img": 7, "fala": "Talvez você espere um terremoto, e Ele já esteja *sussurrando*.", "card": "ESCUTA"},
-    {"img": 7, "fala": "*Curte* e comenta amém.", "cta": "Comente: AMÉM"},
-    {"img": 7, "fala": "Deus não estava no terremoto… estava no *sussurro* pra você."}
+    {
+      "img": 0,
+      "fala": "3 vezes Deus passou por Elias, e *não* estava lá.",
+      "titulo": true
+    },
+    {
+      "img": 0,
+      "fala": "E onde Ele estava vai *mexer* com você.",
+      "card": "ONDE ELE ESTAVA"
+    },
+    {
+      "img": 1,
+      "fala": "Elias fugiu da rainha Jezabel e *desabou* numa caverna.",
+      "card": "FUGINDO"
+    },
+    {
+      "img": 1,
+      "fala": "Cansado, com medo, achando que estava *sozinho*.",
+      "card": "SOZINHO"
+    },
+    {
+      "img": 1,
+      "fala": "Então Deus disse: fica no monte, que *eu vou passar*.",
+      "card": "DEUS VAI PASSAR"
+    },
+    {
+      "img": 2,
+      "fala": "Veio um vento tão forte que *quebrava* rochas.",
+      "card": "1º O VENTO"
+    },
+    {
+      "img": 2,
+      "fala": "Mas a Bíblia diz: Deus *não estava* no vento.",
+      "card": "MAS ESPERA…"
+    },
+    {
+      "img": 3,
+      "fala": "Veio um terremoto. Deus não estava *ali*.",
+      "card": "2º O TERREMOTO"
+    },
+    {
+      "img": 4,
+      "fala": "Veio um fogo. E Deus *também não*.",
+      "card": "3º O FOGO"
+    },
+    {
+      "img": 5,
+      "fala": "Então veio um *sussurro* tranquilo e suave…",
+      "card": "ENTÃO…"
+    },
+    {
+      "img": 5,
+      "fala": "Era *ali*. Deus estava no silêncio.",
+      "card": "ERA ELE"
+    },
+    {
+      "img": 6,
+      "fala": "Elias cobriu o rosto, porque reconheceu a *voz*.",
+      "card": "ELE COBRIU O ROSTO"
+    },
+    {
+      "img": 6,
+      "fala": "Deus não precisa *gritar* pra te alcançar.",
+      "card": "ISSO É PRA VOCÊ"
+    },
+    {
+      "img": 7,
+      "fala": "Talvez você espere um terremoto, e Ele já esteja *sussurrando*.",
+      "card": "ESCUTA"
+    },
+    {
+      "img": 7,
+      "fala": "*Curte* e comenta amém.",
+      "cta": "Comente: AMÉM"
+    },
+    {
+      "img": 7,
+      "fala": "Deus não estava no terremoto… estava no *sussurro* pra você."
+    }
   ],
   "estilo_extra": "'sussurro tranquilo e suave' is said as a soft whisper with a pause before it. 'Era ali' is tender and slow. Wind, earthquake and fire lines are said with rising intensity but never shouting.",
   "revelacao": 9,

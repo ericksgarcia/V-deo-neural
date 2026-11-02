@@ -51,7 +51,7 @@ Está em `Fundo.quadro` (`gerar.py`); vale para todos os vídeos automaticamente
 ## Layout e área dos ícones do TikTok (decisão de 02/nov/2026)
 
 Nenhum texto embaixo da interface do TikTok: coluna de ícones à direita (x > 940, y 760-1580), faixa de nome/legenda/música
-embaixo (y > 1500) e abas no topo (y < 150). Textos centralizados com no máximo 780 px de largura. Posições: referência y 230,
+embaixo (y > 1500) e abas no topo (y < 150). Textos centralizados com no máximo 740 px de largura. Posições: referência y 230,
 título y 380-720, cartão y 650, legenda y ~1040, botão "Comente" y 1300, **contagem regressiva embaixo em y 1415** (pílula escura
 com borda dourada, número grande e barra que esvazia). O gerador grava a caixa real de cada elemento em `.cache/luz/<slug>/render.json`.
 
