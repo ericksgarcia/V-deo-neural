@@ -41,7 +41,7 @@
     },
     {
       "img": 0,
-      "fala": "E o motivo dessa luta vai *mexer* com você.",
+      "fala": "E o que aconteceu nessa noite vai *mexer* com você.",
       "card": "UM DETALHE ESCONDIDO"
     },
     {
@@ -56,13 +56,13 @@
     },
     {
       "img": 3,
-      "fala": "Então um homem lutou com ele até o *amanhecer*…",
+      "fala": "Então um homem lutou com ele a noite *toda*…",
       "peso_pausa": -8,
       "card": "MAS ESPERA…"
     },
     {
       "img": 3,
-      "fala": "Vendo que não vencia, ele tocou na *coxa* de Jacó.",
+      "fala": "Vendo que não vencia, o homem tocou na *coxa* de Jacó.",
       "card": "A COXA"
     },
     {
@@ -87,7 +87,7 @@
     },
     {
       "img": 6,
-      "fala": "Aí o irmão que ele temia correu e o *abraçou*.",
+      "fala": "Depois, o irmão que ele temia correu e o *abraçou*.",
       "card": "O ABRAÇO"
     },
     {
@@ -98,16 +98,17 @@
     {
       "img": 7,
       "fala": "Se fosse você, soltava ou segurava? Comenta *SOLTAR* ou *SEGURAR*.",
-      "cta": "Comente: SOLTAR OU SEGURAR"
+      "cta": "SOLTAR OU SEGURAR?"
     },
     {
       "img": 0,
-      "fala": "E tudo começou naquela noite em que"
+      "fala": "E tudo começou naquela noite em que",
+      "card": "NAQUELA NOITE…"
     }
   ],
   "emenda": "E tudo começou naquela noite em que Jacó lutou com Deus. E saiu mancando.",
   "estilo_extra": "'Então um homem lutou com ele até o amanhecer' is a hushed, suspenseful beat. 'Vi Deus face a face' is warm and astonished. 'Se hoje você está ferido' is the tenderest line, personal. Never shout.",
   "revelacao": 7,
   "velocidade": 0.94,
-  "legenda": "Jacó lutou com Deus. E saiu mancando 🙏 E o motivo dessa luta vai mexer com você.\nSe fosse você, soltava ou segurava? Comenta SOLTAR ou SEGURAR aqui embaixo. 👇\nManda pra quem está ferido e precisa ouvir isso hoje.\n\n#jesus #biblia #fe #genesis #deus"
+  "legenda": "Jacó lutou com Deus. E saiu mancando 🙏 E o que aconteceu nessa noite vai mexer com você.\nSe fosse você, soltava ou segurava? Comenta SOLTAR ou SEGURAR aqui embaixo. 👇\nManda pra quem está ferido e precisa ouvir isso hoje.\n\n#jesus #biblia #fe #genesis #deus"
 }

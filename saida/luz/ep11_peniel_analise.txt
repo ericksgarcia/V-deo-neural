@@ -1,0 +1,15 @@
+Analistas automáticos · ep11_peniel.mp4
+
+1. técnico: OK  (52.3 s, -15.5 LUFS, pico -1.3 dBFS)
+2. zona segura (TikTok): OK  (referencia y202-248, titulo y375-723, cartao y583-706, legenda y909-1195, cta y1244-1357, contagem y1380-1451)
+3. ritmo: OK  (14 cenas)
+4. emenda (loop): OK  (diferença de fundo 0.9, sobra 0.17 s · "E tudo começou naquela noite em que Jacó lutou com Deus. E saiu mancando.")
+5. som (música e narração): OK  (música -20.7 dB sob a voz, -16.1 dB nas pausas, presente 100.0%)
+6. contraste do texto: OK  (pior brilho atrás do texto 113.0)
+7. ortografia: 0 FALHA, 1 AVISO  (79 palavras conferidas)
+    AVISO: fora do dicionário (conferir grafia): embaixo
+8. post (legenda, CTA, capa): OK  (255 caracteres, 5 hashtags, capa em 1.2 s)
+9. integridade do arquivo: OK  (52.3 MB)
+
+APROVADO nos automáticos
+Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep11_peniel/revisao
