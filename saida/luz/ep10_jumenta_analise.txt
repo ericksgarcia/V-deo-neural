@@ -1,0 +1,15 @@
+Analistas automáticos · ep10_jumenta.mp4
+
+1. técnico: OK  (42.1 s, -16.0 LUFS, pico -1.3 dBFS)
+2. zona segura (TikTok): OK  (referencia y201-248, titulo y396-734, cartao y593-697, legenda y904-1193, cta y1244-1357, contagem y1380-1451)
+3. ritmo: OK  (14 cenas)
+4. emenda (loop): OK  (diferença de fundo 0.8, sobra 0.18 s · "E tudo começou quando, na estrada, Balaão não viu o anjo. A jumenta viu.")
+5. som (música e narração): OK  (música -21.0 dB sob a voz, -15.6 dB nas pausas, presente 100.0%)
+6. contraste do texto: OK  (pior brilho atrás do texto 112.0)
+7. ortografia: 0 FALHA, 1 AVISO  (66 palavras conferidas)
+    AVISO: fora do dicionário (conferir grafia): embaixo
+8. post (legenda, CTA, capa): OK  (246 caracteres, 5 hashtags, capa em 1.2 s)
+9. integridade do arquivo: OK  (40.9 MB)
+
+APROVADO nos automáticos
+Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep10_jumenta/revisao
