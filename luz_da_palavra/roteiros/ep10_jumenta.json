@@ -12,7 +12,7 @@
     "Nm 22:21-22: Balaão se levantou pela manhã, albardou a sua jumenta e foi; o anjo do Senhor se pôs no caminho por adversário.",
     "Nm 22:23: a jumenta viu o anjo do Senhor com a espada desembainhada na mão e se desviou do caminho; Balaão a espancou.",
     "Nm 22:24-27: o anjo ficou numa vereda e depois num lugar estreito; a jumenta se desviou de novo e se deitou debaixo dele (três vezes ao todo: v. 28 diz três vezes).",
-    "Nm 22:28: o Senhor abriu a boca da jumenta, e ela disse a Balaão: Que te fiz eu, que me espancaste já três vezes?",
+    "Nm 22:25: a jumenta se encostou à parede e apertou o pé de Balaão; ele a espancou de novo. Nm 22:26-27: o anjo passou a um lugar estreito, sem caminho para se desviar; a jumenta se deitou debaixo de Balaão e ele a espancou com um bordão (três espancamentos: v. 23, 25, 27; v. 28 e v. 32 dizem três vezes).",
     "Nm 22:30: a jumenta perguntou se não era a jumenta em que ele andara montado toda a vida; ele respondeu: Não.",
     "Nm 22:31: o Senhor abriu os olhos de Balaão, e ele viu o anjo com a espada na mão; inclinou-se e prostrou-se.",
     "Nm 22:33: o anjo disse que, se a jumenta não se desviasse, ele teria matado Balaão e deixado a jumenta viva.",
@@ -34,24 +34,80 @@
     "a white dove flying through golden light beams in a deep blue sky, peaceful and holy"
   ],
   "cenas": [
-    {"img": 0, "fala": "Balaão não viu o *anjo*. A *jumenta* viu.", "titulo": true},
-    {"img": 0, "fala": "E o que ela fez depois quase ninguém *percebe*.", "card": "UM DETALHE ESCONDIDO"},
-    {"img": 1, "fala": "Balaão era *profeta*, e ia montado na jumenta de sempre.", "card": "A ESTRADA"},
-    {"img": 2, "fala": "No caminho, um *anjo* com a espada na mão.", "card": "A ESPADA"},
-    {"img": 3, "fala": "Só a jumenta o *viu*…", "peso_pausa": -8, "card": "MAS ESPERA…"},
-    {"img": 4, "fala": "Ela se desviou, e ele a bateu *três vezes*.", "card": "3 VEZES"},
-    {"img": 4, "fala": "Então Deus abriu a *boca* da jumenta.", "card": "ELA FALOU"},
-    {"img": 5, "fala": "E o anjo disse: ela *salvou* a sua vida.", "card": "ELA SALVOU"},
-    {"img": 5, "fala": "Ele bateu em quem o *protegia*.", "card": "QUEM O PROTEGIA"},
-    {"img": 6, "fala": "Aí Deus abriu os *olhos* dele. E ele viu o anjo.", "card": "OS OLHOS"},
-    {"img": 6, "fala": "Balaão se curvou e disse: *pequei*.", "card": "ELE SE CURVOU"},
-    {"img": 7, "fala": "Às vezes Deus usa o que você *despreza* pra te livrar.", "card": "ISSO É PRA VOCÊ"},
-    {"img": 7, "fala": "Quem já foi seu anjo sem você perceber? Comenta um *nome*.", "cta": "Comente: UM NOME"},
-    {"img": 0, "fala": "E tudo começou quando, na *estrada*,"}
+    {
+      "img": 0,
+      "fala": "Balaão não viu o *anjo*. A *jumenta* viu.",
+      "titulo": true
+    },
+    {
+      "img": 0,
+      "fala": "E o que ela fez depois quase ninguém *percebe*.",
+      "card": "UM DETALHE ESCONDIDO"
+    },
+    {
+      "img": 1,
+      "fala": "Balaão era *profeta*, e ia montado na jumenta de sempre.",
+      "card": "A ESTRADA"
+    },
+    {
+      "img": 2,
+      "fala": "No caminho, um *anjo* com a espada na mão.",
+      "card": "A ESPADA"
+    },
+    {
+      "img": 3,
+      "fala": "Mas a jumenta o *viu*…",
+      "peso_pausa": -8,
+      "card": "MAS ESPERA…"
+    },
+    {
+      "img": 4,
+      "fala": "Ela se desviou, e ele a bateu *três vezes*.",
+      "card": "3 VEZES"
+    },
+    {
+      "img": 4,
+      "fala": "Então Deus abriu a *boca* da jumenta.",
+      "card": "ELA FALOU"
+    },
+    {
+      "img": 5,
+      "fala": "Aí Deus abriu os *olhos* dele. E ele viu o anjo.",
+      "card": "OS OLHOS"
+    },
+    {
+      "img": 5,
+      "fala": "E o anjo disse: ela *salvou* a sua vida.",
+      "card": "ELA SALVOU"
+    },
+    {
+      "img": 6,
+      "fala": "Ele bateu em quem o *protegia*.",
+      "card": "QUEM O PROTEGIA"
+    },
+    {
+      "img": 6,
+      "fala": "Balaão se curvou e disse: *pequei*.",
+      "card": "ELE SE CURVOU"
+    },
+    {
+      "img": 7,
+      "fala": "Às vezes Deus usa o que você *despreza* pra te livrar.",
+      "card": "ISSO É PRA VOCÊ"
+    },
+    {
+      "img": 7,
+      "fala": "Quem já foi seu anjo sem você perceber? Comenta um *nome*.",
+      "cta": "Comente: UM NOME"
+    },
+    {
+      "img": 0,
+      "fala": "E tudo começou quando, na *estrada*,"
+    }
   ],
   "emenda": "E tudo começou quando, na estrada, Balaão não viu o anjo. A jumenta viu.",
   "estilo_extra": "'Só a jumenta o viu' is a hushed, suspenseful beat. 'Ela salvou a sua vida' is warm and astonished. 'Isso é pra você' is the tenderest line, personal. Never shout.",
-  "revelacao": 7,
+  "revelacao": 8,
   "velocidade": 0.94,
   "legenda": "Balaão não viu o anjo. A jumenta viu 🙏 E o que ela fez depois quase ninguém percebe.\nQuem já foi seu anjo sem você perceber? Comenta UM NOME aqui embaixo. 👇\nManda pra quem Deus usou pra te livrar sem você notar.\n\n#jesus #biblia #fe #numeros #deus"
 }
