@@ -97,5 +97,19 @@
   "capa_ms": 1200,
   "ia_gerado": false,
   "legenda_linha1": "Jacó lutou com Deus. E saiu mancando 🙏 E o que aconteceu nessa noite vai mexer com você."
+ },
+ {
+  "slug": "ep12_emaus",
+  "rede": "tiktok",
+  "canal": "luzdapalavraamem",
+  "post_id": "6ae944e06f053cdb90b9662d",
+  "modo": "customScheduled",
+  "quando": "2026-11-03 02:20",
+  "agendado_para": "2026-11-04T10:50:00.000Z",
+  "video_url": "https://pub-cd071ac800384b009eaf3ddab42583fe.r2.dev/luz/pendentes/ep12_emaus.mp4",
+  "r2_chave": "luz/pendentes/ep12_emaus.mp4",
+  "capa_ms": 1200,
+  "ia_gerado": false,
+  "legenda_linha1": "Jesus ressuscitado caminhou com dois discípulos. E eles não O reconheceram 🙏 E o que eles disseram a Ele vai mexer com você."
  }
 ]
