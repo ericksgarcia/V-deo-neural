@@ -1,0 +1,17 @@
+Analistas automáticos · ep08_pes.mp4
+
+1. técnico: OK  (51.9 s, -15.6 LUFS, pico -1.2 dBFS)
+2. zona segura (TikTok): OK  (referencia y203-254, titulo y378-722, cartao y583-706, legenda y909-1195, cta y1244-1357, contagem y1380-1451)
+3. ritmo: 0 FALHA, 1 AVISO  (15 cenas)
+    AVISO: cena 9: 4.5 palavras/s (corrido demais para ler)
+4. emenda (loop): OK  (diferença de fundo 0.8, sobra 0.18 s · "E foi por isso que, naquela noite, Jesus lavou os pés do homem que ia traí-Lo.")
+5. som (música e narração): 0 FALHA, 1 AVISO  (música -20.7 dB sob a voz, -15.8 dB nas pausas, presente 100.0%)
+    AVISO: nível do som no fim (-25 dB) e no começo (-12 dB) muito diferentes: o loop pula
+6. contraste do texto: OK  (pior brilho atrás do texto 123.0)
+7. ortografia: 0 FALHA, 1 AVISO  (87 palavras conferidas)
+    AVISO: fora do dicionário (conferir grafia): embaixo
+8. post (legenda, CTA, capa): OK  (270 caracteres, 5 hashtags, capa em 1.2 s)
+9. integridade do arquivo: OK  (31.0 MB)
+
+APROVADO nos automáticos
+Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep08_pes/revisao
