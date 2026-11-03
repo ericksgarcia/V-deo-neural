@@ -1,4 +1,4 @@
-"""Publica um episódio pronto no TikTok pelo Buffer (dono, 02/nov/2026).
+"""Publica um episódio pronto no TikTok e no Instagram (Reels) pelo Buffer, nos MESMOS horários (dono, 02-03/nov/2026).
 
     python luz_da_palavra/publicar.py <roteiro> --aprovados fatos,imagens,tela,som,post     # agenda no próximo horário livre
     python luz_da_palavra/publicar.py <roteiro> --aprovados ... --agora                     # publica já
@@ -38,7 +38,8 @@ RAIZ = os.path.dirname(AQUI)
 PUBLICADOS = os.path.join(AQUI, "publicados.json")
 ANALISTAS = ["fatos", "imagens", "tela", "som", "post"]
 BUFFER = "https://api.buffer.com"
-REDE = "tiktok"
+REDE = "tiktok"                           # canal que manda na fila de horários
+REDES = ["tiktok", "instagram"]            # dono, 03/nov/2026: Instagram nos mesmos horários do TikTok
 IA_GERADO = False                         # dono, 02/nov/2026: rótulo "gerado por IA" desmarcado
 BRT = ZoneInfo("America/Sao_Paulo")
 HORARIOS = [(7, 50), (11, 50), (16, 50), (20, 30)]     # dono, 02/nov/2026 (horário de Brasília)
@@ -137,13 +138,23 @@ def organizacao():
     return gql("{ account { organizations { id } } }")["account"]["organizations"][0]["id"]
 
 
-def canal_tiktok(org):
+def canal_da_rede(org, rede):
     canais = gql("query($o: OrganizationId!) { channels(input: {organizationId: $o}) { id name service isDisconnected } }",
                  {"o": org})["channels"]
-    tk = [c for c in canais if c["service"] == REDE and not c["isDisconnected"]]
+    tk = [c for c in canais if c["service"] == rede and not c["isDisconnected"]]
     if not tk:
-        sys.exit(f"[buffer] nenhum canal {REDE} conectado: {canais}")
+        sys.exit(f"[buffer] nenhum canal {rede} conectado: {canais}")
     return tk[0]
+
+
+def canal_tiktok(org):
+    return canal_da_rede(org, REDE)
+
+
+def metadados(rede):
+    if rede == "instagram":                  # Reel que também aparece no feed; rótulo de IA desmarcado
+        return {"instagram": {"type": "reel", "shouldShareToFeed": True, "isAiGenerated": IA_GERADO}}
+    return {"tiktok": {"isAiGenerated": IA_GERADO}}
 
 
 def posts(org, canal_id, status):
@@ -233,25 +244,29 @@ def cmd_lista():
 
 
 def cmd_arruma():
-    """Vídeos cujo post já saiu: copia de luz/pendentes/ para luz/enviados/ e apaga o pendente."""
+    """Vídeos cujos posts (TikTok e Instagram) já saíram: copia de luz/pendentes/ para luz/enviados/ e apaga o pendente."""
     pub = le_publicados()
     mudou = False
+    grupos = {}
     for p in pub:
-        chave = p.get("r2_chave") or p["video_url"].split(CF_PUBLICO + "/")[-1]
+        grupos.setdefault(p.get("r2_chave") or p["video_url"].split(CF_PUBLICO + "/")[-1], []).append(p)
+    for chave, ps in grupos.items():
         if chave.startswith(PASTA_ENVIADOS):
             continue
-        st = status(p["post_id"])
-        if st["status"] != "sent":
-            print(f"  {p['slug']}: {st['status']} (fica em pendentes)")
+        sts = [(p, status(p["post_id"])) for p in ps]
+        pend = [f"{p['rede']}: {st['status']}" for p, st in sts if st["status"] != "sent"]
+        if pend:
+            print(f"  {ps[0]['slug']}: {', '.join(pend)} (fica em pendentes)")
             continue
-        _, dados, _ = _req(p["video_url"], timeout=600)
+        _, dados, _ = _req(ps[0]["video_url"], timeout=600)
         nova = PASTA_ENVIADOS + os.path.basename(chave)
         r2_sobe(dados, nova)
         r2_apaga(chave)
-        p.update({"r2_chave": nova, "video_url": f"{CF_PUBLICO}/{nova}", "enviado_em": st.get("sentAt"),
-                  "link": st.get("externalLink")})
+        for p, st in sts:
+            p.update({"r2_chave": nova, "video_url": f"{CF_PUBLICO}/{nova}", "enviado_em": st.get("sentAt"),
+                      "link": st.get("externalLink")})
         mudou = True
-        print(f"  {p['slug']}: enviado -> {nova}")
+        print(f"  {ps[0]['slug']}: enviado -> {nova}")
     if mudou:
         grava_publicados(pub)
 
@@ -259,28 +274,47 @@ def cmd_arruma():
 def cmd_publica(a, rot):
     slug = rot["slug"]
     pub = le_publicados()
-    feitos = [p for p in pub if p["slug"] == slug and p["rede"] == REDE]
-    if feitos:
-        sys.exit(f"[publicar] {slug} já foi enviado ao {REDE} ({feitos[-1]['quando']}, post {feitos[-1]['post_id']}): não duplico")
-    mp4 = os.path.join(RAIZ, "saida", "luz", slug + ".mp4")
-    analise, legenda_arq = mp4[:-4] + "_analise.txt", mp4[:-4] + "_legenda.txt"
-    rend_arq = os.path.join(RAIZ, ".cache", "luz", slug, "render.json")
-    for arq in (mp4, analise, legenda_arq, rend_arq):
-        if not os.path.exists(arq):
-            sys.exit(f"[publicar] falta {arq}: gere o vídeo antes")
-    if "APROVADO nos automáticos" not in open(analise, encoding="utf-8").read():
-        sys.exit("[publicar] o vídeo não está APROVADO nos analistas automáticos")
-    if os.path.getmtime(analise) < os.path.getmtime(mp4) - 5:
-        sys.exit("[publicar] a análise automática é mais velha que o vídeo: rode o gerador de novo")
-    falta = set(ANALISTAS) - {x.strip() for x in a.aprovados.split(",") if x.strip()}
-    if falta:
-        sys.exit(f"[publicar] faltam analistas Claude APROVADO: {', '.join(sorted(falta))}")
-    legenda = open(legenda_arq, encoding="utf-8").read().strip()
-    capa_ms = int(round(json.load(open(rend_arq))["capa_t"] * 1000))
+    redes = [r.strip() for r in a.redes.split(",") if r.strip()]
+    for r in redes:
+        if r not in REDES:
+            sys.exit(f"[publicar] rede desconhecida {r!r}: use {', '.join(REDES)}")
+    feitas = {p["rede"]: p for p in pub if p["slug"] == slug}
+    redes = [r for r in redes if r not in feitas]
+    for r in set(a.redes.split(",")) - set(redes):
+        if r in feitas:
+            print(f"[publicar] {slug} já foi enviado ao {r} ({feitas[r]['quando']}, post {feitas[r]['post_id']}): pulo")
+    if not redes:
+        sys.exit(f"[publicar] nada a fazer para {slug}")
+    ref = feitas.get(REDE)                    # TikTok já agendado: o Instagram usa o MESMO horário, vídeo e capa
+    if ref:                                   # as travas e os analistas já passaram quando o TikTok foi agendado
+        legenda, capa_ms = rot["legenda"].strip(), ref["capa_ms"]
+    else:
+        mp4 = os.path.join(RAIZ, "saida", "luz", slug + ".mp4")
+        analise, legenda_arq = mp4[:-4] + "_analise.txt", mp4[:-4] + "_legenda.txt"
+        rend_arq = os.path.join(RAIZ, ".cache", "luz", slug, "render.json")
+        for arq in (mp4, analise, legenda_arq, rend_arq):
+            if not os.path.exists(arq):
+                sys.exit(f"[publicar] falta {arq}: gere o vídeo antes")
+        if "APROVADO nos automáticos" not in open(analise, encoding="utf-8").read():
+            sys.exit("[publicar] o vídeo não está APROVADO nos analistas automáticos")
+        if os.path.getmtime(analise) < os.path.getmtime(mp4) - 5:
+            sys.exit("[publicar] a análise automática é mais velha que o vídeo: rode o gerador de novo")
+        falta = set(ANALISTAS) - {x.strip() for x in a.aprovados.split(",") if x.strip()}
+        if falta:
+            sys.exit(f"[publicar] faltam analistas Claude APROVADO: {', '.join(sorted(falta))}")
+        legenda = open(legenda_arq, encoding="utf-8").read().strip()
+        capa_ms = int(round(json.load(open(rend_arq))["capa_t"] * 1000))
 
     org = organizacao()
-    canal = canal_tiktok(org)
-    if a.agora:
+    canais = {r: canal_da_rede(org, r) for r in redes}
+    if ref and ref.get("agendado_para") and not a.agora and not a.quando:
+        quando = _data(ref["agendado_para"])
+        if quando < dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=5):
+            sys.exit(f"[publicar] o horário do TikTok ({quando.astimezone(BRT):%d/%m %H:%M}) já passou ou está perto demais; "
+                     "use --quando ou --agora")
+        modo = "customScheduled"
+        print(f"[agenda] mesmo horário do TikTok: {quando.astimezone(BRT):%a %d/%m %H:%M} (Brasília)")
+    elif a.agora:
         modo, quando = "shareNow", None
     elif a.quando:
         quando = dt.datetime.fromisoformat(a.quando)
@@ -289,42 +323,44 @@ def cmd_publica(a, rot):
             sys.exit(f"[publicar] {quando} já passou ou está perto demais")
         modo = "customScheduled"
     else:
-        quando, fila, ultimo = proximo_livre(org, canal["id"])
+        quando, fila, ultimo = proximo_livre(org, canal_tiktok(org)["id"])
         modo = "customScheduled"
         print(f"[agenda] agora {dt.datetime.now(BRT):%d/%m %H:%M}; último agendado: "
               f"{ultimo.astimezone(BRT).strftime('%d/%m %H:%M') if ultimo else 'nenhum'} ({len(fila)} na fila) "
               f"-> {quando:%a %d/%m %H:%M} (Brasília)")
 
-    chave = PASTA_PENDENTES + slug + ".mp4"
-    url = r2_sobe(open(mp4, "rb").read(), chave)
+    chave = (ref or {}).get("r2_chave") or PASTA_PENDENTES + slug + ".mp4"
+    url = f"{CF_PUBLICO}/{chave}" if ref else r2_sobe(open(mp4, "rb").read(), chave)
     print(f"[r2] vídeo no ar: {url}")
-    entrada = {
-        "channelId": canal["id"], "text": legenda, "mode": modo, "schedulingType": "automatic",
-        "needsApproval": False, "source": "luz_da_palavra",
-        "assets": [{"video": {"url": url, "metadata": {"thumbnailOffset": capa_ms}}}],
-        "metadata": {"tiktok": {"isAiGenerated": IA_GERADO}},
-    }
-    if quando:
-        entrada["dueAt"] = quando.astimezone(dt.timezone.utc).isoformat().replace("+00:00", "Z")
-    r = gql("""mutation($e: CreatePostInput!) { createPost(input: $e) {
-                 __typename
-                 ... on PostActionSuccess { post { id status dueAt } }
-                 ... on InvalidInputError { message }
-                 ... on LimitReachedError { message }
-                 ... on UnauthorizedError { message }
-                 ... on UnexpectedError { message }
-                 ... on RestProxyError { message }
-                 ... on NotFoundError { message } } }""", {"e": entrada})["createPost"]
-    if r["__typename"] != "PostActionSuccess":
-        sys.exit(f"[buffer] post recusado ({r['__typename']}): {r.get('message')}  (o vídeo ficou em {chave})")
-    post = r["post"]
-    due = _data(post.get("dueAt"))
-    print(f"[buffer] post {post['id']} · {post['status']} · {modo}"
-          + (f" · {due.astimezone(BRT):%a %d/%m %H:%M} (Brasília)" if due else ""))
-    pub.append({"slug": slug, "rede": REDE, "canal": canal["name"], "post_id": post["id"], "modo": modo,
-                "quando": time.strftime("%Y-%m-%d %H:%M"), "agendado_para": post.get("dueAt"), "video_url": url,
-                "r2_chave": chave, "capa_ms": capa_ms, "ia_gerado": IA_GERADO, "legenda_linha1": legenda.splitlines()[0]})
-    grava_publicados(pub)
+    for rede in redes:
+        entrada = {
+            "channelId": canais[rede]["id"], "text": legenda, "mode": modo, "schedulingType": "automatic",
+            "needsApproval": False, "source": "luz_da_palavra",
+            "assets": [{"video": {"url": url, "metadata": {"thumbnailOffset": capa_ms}}}],
+            "metadata": metadados(rede),
+        }
+        if quando:
+            entrada["dueAt"] = quando.astimezone(dt.timezone.utc).isoformat().replace("+00:00", "Z")
+        r = gql("""mutation($e: CreatePostInput!) { createPost(input: $e) {
+                     __typename
+                     ... on PostActionSuccess { post { id status dueAt } }
+                     ... on InvalidInputError { message }
+                     ... on LimitReachedError { message }
+                     ... on UnauthorizedError { message }
+                     ... on UnexpectedError { message }
+                     ... on RestProxyError { message }
+                     ... on NotFoundError { message } } }""", {"e": entrada})["createPost"]
+        if r["__typename"] != "PostActionSuccess":
+            print(f"[buffer] post no {rede} recusado ({r['__typename']}): {r.get('message')}  (vídeo em {chave})")
+            continue
+        post = r["post"]
+        due = _data(post.get("dueAt"))
+        print(f"[buffer] {rede}: post {post['id']} · {post['status']} · {modo}"
+              + (f" · {due.astimezone(BRT):%a %d/%m %H:%M} (Brasília)" if due else ""))
+        pub.append({"slug": slug, "rede": rede, "canal": canais[rede]["name"], "post_id": post["id"], "modo": modo,
+                    "quando": time.strftime("%Y-%m-%d %H:%M"), "agendado_para": post.get("dueAt"), "video_url": url,
+                    "r2_chave": chave, "capa_ms": capa_ms, "ia_gerado": IA_GERADO, "legenda_linha1": legenda.splitlines()[0]})
+        grava_publicados(pub)
 
 
 def main():
@@ -333,6 +369,7 @@ def main():
     ap.add_argument("--aprovados", default="", help="os 5 analistas Claude com APROVADO: " + ",".join(ANALISTAS))
     ap.add_argument("--agora", action="store_true", help="publica já, em vez do próximo horário livre")
     ap.add_argument("--quando", help="data/hora (Brasília se sem fuso), ex.: 2026-11-03T20:30")
+    ap.add_argument("--redes", default=",".join(REDES), help="redes: tiktok,instagram (padrão: as duas, mesmo horário)")
     ap.add_argument("--status", action="store_true")
     ap.add_argument("--fila", action="store_true")
     ap.add_argument("--lista", action="store_true")
