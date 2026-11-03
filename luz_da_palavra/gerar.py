@@ -322,7 +322,7 @@ def tempos_cenas(x, cenas):
     """Fronteiras das cenas nos silêncios da narração (o TTS recebe uma pausa entre cenas)."""
     dur = len(x) / SR
     sil = silencios(x)
-    pesos = [len(limpa(c["fala"])) + 12 * c["fala"].count("…") for c in cenas]
+    pesos = [len(limpa(c["fala"])) + c.get("peso_pausa", 12) * c["fala"].count("…") for c in cenas]
     ini, limites = 0.0, []
     for k in range(len(cenas) - 1):
         resto = sum(pesos[k:])
