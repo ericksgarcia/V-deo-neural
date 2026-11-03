@@ -69,5 +69,19 @@
   "capa_ms": 1200,
   "ia_gerado": false,
   "legenda_linha1": "Eli achou que Ana estava bêbada. Ela estava orando 🙏 E o que aconteceu depois quase ninguém percebe."
+ },
+ {
+  "slug": "ep10_jumenta",
+  "rede": "tiktok",
+  "canal": "luzdapalavraamem",
+  "post_id": "6ae93fce7996caf141c59776",
+  "modo": "customScheduled",
+  "quando": "2026-11-03 01:58",
+  "agendado_para": "2026-11-03T19:50:00.000Z",
+  "video_url": "https://pub-cd071ac800384b009eaf3ddab42583fe.r2.dev/luz/pendentes/ep10_jumenta.mp4",
+  "r2_chave": "luz/pendentes/ep10_jumenta.mp4",
+  "capa_ms": 1200,
+  "ia_gerado": false,
+  "legenda_linha1": "Balaão não viu o anjo. A jumenta viu 🙏 E o que ela fez depois quase ninguém percebe."
  }
 ]
