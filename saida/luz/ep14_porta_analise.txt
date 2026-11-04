@@ -1,0 +1,17 @@
+Analistas automáticos · ep14_porta.mp4
+
+1. técnico: OK  (52.4 s, -16.5 LUFS, pico -1.3 dBFS)
+2. zona segura (TikTok): OK  (referencia y210-247, titulo y391-672, cartao y594-692, legenda y909-1193, cta y1244-1357, contagem y1380-1451)
+3. ritmo: 0 FALHA, 1 AVISO  (16 cenas)
+    AVISO: cena 15: 4.9 palavras/s (corrido demais para ler)
+4. emenda (loop): OK  (diferença de fundo 1.2, sobra 0.18 s · "Tudo começou quando oraram por Pedro. Deus atendeu. E deixaram Pedro batendo na porta.")
+5. som (música e narração): 0 FALHA, 1 AVISO  (música -20.6 dB sob a voz, -15.9 dB nas pausas, presente 100.0%)
+    AVISO: cena 15: tempo de fala 0.4x o normal para o tamanho do texto (conferir se o TTS repetiu, pulou ou alongou algo)
+6. contraste do texto: OK  (pior brilho atrás do texto 109.0)
+7. ortografia: 0 FALHA, 1 AVISO  (90 palavras conferidas)
+    AVISO: fora do dicionário (conferir grafia): atônitos, dezesseis, embaixo
+8. post (legenda, CTA, capa): OK  (262 caracteres, 5 hashtags, capa em 1.2 s)
+9. integridade do arquivo: OK  (55.2 MB)
+
+APROVADO nos automáticos
+Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep14_porta/revisao
