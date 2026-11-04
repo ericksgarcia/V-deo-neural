@@ -1,0 +1,60 @@
+{
+  "tema_id": "ester-rei-sem-sono-hama-mardoqueu",
+  "tema": "Hamã construiu uma forca para Mardoqueu, mas naquela noite o rei não conseguiu dormir, mandou ler as crônicas e Hamã teve de honrar Mardoqueu (Ester)",
+  "slug": "ep16_ester",
+  "ref": "ESTER 6:1-11",
+  "titulo": [
+    "HAMÃ FEZ UMA FORCA",
+    "PARA MARDOQUEU. MAS O REI",
+    "NÃO DORMIU"
+  ],
+  "fatos": [
+    "Et 5:14: Hamã mandou fazer uma forca de cinquenta côvados de altura para enforcar Mardoqueu, e isso lhe agradou.",
+    "Et 6:1: naquela noite o rei não pôde dormir e mandou trazer o livro das crônicas, que foi lido diante dele.",
+    "Et 6:2: achou-se escrito que Mardoqueu denunciara a conspiração de dois eunucos contra o rei Assuero.",
+    "Et 6:3: o rei perguntou que honra e distinção se fizera a Mardoqueu, e responderam que nada se lhe fizera.",
+    "Et 6:4: Hamã acabava de entrar no pátio do palácio para pedir ao rei que enforcassem Mardoqueu na forca.",
+    "Et 6:6: o rei perguntou a Hamã o que se deve fazer ao homem a quem o rei deseja honrar; Hamã pensou que o rei falava dele.",
+    "Et 6:8-10: o rei mandou trazer veste real e cavalo e ordenou a Hamã fazer isso a Mardoqueu, o judeu.",
+    "Et 6:11: Hamã vestiu Mardoqueu, fê-lo montar o cavalo e o conduziu pela praça, apregoando: assim se faz ao homem a quem o rei deseja honrar.",
+    "Et 7:10: enforcaram Hamã na forca que ele preparara para Mardoqueu."
+  ],
+  "ganchos": [
+    "Hamã fez uma forca para Mardoqueu. Mas o rei não dormiu. [ESCOLHIDO: contradição, 11 palavras]",
+    "Hamã pediu a morte de Mardoqueu e acabou conduzindo-o pela praça.",
+    "Uma noite sem sono de um rei desmontou o plano de Hamã."
+  ],
+  "imagens": [
+    "ultra realistic photograph of a deep night sky full of bright stars and the Milky Way above dark desert hills, rich saturated colors, razor sharp 4K detail",
+    "tall straight dark cedar tree trunks in a misty mountain forest at dusk with golden light between them, vivid colors, ultra realistic photograph",
+    "a full moon rising over ancient gnarled olive trees on a hillside at night, silver and deep blue tones, ultra realistic photograph",
+    "a small clay oil lamp with a flickering flame on a rough stone surface in darkness, warm glow, shallow depth of field, ultra realistic photograph",
+    "an aged parchment scroll partly unrolled on dark weathered wood in warm lamp light, shallow depth of field, ultra realistic photograph",
+    "golden sunrise over wide desert plains and distant mountains with long warm light, vivid colors, ultra realistic photograph",
+    "a white horse walking across a sunlit green meadow with mountains behind, golden light, vivid colors, ultra realistic photograph",
+    "dramatic storm clouds parting with bright rays of light over a rugged mountain range, vivid colors, ultra realistic photograph"
+  ],
+  "cenas": [
+    {"img": 0, "fala": "Hamã fez uma *forca* para Mardoqueu. Mas o rei não *dormiu*.", "titulo": true},
+    {"img": 0, "fala": "Tudo mudou numa *noite*. Quase ninguém repara.", "card": "TUDO MUDOU NUMA NOITE"},
+    {"img": 1, "fala": "A forca tinha *cinquenta* côvados. Isso agradou a Hamã.", "card": "50 CÔVADOS DE ALTURA"},
+    {"img": 2, "fala": "Naquela noite, o rei não *conseguiu* dormir.", "card": "O REI NÃO DORMIU"},
+    {"img": 3, "fala": "Mandou ler o livro das *crônicas*…", "card": "O LIVRO DAS CRÔNICAS"},
+    {"img": 4, "fala": "Ali estava: Mardoqueu *denunciara* uma conspiração contra o rei.", "card": "MARDOQUEU AVISOU O REI"},
+    {"img": 4, "fala": "O rei perguntou que honra ele *recebeu*. Nada.", "card": "NADA FOI FEITO"},
+    {"img": 5, "fala": "Nesse instante, Hamã *chegou* para pedir a forca…", "card": "HAMÃ CHEGOU"},
+    {"img": 5, "fala": "O rei perguntou: o que fazer a quem eu quero *honrar*?", "card": "QUEM O REI HONRA?"},
+    {"img": 6, "fala": "Hamã pensou: *sou eu*. E sugeriu veste real e cavalo.", "card": "HAMÃ PENSOU: SOU EU!"},
+    {"img": 6, "fala": "Era *Mardoqueu*. E o próprio Hamã o conduziu pela praça.", "card": "ERA MARDOQUEU"},
+    {"img": 6, "fala": "Hamã gritava: assim se faz a quem o rei *honra*.", "card": "HAMÃ APREGOAVA"},
+    {"img": 7, "fala": "No fim, Hamã foi enforcado na *própria* forca.", "card": "NA PRÓPRIA FORCA"},
+    {"img": 7, "fala": "Se tudo parece contra você, esta história é *pra você*.", "card": "ISSO É PRA VOCÊ"},
+    {"img": 5, "fala": "Quem se surpreendeu mais? Comenta *HAMÃ* ou *MARDOQUEU*.", "cta": "HAMÃ OU MARDOQUEU?"},
+    {"img": 0, "fala": "E tudo isso começou quando", "card": "TUDO COMEÇOU QUANDO…"}
+  ],
+  "emenda": "E tudo isso começou quando Hamã fez uma forca para Mardoqueu. Mas o rei não dormiu.",
+  "estilo_extra": "'Naquela noite, o rei não conseguiu dormir' is the quiet hinge: hushed, slow. 'Era Mardoqueu' is the revelation: a short astonished pause before it. 'Se tudo parece contra você' is the tenderest, most personal line. Never shout.",
+  "revelacao": 10,
+  "velocidade": 0.94,
+  "legenda": "Hamã fez uma forca para Mardoqueu 😮 Mas naquela noite o rei não conseguiu dormir, e foi Hamã quem teve de honrá-lo pela praça.\nQuem se surpreendeu mais: HAMÃ ou MARDOQUEU? Comenta o nome aqui embaixo. 👇\nManda pra quem precisa lembrar que uma noite pode mudar tudo.\n\n#ester #biblia #fe #deus #mardoqueu"
+}
