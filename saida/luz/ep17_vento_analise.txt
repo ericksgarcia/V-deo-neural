@@ -1,0 +1,16 @@
+Analistas automáticos · ep17_vento.mp4
+
+1. técnico: OK  (51.4 s, -16.0 LUFS, pico -1.3 dBFS)
+2. zona segura (TikTok): OK  (referencia y209-248, titulo y396-702, cartao y594-706, legenda y909-1195, cta y1244-1357, contagem y1380-1451)
+3. ritmo: 0 FALHA, 1 AVISO  (14 cenas)
+    AVISO: cena 13: 4.3 palavras/s (corrido demais para ler)
+4. emenda (loop): OK  (diferença de fundo 1.0, sobra 0.18 s · "E foi isso que aconteceu quando Pedro andou sobre a água. Mas afundou ao ver o vento.")
+5. som (música e narração): OK  (música -20.9 dB sob a voz, -15.4 dB nas pausas, presente 100.0%)
+6. contraste do texto: OK  (pior brilho atrás do texto 114.0)
+7. ortografia: 0 FALHA, 1 AVISO  (76 palavras conferidas)
+    AVISO: fora do dicionário (conferir grafia): embaixo
+8. post (legenda, CTA, capa): OK  (262 caracteres, 5 hashtags, capa em 1.2 s)
+9. integridade do arquivo: OK  (48.9 MB)
+
+APROVADO nos automáticos
+Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep17_vento/revisao
