@@ -11,7 +11,7 @@ Analistas automáticos · ep14_porta.mp4
 7. ortografia: 0 FALHA, 1 AVISO  (90 palavras conferidas)
     AVISO: fora do dicionário (conferir grafia): atônitos, dezesseis, embaixo
 8. post (legenda, CTA, capa): OK  (262 caracteres, 5 hashtags, capa em 1.2 s)
-9. integridade do arquivo: OK  (55.2 MB)
+9. integridade do arquivo: OK  (54.8 MB)
 
 APROVADO nos automáticos
 Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep14_porta/revisao

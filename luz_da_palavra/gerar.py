@@ -781,7 +781,7 @@ def renderiza(rot, arqs, voz, tempos, saida, provisorio):
     escur, contraste = Escurece(), {}
     parts = particulas()
     # com emenda o botão "Comente" sai 1,5 s depois de entrar a última fala: o fim fica igual ao começo
-    fim_cta = (tempos[-1][0] + 1.5) if rot.get("emenda") else 1e9
+    fim_cta = min(tempos[-1][0] + 1.5, dur - 1.5) if rot.get("emenda") else 1e9   # última fala curta: o botão sai >= 1,5 s antes do fim
     ganchos_t = [tempos[0][0]] + [tp[0] for c, tp in zip(cenas, tempos) if c.get("card") or c.get("cta")]
     rev_t = tempos[rot["revelacao"]][0] if "revelacao" in rot else None
     flash_cor = Image.new("RGBA", (W, H), (255, 214, 140, 255))
