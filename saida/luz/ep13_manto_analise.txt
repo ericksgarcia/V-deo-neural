@@ -3,13 +3,13 @@ Analistas automáticos · ep13_manto.mp4
 1. técnico: OK  (53.3 s, -15.7 LUFS, pico -1.3 dBFS)
 2. zona segura (TikTok): OK  (referencia y210-248, titulo y395-684, cartao y581-707, legenda y862-1243, cta y1244-1357, contagem y1380-1451)
 3. ritmo: OK  (16 cenas)
-4. emenda (loop): OK  (diferença de fundo 0.7, sobra 0.14 s · "Foi numa caverna, quando Davi podia matar o rei. Cortou só um pedaço de pano.")
+4. emenda (loop): OK  (diferença de fundo 1.4, sobra 0.14 s · "Foi numa caverna, quando Davi podia matar o rei. Cortou só um pedaço de pano.")
 5. som (música e narração): OK  (música -20.6 dB sob a voz, -15.8 dB nas pausas, presente 100.0%)
-6. contraste do texto: OK  (pior brilho atrás do texto 112.2)
+6. contraste do texto: OK  (pior brilho atrás do texto 111.0)
 7. ortografia: 0 FALHA, 1 AVISO  (76 palavras conferidas)
     AVISO: fora do dicionário (conferir grafia): embaixo
 8. post (legenda, CTA, capa): OK  (241 caracteres, 5 hashtags, capa em 1.2 s)
-9. integridade do arquivo: OK  (49.2 MB)
+9. integridade do arquivo: OK  (48.6 MB)
 
 APROVADO nos automáticos
 Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep13_manto/revisao
