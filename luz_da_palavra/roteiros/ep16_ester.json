@@ -46,13 +46,13 @@
     {"img": 5, "fala": "O rei perguntou: o que fazer a quem eu quero *honrar*?", "card": "QUEM O REI HONRA?"},
     {"img": 6, "fala": "Hamã pensou: *sou eu*. E sugeriu veste real e cavalo.", "card": "HAMÃ PENSOU: SOU EU!"},
     {"img": 6, "fala": "Era *Mardoqueu*. E o próprio Hamã o conduziu pela praça.", "card": "ERA MARDOQUEU"},
-    {"img": 6, "fala": "Hamã gritava: assim se faz a quem o rei *honra*.", "card": "HAMÃ APREGOAVA"},
+    {"img": 6, "fala": "Hamã apregoava: assim se faz a quem o rei *honra*.", "card": "HAMÃ APREGOAVA"},
     {"img": 7, "fala": "No fim, Hamã foi enforcado na *própria* forca.", "card": "NA PRÓPRIA FORCA"},
     {"img": 7, "fala": "Se tudo parece contra você, esta história é *pra você*.", "card": "ISSO É PRA VOCÊ"},
     {"img": 5, "fala": "Quem se surpreendeu mais? Comenta *HAMÃ* ou *MARDOQUEU*.", "cta": "HAMÃ OU MARDOQUEU?"},
-    {"img": 0, "fala": "E tudo isso começou quando", "card": "TUDO COMEÇOU QUANDO…"}
+    {"img": 0, "fala": "E tudo isso aconteceu depois que", "card": "ACONTECEU DEPOIS…"}
   ],
-  "emenda": "E tudo isso começou quando Hamã fez uma forca para Mardoqueu. Mas o rei não dormiu.",
+  "emenda": "E tudo isso aconteceu depois que Hamã fez uma forca para Mardoqueu. Mas o rei não dormiu.",
   "estilo_extra": "'Naquela noite, o rei não conseguiu dormir' is the quiet hinge: hushed, slow. 'Era Mardoqueu' is the revelation: a short astonished pause before it. 'Se tudo parece contra você' is the tenderest, most personal line. Never shout.",
   "revelacao": 10,
   "velocidade": 0.94,
