@@ -251,5 +251,33 @@
   "capa_ms": 1200,
   "ia_gerado": false,
   "legenda_linha1": "Hamã fez uma forca para Mardoqueu 😮 Mas naquela noite o rei não conseguiu dormir, e foi Hamã quem teve de honrá-lo pela praça."
+ },
+ {
+  "slug": "ep17_vento",
+  "rede": "tiktok",
+  "canal": "luzdapalavraamem",
+  "post_id": "6aeb2314787ed748d0d0ac39",
+  "modo": "customScheduled",
+  "quando": "2026-11-04 12:20",
+  "agendado_para": "2026-11-05T10:50:00.000Z",
+  "video_url": "https://pub-cd071ac800384b009eaf3ddab42583fe.r2.dev/luz/pendentes/ep17_vento.mp4",
+  "r2_chave": "luz/pendentes/ep17_vento.mp4",
+  "capa_ms": 1200,
+  "ia_gerado": false,
+  "legenda_linha1": "Pedro andou sobre a água 🌊 Mas afundou quando viu o vento, e Jesus estendeu a mão na hora."
+ },
+ {
+  "slug": "ep17_vento",
+  "rede": "instagram",
+  "canal": "luzdapalavraamen",
+  "post_id": "6aeb23165702dd92b44684b5",
+  "modo": "customScheduled",
+  "quando": "2026-11-04 12:20",
+  "agendado_para": "2026-11-05T10:50:00.000Z",
+  "video_url": "https://pub-cd071ac800384b009eaf3ddab42583fe.r2.dev/luz/pendentes/ep17_vento.mp4",
+  "r2_chave": "luz/pendentes/ep17_vento.mp4",
+  "capa_ms": 1200,
+  "ia_gerado": false,
+  "legenda_linha1": "Pedro andou sobre a água 🌊 Mas afundou quando viu o vento, e Jesus estendeu a mão na hora."
  }
 ]
