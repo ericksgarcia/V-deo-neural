@@ -1,0 +1,17 @@
+Analistas automáticos · ep15_jonas.mp4
+
+1. técnico: 0 FALHA, 1 AVISO  (56.5 s, -15.8 LUFS, pico -1.3 dBFS)
+    AVISO: duração 56.5 s (alvo 40-55 s)
+2. zona segura (TikTok): OK  (referencia y210-254, titulo y390-699, cartao y581-689, legenda y909-1195, cta y1244-1357, contagem y1380-1451)
+3. ritmo: OK  (17 cenas)
+4. emenda (loop): OK  (diferença de fundo 1.1, sobra 0.17 s · "A verdade é que, desde o começo, Jonas fugiu de Deus porque sabia que Deus perdoaria.")
+5. som (música e narração): 0 FALHA, 1 AVISO  (música -20.9 dB sob a voz, -15.7 dB nas pausas, presente 100.0%)
+    AVISO: nível do som no fim (-25 dB) e no começo (-13 dB) muito diferentes: o loop pula
+6. contraste do texto: OK  (pior brilho atrás do texto 116.0)
+7. ortografia: 0 FALHA, 1 AVISO  (96 palavras conferidas)
+    AVISO: fora do dicionário (conferir grafia): embaixo
+8. post (legenda, CTA, capa): OK  (320 caracteres, 5 hashtags, capa em 1.2 s)
+9. integridade do arquivo: OK  (54.9 MB)
+
+APROVADO nos automáticos
+Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep15_jonas/revisao
