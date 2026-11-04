@@ -10,7 +10,7 @@ Analistas automáticos · ep16_ester.mp4
 7. ortografia: 0 FALHA, 1 AVISO  (90 palavras conferidas)
     AVISO: fora do dicionário (conferir grafia): crônicas, côvados, embaixo
 8. post (legenda, CTA, capa): OK  (301 caracteres, 5 hashtags, capa em 1.2 s)
-9. integridade do arquivo: OK  (69.1 MB)
+9. integridade do arquivo: OK  (71.1 MB)
 
 APROVADO nos automáticos
 Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep16_ester/revisao

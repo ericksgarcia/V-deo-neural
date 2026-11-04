@@ -27,30 +27,94 @@
   "imagens": [
     "ultra realistic photograph of a deep night sky full of bright stars and the Milky Way above dark desert hills, rich saturated colors, razor sharp 4K detail",
     "tall straight dark cedar tree trunks in a misty mountain forest at dusk with golden light between them, vivid colors, ultra realistic photograph",
-    "a full moon rising over ancient gnarled olive trees on a hillside at night, silver and deep blue tones, ultra realistic photograph",
+    "a full moon rising over ancient gnarled olive trees on an empty rocky hillside at night, wild grass and stones, silver and deep blue tones, sharp detail",
     "a small clay oil lamp with a flickering flame on a rough stone surface in darkness, warm glow, shallow depth of field, ultra realistic photograph",
-    "an aged parchment scroll partly unrolled on dark weathered wood in warm lamp light, shallow depth of field, ultra realistic photograph",
+    "an aged smooth parchment scroll partly unrolled on dark weathered wood in warm oil lamp light, shallow depth of field, sharp detail",
     "golden sunrise over wide desert plains and distant mountains with long warm light, vivid colors, ultra realistic photograph",
     "a white horse walking across a sunlit green meadow with mountains behind, golden light, vivid colors, ultra realistic photograph",
     "dramatic storm clouds parting with bright rays of light over a rugged mountain range, vivid colors, ultra realistic photograph"
   ],
   "cenas": [
-    {"img": 0, "fala": "Hamã fez uma *forca* para Mardoqueu. Mas o rei não *dormiu*.", "titulo": true},
-    {"img": 0, "fala": "Tudo mudou numa *noite*. Quase ninguém repara.", "card": "TUDO MUDOU NUMA NOITE"},
-    {"img": 1, "fala": "A forca tinha *cinquenta* côvados. Isso agradou a Hamã.", "card": "50 CÔVADOS DE ALTURA"},
-    {"img": 2, "fala": "Naquela noite, o rei não *conseguiu* dormir.", "card": "O REI NÃO DORMIU"},
-    {"img": 3, "fala": "Mandou ler o livro das *crônicas*…", "card": "O LIVRO DAS CRÔNICAS"},
-    {"img": 4, "fala": "Ali estava: Mardoqueu *denunciara* uma conspiração contra o rei.", "card": "MARDOQUEU AVISOU O REI"},
-    {"img": 4, "fala": "O rei perguntou que honra ele *recebeu*. Nada.", "card": "NADA FOI FEITO"},
-    {"img": 5, "fala": "Nesse instante, Hamã *chegou* para pedir a forca…", "card": "HAMÃ CHEGOU"},
-    {"img": 5, "fala": "O rei perguntou: o que fazer a quem eu quero *honrar*?", "card": "QUEM O REI HONRA?"},
-    {"img": 6, "fala": "Hamã pensou: *sou eu*. E sugeriu veste real e cavalo.", "card": "HAMÃ PENSOU: SOU EU!"},
-    {"img": 6, "fala": "Era *Mardoqueu*. E o próprio Hamã o conduziu pela praça.", "card": "ERA MARDOQUEU"},
-    {"img": 6, "fala": "Hamã apregoava: assim se faz a quem o rei *honra*.", "card": "HAMÃ APREGOAVA"},
-    {"img": 7, "fala": "No fim, Hamã foi enforcado na *própria* forca.", "card": "NA PRÓPRIA FORCA"},
-    {"img": 7, "fala": "Se tudo parece contra você, esta história é *pra você*.", "card": "ISSO É PRA VOCÊ"},
-    {"img": 5, "fala": "Quem se surpreendeu mais? Comenta *HAMÃ* ou *MARDOQUEU*.", "cta": "HAMÃ OU MARDOQUEU?"},
-    {"img": 0, "fala": "E tudo isso aconteceu depois que", "card": "ACONTECEU DEPOIS…"}
+    {
+      "img": 0,
+      "fala": "Hamã fez uma *forca* para Mardoqueu. Mas o rei não *dormiu*.",
+      "titulo": true
+    },
+    {
+      "img": 0,
+      "fala": "Tudo mudou numa *noite*. Quase ninguém repara.",
+      "card": "TUDO MUDOU NUMA NOITE"
+    },
+    {
+      "img": 1,
+      "fala": "A forca tinha *cinquenta* côvados. Isso agradou a Hamã.",
+      "card": "50 CÔVADOS DE ALTURA"
+    },
+    {
+      "img": 2,
+      "fala": "Naquela noite, o rei não *conseguiu* dormir.",
+      "card": "O REI NÃO DORMIU"
+    },
+    {
+      "img": 3,
+      "fala": "Mandou ler o livro das *crônicas*…",
+      "card": "O LIVRO DAS CRÔNICAS"
+    },
+    {
+      "img": 4,
+      "fala": "Ali estava: Mardoqueu *denunciara* uma conspiração contra o rei.",
+      "card": "MARDOQUEU AVISOU O REI"
+    },
+    {
+      "img": 4,
+      "fala": "O rei perguntou que honra ele *recebeu*. Nada.",
+      "card": "NADA FOI FEITO"
+    },
+    {
+      "img": 5,
+      "fala": "Nesse instante, Hamã *chegou* para pedir a forca…",
+      "card": "HAMÃ CHEGOU"
+    },
+    {
+      "img": 5,
+      "fala": "O rei perguntou: o que fazer a quem eu quero *honrar*?",
+      "card": "QUEM O REI HONRA?"
+    },
+    {
+      "img": 6,
+      "fala": "Hamã pensou: *sou eu*. E sugeriu veste real e cavalo.",
+      "card": "HAMÃ PENSOU: SOU EU!"
+    },
+    {
+      "img": 6,
+      "fala": "Era *Mardoqueu*. E o próprio Hamã o conduziu pela praça.",
+      "card": "ERA MARDOQUEU"
+    },
+    {
+      "img": 6,
+      "fala": "Hamã apregoava: assim se faz a quem o rei *honra*.",
+      "card": "HAMÃ APREGOAVA"
+    },
+    {
+      "img": 7,
+      "fala": "No fim, Hamã foi enforcado na *própria* forca.",
+      "card": "NA PRÓPRIA FORCA"
+    },
+    {
+      "img": 7,
+      "fala": "Se tudo parece contra você, esta história é *pra você*.",
+      "card": "ISSO É PRA VOCÊ"
+    },
+    {
+      "img": 5,
+      "fala": "Quem se surpreendeu mais? Comenta *HAMÃ* ou *MARDOQUEU*.",
+      "cta": "HAMÃ OU MARDOQUEU?"
+    },
+    {
+      "img": 0,
+      "fala": "E tudo isso aconteceu depois que",
+      "card": "ACONTECEU DEPOIS…"
+    }
   ],
   "emenda": "E tudo isso aconteceu depois que Hamã fez uma forca para Mardoqueu. Mas o rei não dormiu.",
   "estilo_extra": "'Naquela noite, o rei não conseguiu dormir' is the quiet hinge: hushed, slow. 'Era Mardoqueu' is the revelation: a short astonished pause before it. 'Se tudo parece contra você' is the tenderest, most personal line. Never shout.",
