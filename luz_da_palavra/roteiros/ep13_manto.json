@@ -1,0 +1,122 @@
+{
+  "tema_id": "davi-manto-saul-caverna",
+  "tema": "Davi poupou Saul na caverna, cortou só a ponta do manto do rei e o coração dele doeu por isso (1 Samuel)",
+  "slug": "ep13_manto",
+  "ref": "1 SAMUEL 24:1-20",
+  "titulo": [
+    "DAVI PODIA",
+    "MATAR O REI E CORTOU",
+    "SÓ UM PEDAÇO DE PANO"
+  ],
+  "fatos": [
+    "1Sm 24:1-2: avisaram Saul de que Davi estava no deserto de En-Gedi; Saul tomou três mil homens escolhidos de todo o Israel e foi procurar Davi.",
+    "1Sm 24:3: Saul entrou numa caverna; Davi e seus homens estavam no fundo da caverna.",
+    "1Sm 24:4: os homens de Davi lhe disseram: Eis o dia de que o SENHOR te falou: entrego o teu inimigo nas tuas mãos, faze-lhe como parecer bem aos teus olhos.",
+    "1Sm 24:4: Davi se levantou e, mansamente (sem ser notado), cortou a orla (a ponta) do manto de Saul.",
+    "1Sm 24:5: depois disso, o coração de Davi lhe batia (o feriu, ele sentiu remorso) por ter cortado a orla do manto de Saul.",
+    "1Sm 24:6-7: Davi disse que o SENHOR o guardasse de estender a mão contra o ungido do SENHOR; com essas palavras conteve seus homens e não os deixou se levantar contra Saul. Saul saiu da caverna e seguiu seu caminho.",
+    "1Sm 24:8: Davi saiu da caverna e gritou por trás de Saul: Ó rei, meu senhor!",
+    "1Sm 24:11: Davi mostrou a orla do manto na sua mão e disse que, ao cortá-la, não o matou.",
+    "1Sm 24:16-17: Saul levantou a voz e chorou, e disse a Davi: Mais justo és tu do que eu, pois me pagaste com bem e eu te paguei com mal."
+  ],
+  "ganchos": [
+    "Davi podia matar o rei. Cortou só um pedaço de pano. [ESCOLHIDO: contradição concreta + choque \"só\", 11 palavras]",
+    "Três mil soldados caçavam Davi. Ele achou o rei numa caverna.",
+    "Davi cortou o manto do rei, e o coração dele doeu."
+  ],
+  "imagens": [
+    "a dramatic desert canyon with golden limestone cliffs and a dark cave opening glowing in warm sunset light, vivid colors",
+    "a rugged rocky desert wilderness of golden cliffs at sunrise with a lone acacia tree, long shadows, vivid colors",
+    "the dark entrance of a limestone cave with a beam of golden light falling inside, dust floating in the light, dramatic",
+    "deep inside a dark cave, a single beam of warm light on rough stone walls, shallow depth of field, mysterious",
+    "a close up of a folded deep purple wool cloth with a frayed hem lying on rough sandstone, warm light, shallow depth of field",
+    "a lush desert oasis waterfall cascading into a turquoise pool between golden cliffs, vivid colors",
+    "wild ibex standing on a high rocky cliff ledge at golden hour, dramatic sky, vivid colors",
+    "a golden sunrise over layered desert mountains above a calm blue sea, brilliant rays of light, vivid colors"
+  ],
+  "cenas": [
+    {
+      "img": 0,
+      "fala": "Davi podia matar o rei. Cortou só um pedaço de *pano*.",
+      "titulo": true
+    },
+    {
+      "img": 0,
+      "fala": "E o que aconteceu depois quase ninguém *percebe*.",
+      "card": "UM DETALHE ESCONDIDO"
+    },
+    {
+      "img": 1,
+      "fala": "Saul levou *três mil* soldados para caçar Davi.",
+      "card": "TRÊS MIL SOLDADOS"
+    },
+    {
+      "img": 2,
+      "fala": "Saul entrou numa caverna. Davi e seus homens estavam no *fundo*.",
+      "card": "NO FUNDO DA CAVERNA"
+    },
+    {
+      "img": 3,
+      "fala": "Os homens disseram a Davi: *hoje* é o dia!",
+      "card": "HOJE É O DIA!"
+    },
+    {
+      "img": 3,
+      "fala": "Davi se levantou, sem fazer *barulho*…"
+    },
+    {
+      "img": 4,
+      "fala": "Cortou só a ponta do manto do rei. E *parou*.",
+      "card": "E PAROU"
+    },
+    {
+      "img": 4,
+      "fala": "Logo depois, o coração de Davi *doeu*…",
+      "card": "O CORAÇÃO DOEU"
+    },
+    {
+      "img": 4,
+      "fala": "Doeu por ter cortado um *pedaço* de pano.",
+      "card": "SÓ POR UM PANO"
+    },
+    {
+      "img": 5,
+      "fala": "E segurou os homens: ninguém *toca* no ungido de Deus!",
+      "card": "NINGUÉM TOCA"
+    },
+    {
+      "img": 5,
+      "fala": "Saul saiu. Davi gritou: *meu* senhor, o rei!",
+      "card": "MEU SENHOR, O REI!"
+    },
+    {
+      "img": 6,
+      "fala": "Mostrou o pedaço do manto: eu *podia* ter te matado.",
+      "card": "PODIA TER MATADO"
+    },
+    {
+      "img": 6,
+      "fala": "Saul *chorou*: você é mais justo do que eu.",
+      "card": "SAUL CHOROU"
+    },
+    {
+      "img": 7,
+      "fala": "Se você já poupou quem te feriu, isso é *pra você*.",
+      "card": "ISSO É PRA VOCÊ"
+    },
+    {
+      "img": 7,
+      "fala": "Você teria poupado o rei? Comenta *SIM* ou *NÃO*.",
+      "cta": "SIM OU NÃO?"
+    },
+    {
+      "img": 0,
+      "fala": "Tudo isso aconteceu numa caverna, quando",
+      "card": "NUMA CAVERNA…"
+    }
+  ],
+  "emenda": "Tudo isso aconteceu numa caverna, quando Davi podia matar o rei. Cortou só um pedaço de pano.",
+  "estilo_extra": "'Davi se levantou, sem fazer barulho' is a hushed, tense whisper. 'Logo depois, o coração de Davi doeu' is the revelation beat: a quiet, astonished pause before it. 'Saul chorou alto' is moved and tender. 'Se você já poupou quem te feriu' is the tenderest, most personal line. Never shout.",
+  "revelacao": 7,
+  "legenda": "Davi podia matar o rei. Cortou só um pedaço de pano ✂️ E o que aconteceu depois quase ninguém percebe.\nVocê teria poupado o rei? Comenta SIM ou NÃO aqui embaixo. 👇\nManda pra quem precisa perdoar alguém hoje.\n\n#davi #biblia #fe #1samuel #deus"
+}
