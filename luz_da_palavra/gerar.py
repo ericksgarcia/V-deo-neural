@@ -15,6 +15,7 @@ import base64
 import hashlib
 import io
 import json
+import math
 import os
 import re
 import subprocess
@@ -393,7 +394,7 @@ def cauda(rot):
 
 def le_musica(segundos, arquivo=MUSICA):
     """Música de fundo mono 48 kHz (os primeiros `segundos`)."""
-    p = subprocess.run(["ffmpeg", "-v", "error", "-i", arquivo, "-t", f"{segundos:.2f}", "-ac", "1", "-ar", str(SR),
+    p = subprocess.run(["ffmpeg", "-v", "error", "-i", arquivo, "-t", f"{math.ceil(segundos * 100) / 100:.2f}", "-ac", "1", "-ar", str(SR),
                         "-f", "f32le", "-"], capture_output=True, check=True)
     x = np.frombuffer(p.stdout, np.float32).copy()
     if len(x) < int(segundos * SR):
