@@ -1,0 +1,16 @@
+Analistas automáticos · ep16_ester.mp4
+
+1. técnico: 0 FALHA, 1 AVISO  (58.2 s, -15.1 LUFS, pico -1.4 dBFS)
+    AVISO: duração 58.2 s (alvo 40-55 s)
+2. zona segura (TikTok): OK  (referencia y209-247, titulo y380-723, cartao y591-700, legenda y861-1222, cta y1244-1357, contagem y1380-1451)
+3. ritmo: OK  (16 cenas)
+4. emenda (loop): OK  (diferença de fundo 0.7, sobra 0.18 s · "E tudo isso aconteceu depois que Hamã fez uma forca para Mardoqueu. Mas o rei não dormiu.")
+5. som (música e narração): OK  (música -20.3 dB sob a voz, -17.1 dB nas pausas, presente 100.0%)
+6. contraste do texto: OK  (pior brilho atrás do texto 112.0)
+7. ortografia: 0 FALHA, 1 AVISO  (90 palavras conferidas)
+    AVISO: fora do dicionário (conferir grafia): crônicas, côvados, embaixo
+8. post (legenda, CTA, capa): OK  (301 caracteres, 5 hashtags, capa em 1.2 s)
+9. integridade do arquivo: OK  (69.1 MB)
+
+APROVADO nos automáticos
+Pacote para os analistas Claude (fatos, imagens, tela): /home/user/V-deo-neural/.cache/luz/ep16_ester/revisao
