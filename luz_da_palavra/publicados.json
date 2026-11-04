@@ -223,5 +223,33 @@
   "capa_ms": 1200,
   "ia_gerado": false,
   "legenda_linha1": "Jonas fugiu de Deus porque sabia que Deus perdoaria 🌊 E quando Deus perdoou, ele ficou furioso. O livro termina com uma pergunta sem resposta."
+ },
+ {
+  "slug": "ep16_ester",
+  "rede": "tiktok",
+  "canal": "luzdapalavraamem",
+  "post_id": "6aeb1c6cdabf2501c091d9ad",
+  "modo": "customScheduled",
+  "quando": "2026-11-04 11:52",
+  "agendado_para": "2026-11-04T23:30:00.000Z",
+  "video_url": "https://pub-cd071ac800384b009eaf3ddab42583fe.r2.dev/luz/pendentes/ep16_ester.mp4",
+  "r2_chave": "luz/pendentes/ep16_ester.mp4",
+  "capa_ms": 1200,
+  "ia_gerado": false,
+  "legenda_linha1": "Hamã fez uma forca para Mardoqueu 😮 Mas naquela noite o rei não conseguiu dormir, e foi Hamã quem teve de honrá-lo pela praça."
+ },
+ {
+  "slug": "ep16_ester",
+  "rede": "instagram",
+  "canal": "luzdapalavraamen",
+  "post_id": "6aeb1c6c400b4e9be06c1f99",
+  "modo": "customScheduled",
+  "quando": "2026-11-04 11:52",
+  "agendado_para": "2026-11-04T23:30:00.000Z",
+  "video_url": "https://pub-cd071ac800384b009eaf3ddab42583fe.r2.dev/luz/pendentes/ep16_ester.mp4",
+  "r2_chave": "luz/pendentes/ep16_ester.mp4",
+  "capa_ms": 1200,
+  "ia_gerado": false,
+  "legenda_linha1": "Hamã fez uma forca para Mardoqueu 😮 Mas naquela noite o rei não conseguiu dormir, e foi Hamã quem teve de honrá-lo pela praça."
  }
 ]
