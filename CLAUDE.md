@@ -46,9 +46,8 @@ Este repositório contém SÓ esse canal (o antigo canal de simulações de IA f
 - **Transições:** fusão suave entre imagens (dissolve de 1 s com desfoque/brilho leve). **Sem soco de zoom** e sem corte seco.
 - **Música de fundo (02/nov/2026):** a trilha do dono (`luz_da_palavra/musica/trilha.m4a`, já cortada a partir de 3:55),
   baixa: -15 dB da voz nas pausas e ~-21 dB debaixo da fala (+3 dB, dono 02/nov) (o gerador mede e o analista de som cobra).
-- **Instagram (03/nov/2026):** todo vídeo também vai para o Instagram (Reel, canal `luzdapalavraamen` no Buffer) no MESMO horário do TikTok, mesma
-  legenda e capa, rótulo de IA desmarcado. O `publicar.py` já cria os dois posts; `--redes instagram` agenda só o Instagram de um episódio
-  que já está no TikTok (usa o horário dele).
+- **Instagram (05/nov/2026): NÃO é automático.** O dono desligou a postagem automática no Instagram; o `publicar.py` agenda só o TikTok.
+  `--redes instagram` agenda o Reel de um episódio já enviado ao TikTok (mesmo horário), mas só se o dono pedir.
 - **Publicação (02/nov/2026):** TikTok pelo Buffer (`publicar.py`), **agendado nos horários 07:50, 11:50, 16:50 e 20:30 de
   Brasília** (o próximo livre depois do último agendado), capa = quadro do título (as redes não aceitam imagem de capa avulsa),
   legenda do post = `legenda` do roteiro, **rótulo "gerado por IA" DESMARCADO**. Vídeo no Cloudflare R2 (bucket público

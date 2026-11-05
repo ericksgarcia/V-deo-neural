@@ -82,8 +82,8 @@ python luz_da_palavra/publicar.py --lista                # Cloudflare: pendentes
 python luz_da_palavra/publicar.py --arruma               # move para luz/enviados/ o que já foi publicado
 ```
 
-Desde 03/nov/2026 o mesmo comando também agenda o Reel no Instagram (canal `luzdapalavraamen`), no mesmo horário do TikTok; `--redes instagram`
-agenda só o Instagram de um episódio já enviado ao TikTok.
+O Instagram deixou de ser automático em 05/nov/2026: o comando agenda só o TikTok. `--redes instagram` agenda o Reel (canal `luzdapalavraamen`)
+de um episódio já enviado ao TikTok, no mesmo horário, só quando o dono pedir.
 `publicados.json` (no git) guarda cada envio (post do Buffer, link, chave no R2): impede post duplicado.
 Chaves: segredos do ambiente injetados pelo proxy em `api.buffer.com` e `api.cloudflare.com` (Authorization: Bearer).
 

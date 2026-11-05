@@ -1,4 +1,4 @@
-"""Publica um episódio pronto no TikTok e no Instagram (Reels) pelo Buffer, nos MESMOS horários (dono, 02-03/nov/2026).
+"""Publica um episódio pronto no TikTok pelo Buffer (dono, 02/nov/2026). Instagram só manual: --redes instagram (dono desligou o automático em 05/nov/2026).
 
     python luz_da_palavra/publicar.py <roteiro> --aprovados fatos,imagens,tela,som,post     # agenda no próximo horário livre
     python luz_da_palavra/publicar.py <roteiro> --aprovados ... --agora                     # publica já
@@ -39,7 +39,8 @@ PUBLICADOS = os.path.join(AQUI, "publicados.json")
 ANALISTAS = ["fatos", "imagens", "tela", "som", "post"]
 BUFFER = "https://api.buffer.com"
 REDE = "tiktok"                           # canal que manda na fila de horários
-REDES = ["tiktok", "instagram"]            # dono, 03/nov/2026: Instagram nos mesmos horários do TikTok
+REDES = ["tiktok", "instagram"]            # redes que o script sabe usar
+REDES_PADRAO = ["tiktok"]                  # dono, 05/nov/2026: Instagram NÃO é mais automático (só com --redes instagram)
 IA_GERADO = False                         # dono, 02/nov/2026: rótulo "gerado por IA" desmarcado
 BRT = ZoneInfo("America/Sao_Paulo")
 HORARIOS = [(7, 50), (11, 50), (16, 50), (20, 30)]     # dono, 02/nov/2026 (horário de Brasília)
@@ -369,7 +370,7 @@ def main():
     ap.add_argument("--aprovados", default="", help="os 5 analistas Claude com APROVADO: " + ",".join(ANALISTAS))
     ap.add_argument("--agora", action="store_true", help="publica já, em vez do próximo horário livre")
     ap.add_argument("--quando", help="data/hora (Brasília se sem fuso), ex.: 2026-11-03T20:30")
-    ap.add_argument("--redes", default=",".join(REDES), help="redes: tiktok,instagram (padrão: as duas, mesmo horário)")
+    ap.add_argument("--redes", default=",".join(REDES_PADRAO), help="redes: tiktok,instagram (padrão: só tiktok; instagram só se pedido)")
     ap.add_argument("--status", action="store_true")
     ap.add_argument("--fila", action="store_true")
     ap.add_argument("--lista", action="store_true")
